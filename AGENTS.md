@@ -67,6 +67,7 @@ python3 ../rimi/scripts/build_mobile_assets.py --with-english   # 重新生成 c
 - 同步：读本地 userdb → 与上次快照比对 push 增量（含墓碑）→ pull 远端增量 → 直接写回 userdb
   → 有写入则 `updateConfig()` 重启引擎，让新词立刻参与候选排序。
 - 触发：设置页「立即同步」；`RimiCloudSyncWork` 周期后台同步（默认 360 分钟，可调，≥15）。
+- 退出登录会清空同步游标/快照：公钥已删除后无法判断「换没换账户」，不能把上个账户的游标带下去。
   键盘可见时后台任务主动让路（`TrimeInputMethodService.isInputViewShowing`）。
 - 代码地图（`app/src/main/java/com/osfans/trime/data/rimi/`）：
   `RimiCloud`（认证 + HTTP）、`RimiDictSync`（同步算法/快照）、`RimiUserDb`（JNI TSV 桥）、

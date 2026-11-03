@@ -174,7 +174,9 @@ object RimiCloud {
             .remove(KEY_LEVEL)
             .remove(KEY_ROLE)
             .apply()
-        // 不清同步游标/快照：同一账户重新登录时继续增量；换账户由 login() 比对公钥后重置
+        // 退出即清同步基线：公钥已删除后 login() 无从判断"换没换账户"，
+        // 若把上个账户的游标/快照留给下一个账户，会漏拉/错推。
+        RimiDictSync.resetSyncState()
     }
 
     /** 返回可用 access token；过期或 force 时用本地 seed 静默重登。 */
