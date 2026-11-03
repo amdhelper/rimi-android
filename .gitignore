@@ -9,6 +9,9 @@
 # Gradle files
 .gradle/
 build/
+# rimi: 预编译 RIME 数据（librime prebuilt_data_dir）必须进仓库
+!app/src/main/assets/shared/build/
+!app/src/main/assets/shared/build/**
 
 # Local configuration file (sdk path, etc)
 local.properties

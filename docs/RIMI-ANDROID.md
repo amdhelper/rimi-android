@@ -10,12 +10,14 @@
 - [x] 深色键盘主题（Catppuccin Mocha，与桌面 rimi_dark 同色板）
 - [x] HarmonyOS 4.3 真机（PLR-AL30）安装、启用、部署、nihao→你好 / baizhu→白术 实测
 
-## M2 — 首启体验
+## M2 — 首启体验（已完成 2026-11-04）
 
-- [ ] 预置编译产物（`assets/shared/build/*.bin`）：把真机编译一次的 table.bin/prism.bin 固化，首启秒开
-- [ ] 默认方案必为「日弥」：首次部署完成后写 `user.yaml` 的 `var/previously_selected_schema`
-- [ ] 键盘布局品牌化（空格键标「日弥」、候选栏样式、按键配色细节）
-- [ ] 引导页文案去 Trime 化（「同文输入法」→「日弥输入法」）
+- [x] 预置编译产物（`assets/shared/build/*.bin`）：真机部署一次的 table/prism/reverse 固化进 APK，
+      首启不再重编译 18MB 词库表；实测首启部署 8 秒内完成（之前 40s+）
+- [x] 默认方案锁定日弥：`schema_list` 第一位 = rimi，首次启动无 `previously_selected_schema` 时必落 rimi
+- [x] 引导页文案去 Trime 化：「同文输入法」→「日弥输入法」（简/繁/英三套）
+- [x] 默认存储模式改为「应用专属存储空间」，向导第 1 步不再要求先选外部目录
+- [ ] 键盘布局细节品牌化（空格键已显示「日弥」，候选栏圆角/间距再打磨）
 
 ## M3 — wumi 账户与词库同步
 

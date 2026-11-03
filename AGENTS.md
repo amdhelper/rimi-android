@@ -32,6 +32,30 @@ systemd-run --user --scope -p MemoryMax=12G -p MemorySwapMax=2G -- bash -lc '
   运行期 `DataManager.syncExtraOpenCC()` 合并进 `shared/opencc`
 - 默认方案列表在 `UserDataManager.SCHEMA_LIST_CUSTOM_PATCH`（rimi 第一，luna_pinyin 兜底）
 
+## 预编译数据（首启加速）
+
+`app/src/main/assets/shared/build/` 内置了在真机部署一次后拉回的编译产物
+（`rimi.mobile.table.bin` 18MB / `rimi.prism.bin` / `rimi.mobile.reverse.bin` /
+`luna_pinyin.*` / `stroke.*` / 编译后的 `default.yaml`、`*.schema.yaml`），
+放在这里等价于 librime 的 `prebuilt_data_dir`（shared_data_dir/build），
+有它时首启直接复用，不再花 ~40s 从 26MB 词库源码重编译。
+
+重生成步骤（改了词库/方案或升级 librime 后必须做）：
+
+```bash
+adb shell rm -rf /sdcard/Android/data/com.rimi.ime.debug/files/rime/build
+adb shell am broadcast -a com.rimi.ime.debug.action.DEPLOY   # 或 App 内点「部署」
+adb pull /sdcard/Android/data/com.rimi.ime.debug/files/rime/build /tmp/rimi_prebuilt
+cp /tmp/rimi_prebuilt/build/* app/src/main/assets/shared/build/
+python3 ../rimi/scripts/build_mobile_assets.py --with-english   # 重新生成 checksums.json 前的资产
+./gradlew :app:assembleDebug
+```
+
+- 词库源码（cn_dicts/en_dicts）仍随包发布，预编译产物失效时 librime 会按 checksum 自动回退重编译
+- 首次部署细节：词库表用 checksum 判断（内容哈希），方案 YAML 用 mtime 判断；
+  所以我们保留源码也不会触发 18MB 重编译
+- 注意 APK 体积：预编译数据让 debug APK 从 30MB 涨到 48MB，release 需评估裁剪
+
 ## 品牌与主题
 
 - applicationId `com.rimi.ime`（debug 变体 `.debug`）；namespace 暂留 `com.osfans.trime`
