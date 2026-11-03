@@ -77,6 +77,8 @@ python3 ../rimi/scripts/build_mobile_assets.py --with-english   # 重新生成 c
 - ⚠️ 新增 native 源文件必须显式写进 `librime_jni/CMakeLists.txt`：`aux_source_directory` 的结果在
   CMake configure 时固化，只放文件不重新 configure 不会进 so，运行期报 UnsatisfiedLinkError。
 - ⚠️ Kotlin 块注释可嵌套：KDoc 里写 `/rimi/dict/*` 会开启嵌套注释，编译报 "Unclosed comment"。
+- ⚠️ 输入法引擎持有 userdb 时，同进程 JNI 读/写都会失败（手动同步常在刚打完字之后）：
+  sync 里检测 `read == null` / `apply < 0`，`rime.updateConfig()` 释放句柄后重试（3×300ms）。
 - 实测（PLR-AL30 / Android 12）：seed 登录 → 云端 push `云同步测试` → 手机同步（拉取 1 应用 1）
   → 打 `yuntongbuceshi` 候选出现该词；手机提交候选生成 `你好` → 同步上传 1 → 云端 `/rimi/dict/status` = 2 条。
 
