@@ -1,0 +1,247 @@
+# Rimi 词库 — 易经·术数 (六十四卦/卦爻辞/紫微斗数)
+# 生成自倪海厦知识库 (raw/伤寒金匮讲稿等) + 经典白名单
+# 生成时间: 2026-08-16
+# 编码格式: rime 全拼 (空格分隔音节)
+---
+name: rimi.yijing
+version: "1.0.0"
+sort: by_weight
+use_preset_vocabulary: false
+max_phrase_length: 9
+min_phrase_weight: 100
+...
+
+乾为天	qian wei tian	750
+坤为地	kun wei di	750
+水雷屯	shui lei tun	750
+山水蒙	shan shui meng	750
+水天需	shui tian xu	750
+天水讼	tian shui song	750
+地水师	di shui shi	750
+水地比	shui di bi	750
+风天小畜	feng tian xiao chu	750
+天泽履	tian ze lv	750
+地天泰	di tian tai	750
+天地否	tian di fou	750
+天火同人	tian huo tong ren	750
+火天大有	huo tian da you	750
+地山谦	di shan qian	750
+雷地豫	lei di yu	750
+泽雷随	ze lei sui	750
+山风蛊	shan feng gu	750
+地泽临	di ze lin	750
+风地观	feng di guan	750
+火雷噬嗑	huo lei shi ke	750
+山火贲	shan huo bi	750
+山地剥	shan di bo	750
+地雷复	di lei fu	750
+天雷无妄	tian lei wu wang	750
+山天大畜	shan tian da chu	750
+山雷颐	shan lei yi	750
+泽风大过	ze feng da guo	750
+坎为水	kan wei shui	750
+离为火	li wei huo	750
+泽山咸	ze shan xian	750
+雷风恒	lei feng heng	750
+天山遁	tian shan dun	750
+雷天大壮	lei tian da zhuang	750
+火地晋	huo di jin	750
+地火明夷	di huo ming yi	750
+风火家人	feng huo jia ren	750
+火泽睽	huo ze kui	750
+水山蹇	shui shan jian	750
+雷水解	lei shui jie	750
+山泽损	shan ze sun	750
+风雷益	feng lei yi	750
+泽天夬	ze tian guai	750
+天风姤	tian feng gou	750
+泽地萃	ze di cui	750
+地风升	di feng sheng	750
+泽水困	ze shui kun	750
+水风井	shui feng jing	750
+泽火革	ze huo ge	750
+火风鼎	huo feng ding	750
+震为雷	zhen wei lei	750
+艮为山	gen wei shan	750
+风山渐	feng shan jian	750
+雷泽归妹	lei ze gui mei	750
+雷火丰	lei huo feng	750
+火山旅	huo shan lv	750
+巽为风	xun wei feng	750
+兑为泽	dui wei ze	750
+风水涣	feng shui huan	750
+水泽节	shui ze jie	750
+风泽中孚	feng ze zhong fu	750
+雷山小过	lei shan xiao guo	750
+水火既济	shui huo ji ji	750
+火水未济	huo shui wei ji	750
+元亨利贞	yuan heng li zhen	750
+潜龙勿用	qian long wu yong	750
+见龙在田	jian long zai tian	750
+飞龙在天	fei long zai tian	750
+亢龙有悔	kang long you hui	750
+履霜坚冰至	lv shuang jian bing zhi	750
+厚德载物	hou de zai wu	750
+自强不息	zi qiang bu xi	750
+天行健	tian xing jian	750
+地势坤	di shi kun	750
+穷则变	qiong ze bian	750
+变则通	bian ze tong	750
+通则久	tong ze jiu	750
+六十四卦	liu shi si gua	750
+先天八卦	xian tian ba gua	750
+后天八卦	hou tian ba gua	750
+紫微斗数	zi wei dou shu	750
+兄弟宫	xiong di gong	750
+夫妻宫	fu qi gong	750
+子女宫	zi nv gong	750
+财帛宫	cai bo gong	750
+疾厄宫	ji e gong	750
+迁移宫	qian yi gong	750
+仆役宫	pu yi gong	750
+官禄宫	guan lu gong	750
+田宅宫	tian zhai gong	750
+福德宫	fu de gong	750
+父母宫	fu mu gong	750
+乾	qian	700
+坤	kun	700
+屯	tun	700
+蒙	meng	700
+需	xu	700
+讼	song	700
+师	shi	700
+比	bi	700
+小畜	xiao chu	700
+履	lv	700
+泰	tai	700
+否	fou	700
+同人	tong ren	700
+大有	da you	700
+谦	qian	700
+豫	yu	700
+随	sui	700
+蛊	gu	700
+临	lin	700
+观	guan	700
+噬嗑	shi ke	700
+贲	bi	700
+剥	bo	700
+复	fu	700
+无妄	wu wang	700
+大畜	da chu	700
+颐	yi	700
+大过	da guo	700
+坎	kan	700
+离	li	700
+咸	xian	700
+恒	heng	700
+遁	dun	700
+大壮	da zhuang	700
+晋	jin	700
+明夷	ming yi	700
+家人	jia ren	700
+睽	kui	700
+蹇	jian	700
+解	jie	700
+损	sun	700
+益	yi	700
+夬	guai	700
+姤	gou	700
+萃	cui	700
+升	sheng	700
+困	kun	700
+井	jing	700
+革	ge	700
+鼎	ding	700
+震	zhen	700
+艮	gen	700
+渐	jian	700
+归妹	gui mei	700
+丰	feng	700
+旅	lv	700
+巽	xun	700
+兑	dui	700
+涣	huan	700
+节	jie	700
+中孚	zhong fu	700
+小过	xiao guo	700
+既济	ji ji	700
+未济	wei ji	700
+初九	chu jiu	700
+九二	jiu er	700
+九三	jiu san	700
+九四	jiu si	700
+九五	jiu wu	700
+上九	shang jiu	700
+初六	chu liu	700
+六二	liu er	700
+六三	liu san	700
+六四	liu si	700
+六五	liu wu	700
+上六	shang liu	700
+用九	yong jiu	700
+用六	yong liu	700
+阴阳	yin yang	700
+太极	tai ji	700
+两仪	liang yi	700
+四象	si xiang	700
+八卦	ba gua	700
+爻	yao	700
+彖	tuan	700
+象	xiang	700
+系辞	xi ci	700
+文言	wen yan	700
+说卦	shuo gua	700
+序卦	xu gua	700
+杂卦	za gua	700
+河图	he tu	700
+洛书	luo shu	700
+错卦	cuo gua	700
+综卦	zong gua	700
+互卦	hu gua	700
+变卦	bian gua	700
+本卦	ben gua	700
+之卦	zhi gua	700
+卦气	gua qi	700
+纳甲	na jia	700
+世应	shi ying	700
+飞伏	fei fu	700
+六亲	liu qin	700
+六神	liu shen	700
+官鬼	guan gui	700
+父母	fu mu	700
+兄弟	xiong di	700
+妻财	qi cai	700
+子孙	zi sun	700
+青龙	qing long	700
+朱雀	zhu que	700
+勾陈	gou chen	700
+螣蛇	teng she	700
+白虎	bai hu	700
+玄武	xuan wu	700
+命宫	ming gong	700
+身宫	shen gong	700
+大限	da xian	700
+小限	xiao xian	700
+流年	liu nian	700
+流月	liu yue	700
+流日	liu ri	700
+四化	si hua	700
+化禄	hua lu	700
+化权	hua quan	700
+化科	hua ke	700
+化忌	hua ji	700
+擎羊	qing yang	700
+陀罗	tuo luo	700
+火星	huo xing	700
+铃星	ling xing	700
+地空	di kong	700
+地劫	di jie	700
+左辅	zuo fu	700
+右弼	you bi	700
+文昌	wen chang	700
+文曲	wen qu	700
+天魁	tian kui	700
+天钺	tian yue	700
+禄存	lu cun	700
+天马	tian ma	700

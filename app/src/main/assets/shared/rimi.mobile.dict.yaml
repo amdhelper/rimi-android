@@ -1,0 +1,17 @@
+# Rimi 移动端词库（由 scripts/build_mobile_assets.py 生成，勿手改）
+# 底座 = 8105 字表 + 基础词库；专业词库 = rimi.medical / yijing / zwds_bazi / shushu
+---
+name: rimi.mobile
+version: "1.0.0"
+sort: by_weight
+use_preset_vocabulary: true
+max_phrase_length: 9
+min_phrase_weight: 100
+import_tables:
+  - cn_dicts/8105
+  - rimi.medical
+  - rimi.yijing
+  - rimi.zwds_bazi
+  - rimi.shushu
+  - cn_dicts/base
+...

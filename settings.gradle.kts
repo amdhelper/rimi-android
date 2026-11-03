@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "trime"
+rootProject.name = "rimi-android"
 include(":app")
 include(":codegen")

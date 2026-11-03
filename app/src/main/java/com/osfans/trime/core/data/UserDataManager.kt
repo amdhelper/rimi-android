@@ -44,6 +44,7 @@ object UserDataManager {
     private const val SCHEMA_LIST_CUSTOM_PATCH = """
       patch:
         schema_list:
+          - schema: rimi
           - schema: luna_pinyin
           - schema: luna_pinyin_simp
     """

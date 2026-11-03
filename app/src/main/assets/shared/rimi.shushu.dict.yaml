@@ -1,0 +1,483 @@
+# Rimi 专用词库 — 术数大全（紫微格局·八字格局/神煞·六爻·奇门·六壬·梅花·风水择日·通用命理）
+# 与 rimi.zwds_bazi（基础术语）互补：本库聚焦「格局专名词 + 各术数术语 + 神煞 + 占卜词汇」
+# 编码格式：Rime 全拼（空格分隔音节）
+---
+name: rimi.shushu
+version: "1.0.0"
+sort: by_weight
+use_preset_vocabulary: false
+max_phrase_length: 12
+min_phrase_weight: 80
+...
+火贪格	huo tan ge	950
+铃贪格	ling tan ge	950
+武贪格	wu tan ge	950
+紫贪格	zi tan ge	900
+廉贪格	lian tan ge	900
+泛水桃花	fan shui tao hua	950
+阳梁昌禄	yang liang chang lu	950
+紫府同宫	zi fu tong gong	950
+日月同宫	ri yue tong gong	950
+武府同宫	wu fu tong gong	900
+紫相朝垣	zi xiang chao yuan	950
+君臣庆会	jun chen qing hui	900
+三奇嘉会	san qi jia hui	900
+巨火羊	ju huo yang	900
+火铃夹命	huo ling jia ming	900
+羊陀夹忌	yang tuo jia ji	900
+空劫夹命	kong jie jia ming	900
+双禄朝垣	shuang lu chao yuan	900
+马头带剑	ma tou dai jian	950
+财荫夹印	cai yin jia yin	900
+青龙伏匿	qing long fu ni	900
+朱雀乘风	zhu que cheng feng	900
+玄武当权	xuan wu dang quan	900
+白虎持势	bai hu chi shi	900
+贪武同行	tan wu tong xing	900
+紫微七杀	zi wei qi sha	900
+武曲七杀	wu qu qi sha	900
+廉贞七杀	lian zhen qi sha	900
+巨日同宫	ju ri tong gong	900
+日月辉映	ri yue hui ying	900
+日月反背	ri yue fan bei	900
+日月并明	ri yue bing ming	900
+日出扶桑	ri chu fu sang	900
+月朗天门	yue lang tian men	900
+月落亥宫	yue luo hai gong	900
+日丽中天	ri li zhong tian	900
+明禄暗禄	ming lu an lu	900
+禄逢冲破	lu feng chong po	900
+化忌对冲	hua ji dui chong	900
+的格	di ge	850
+杀破狼格	sha po lang ge	850
+紫微坐命	zi wei zuo ming	850
+天府坐命	tian fu zuo ming	850
+庙旺平陷	miao wang ping xian	850
+平陷	ping xian	850
+入庙	ru miao	850
+落陷	luo xian	850
+八座	ba zuo	800
+三台	san tai	800
+天姚	tian yao	800
+咸池	xian chi	800
+桃花	tao hua	800
+沐浴	mu yu	800
+长生	chang sheng	800
+十二长生	shi er chang sheng	900
+临官	lin guan	800
+帝旺	di wang	800
+衰	shuai	780
+病	bing	780
+死	si	780
+墓	mu	780
+绝	jue	780
+胎	tai	780
+养	yang	780
+冠带	guan dai	800
+胎元	tai yuan	800
+命宫主星	ming gong zhu xing	850
+身宫入命	shen gong ru ming	850
+身命同宫	shen ming tong gong	850
+命宫午	ming gong wu	780
+命宫子	ming gong zi	780
+命宫寅	ming gong yin	780
+命宫申	ming gong shen	780
+命宫卯	ming gong mao	780
+命宫酉	ming gong you	780
+命宫巳	ming gong si	780
+命宫亥	ming gong hai	780
+命宫辰	ming gong chen	780
+命宫戌	ming gong xu	780
+命宫丑	ming gong chou	780
+命宫未	ming gong wei	780
+曲直格	qu zhi ge	950
+炎上格	yan shang ge	950
+稼穑格	jia se ge	950
+从革格	cong ge ge	950
+润下格	run xia ge	950
+化气格	hua qi ge	950
+专旺格	zhuan wang ge	900
+从旺格	cong wang ge	900
+从财格	cong cai ge	900
+从杀格	cong sha ge	900
+从儿格	cong er ge	900
+扶桑格	fu sang ge	900
+羊刃驾杀	yang ren jia sha	950
+伤官见官	shang guan jian guan	950
+枭神夺食	xiao shen duo shi	950
+财多身弱	cai duo shen ruo	950
+身强财旺	shen qiang cai wang	950
+比劫夺财	bi jie duo cai	950
+官杀混杂	guan sha hun za	950
+食神制杀	shi shen zhi sha	950
+杀印相生	sha yin xiang sheng	950
+伤官配印	shang guan pei yin	950
+归禄格	gui lu ge	900
+六阴朝阳	liu yin chao yang	900
+六乙鼠贵	liu yi shu gui	900
+魁罡格	kui gang ge	900
+金神格	jin shen ge	900
+井栏叉格	jing lan cha ge	900
+飞天禄马	fei tian lu ma	900
+子丑遥巳	zi chou yao si	900
+丑遥巳禄	chou yao si lu	900
+杂气格	za qi ge	880
+五行独旺	wu xing du wang	850
+五行偏枯	wu xing pian ku	820
+旺衰	wang shuai	850
+通根透干	tong gen tou gan	900
+用神有力	yong shen you li	900
+忌神有制	ji shen you zhi	880
+身旺用财	shen wang yong cai	850
+身弱用印	shen ruo yong yin	850
+十神生克	shi shen sheng ke	900
+六亲十神	liu qin shi shen	850
+十神定位	shi shen ding wei	850
+天乙贵人	tian yi gui ren	950
+天德贵人	tian de gui ren	950
+月德贵人	yue de gui ren	950
+文昌贵人	wen chang gui ren	950
+福星贵人	fu xing gui ren	950
+国印贵人	guo yin gui ren	950
+太极贵人	tai ji gui ren	950
+天医	tian yi	900
+金舆	jin yu	900
+驿马	yi ma	900
+将星	jiang xing	900
+学堂	xue tang	850
+词馆	ci guan	850
+禄神	lu shen	900
+羊刃	yang ren	900
+劫煞	jie sha	850
+灾煞	zai sha	850
+勾陈	gou chen	850
+腾蛇	teng she	850
+空亡	kong wang	850
+旬空	xun kong	850
+六甲空亡	liu jia kong wang	850
+孤鸾煞	gu luan sha	850
+阴差阳错	yin cha yang cuo	850
+十恶大败	shi e da bai	850
+四废	si fei	820
+八专	ba zhuan	820
+元辰	yuan chen	820
+大耗	da hao	820
+小耗	xiao hao	820
+天罗地网	tian luo di wang	900
+血光	xue guang	820
+血刃	xue ren	820
+飞刃	fei ren	820
+丧门	sang men	820
+吊客	diao ke	820
+进神	jin shen	820
+退神	tui shen	820
+通书	tong shu	820
+黄历	huang li	820
+万年历	wan nian li	850
+命理	ming li	950
+算命	suan ming	920
+批命	pi ming	900
+排八字	pai ba zi	900
+排紫微	pai zi wei	900
+合婚	he hun	880
+看相	kan xiang	850
+手相	shou xiang	820
+面相	mian xiang	820
+测字	ce zi	820
+姓名学	xing ming xue	880
+起名	qi ming	850
+改运	gai yun	820
+化解	hua jie	820
+趋吉避凶	qu ji bi xiong	920
+风水师	feng shui shi	850
+算命师	suan ming shi	850
+命理师	ming li shi	850
+占卜	zhan bu	850
+预测	yu ce	820
+本命年	ben ming nian	900
+犯太岁	fan tai sui	900
+冲太岁	chong tai sui	880
+合太岁	he tai sui	880
+刑太岁	xing tai sui	880
+害太岁	hai tai sui	880
+岁君	sui jun	820
+生肖	sheng xiao	850
+生肖属相	sheng xiao shu xiang	850
+流年运	liu nian yun	880
+运势	yun shi	780
+财运	cai yun	880
+事业运	shi ye yun	880
+学业运	xue ye yun	880
+婚姻运	hun yin yun	880
+健康运	jian kang yun	880
+贵人运	gui ren yun	880
+桃花运	tao hua yun	880
+功名	gong ming	820
+破财	po cai	820
+是非	shi fei	820
+口舌	kou she	820
+官非	guan fei	820
+病灾	bing zai	820
+血光之灾	xue guang zhi zai	850
+天灾人祸	tian zai ren huo	820
+子孙缘	zi sun yuan	820
+子女缘	zi nv yuan	820
+姻缘	yin yuan	900
+正缘	zheng yuan	880
+配偶	pei ou	850
+父母双亲	fu mu shuang qin	850
+兄弟姐妹	xiong di jie mei	850
+六亲缘	liu qin yuan	820
+六爻	liu yao	950
+六爻预测	liu yao yu ce	900
+装卦	zhuang gua	850
+摇卦	yao gua	880
+起卦	qi gua	880
+金钱卦	jin qian gua	880
+铜钱卦	tong qian gua	850
+断卦	duan gua	880
+卦象	gua xiang	880
+卦辞	gua ci	850
+爻辞	yao ci	850
+世爻	shi yao	900
+应爻	ying yao	900
+用神	yong shen	900
+原神	yuan shen	900
+忌神	ji shen	900
+仇神	chou shen	900
+伏神	fu shen	850
+飞神	fei shen	850
+动爻	dong yao	900
+变爻	bian yao	900
+本卦	ben gua	880
+变卦	bian gua	880
+互卦	hu gua	880
+错卦	cuo gua	850
+综卦	zong gua	850
+兄弟	xiong di	880
+子孙	zi sun	880
+妻财	qi cai	880
+官鬼	guan gui	880
+六神	liu shen	880
+青龙	qing long	880
+朱雀	zhu que	880
+白虎	bai hu	880
+玄武	xuan wu	880
+月建	yue jian	880
+日辰	ri chen	880
+旺相	wang xiang	850
+休囚	xiu qiu	850
+飞伏	fei fu	820
+奇门遁甲	qi men dun jia	950
+奇门	qi men	950
+三奇	san qi	900
+六仪	liu yi	900
+三奇六仪	san qi liu yi	900
+八门	ba men	900
+九星	jiu xing	900
+八神	ba shen	900
+值符	zhi fu	900
+值使	zhi shi	900
+天盘	tian pan	880
+地盘	di pan	880
+阳遁	yang dun	880
+阴遁	yin dun	880
+九宫	jiu gong	880
+休门	xiu men	900
+生门	sheng men	900
+伤门	shang men	900
+杜门	du men	900
+景门	jing men	900
+死门	si men	900
+惊门	jing men	900
+开门	kai men	900
+天蓬	tian peng	880
+天芮	tian rui	880
+天冲	tian chong	880
+天辅	tian fu	880
+天禽	tian qin	880
+天心	tian xin	880
+天柱	tian zhu	880
+天任	tian ren	880
+天英	tian ying	880
+九天	jiu tian	850
+九地	jiu di	850
+排局	pai ju	850
+定局	ding ju	850
+超神	chao shen	850
+接气	jie qi	850
+正授	zheng shou	850
+置闰	zhi run	850
+拆补	chai bu	850
+时家奇门	shi jia qi men	880
+日家奇门	ri jia qi men	880
+月家奇门	yue jia qi men	880
+年家奇门	nian jia qi men	880
+飞盘奇门	fei pan qi men	880
+转盘奇门	zhuan pan qi men	880
+烟波钓叟	yan bo diao sou	880
+中宫	zhong gong	820
+大六壬	da liu ren	950
+小六壬	xiao liu ren	950
+六壬	liu ren	950
+四课	si ke	880
+三传	san chuan	880
+天地盘	tian di pan	880
+九宗门	jiu zong men	880
+贼克	zei ke	850
+比用	bi yong	850
+涉害	she hai	850
+遥克	yao ke	850
+昴星	mao xing	850
+别责	bie ze	850
+伏吟	fu yin	850
+返吟	fan yin	850
+初传	chu chuan	850
+中传	zhong chuan	850
+末传	mo chuan	850
+本命	ben ming	820
+行年	xing nian	820
+十二天将	shi er tian jiang	900
+天后	tian hou	850
+太常	tai chang	850
+天乙	tian yi	850
+贵人	gui ren	850
+金口诀	jin kou jue	880
+六壬占	liu ren zhan	880
+三式	san shi	880
+梅花易数	mei hua yi shu	950
+邵雍	shao yong	880
+观梅占	guan mei zhan	850
+体卦	ti gua	880
+用卦	yong gua	880
+体用	ti yong	880
+体用生克	ti yong sheng ke	880
+梅花	mei hua	850
+万物类象	wan wu lei xiang	850
+报数起卦	bao shu qi gua	850
+时间起卦	shi jian qi gua	850
+先天数	xian tian shu	850
+后天数	hou tian shu	850
+风水	feng shui	950
+理气	li qi	880
+形势	xing shi	880
+峦头	luan tou	880
+玄空	xuan kong	880
+玄空飞星	xuan kong fei xing	900
+飞星	fei xing	880
+三元九运	san yuan jiu yun	900
+八宅	ba zhai	880
+坐向	zuo xiang	880
+罗盘	luo pan	880
+龙穴	long xue	880
+砂水	sha shui	850
+明堂	ming tang	850
+朝山	chao shan	850
+案山	an shan	850
+水口	shui kou	850
+阴宅	yin zhai	880
+阳宅	yang zhai	880
+择日	ze ri	880
+黄道吉日	huang dao ji ri	900
+吉日	ji ri	880
+宜忌	yi ji	850
+动土	dong tu	850
+搬迁	ban qian	850
+安床	an chuang	850
+嫁娶	jia qu	850
+开市	kai shi	850
+出行	chu xing	850
+入宅	ru zhai	850
+祈福	qi fu	820
+祭祀	ji si	820
+作灶	zuo zao	820
+掘井	jue jing	820
+上梁	shang liang	820
+竖柱	shu zhu	820
+安门	an men	820
+修造	xiu zao	820
+迁坟	qian fen	850
+安葬	an zang	850
+下葬	xia zang	850
+破土	po tu	850
+谢土	xie tu	820
+化煞	hua sha	850
+化解煞气	hua jie sha qi	850
+乾为天	qian wei tian	880
+坤为地	kun wei di	880
+水雷屯	shui lei zhun	850
+山水蒙	shan shui meng	850
+水天需	shui tian xu	850
+天水讼	tian shui song	850
+地水师	di shui shi	850
+水地比	shui di bi	850
+风天小畜	feng tian xiao chu	850
+天泽履	tian ze lv	850
+地天泰	di tian tai	850
+天地否	tian di pi	850
+天火同人	tian huo tong ren	850
+火天大有	huo tian da you	850
+地山谦	di shan qian	850
+雷地豫	lei di yu	850
+泽雷随	ze lei sui	850
+山风蛊	shan feng gu	850
+地泽临	di ze lin	850
+风地观	feng di guan	850
+火雷噬嗑	huo lei shi ke	850
+山火贲	shan huo bi	850
+山地剥	shan di bo	850
+地雷复	di lei fu	850
+天雷无妄	tian lei wu wang	850
+山天大畜	shan tian da xu	850
+山雷颐	shan lei yi	850
+泽风大过	ze feng da guo	850
+坎为水	kan wei shui	880
+离为火	li wei huo	880
+泽山咸	ze shan xian	850
+雷风恒	lei feng heng	850
+天山遁	tian shan dun	850
+雷天大壮	lei tian da zhuang	850
+火地晋	huo di jin	850
+地火明夷	di huo ming yi	850
+风火家人	feng huo jia ren	850
+火泽睽	huo ze kui	850
+水山蹇	shui shan jian	850
+雷水解	lei shui jie	850
+山泽损	shan ze sun	850
+风雷益	feng lei yi	850
+泽天夬	ze tian guai	850
+天风姤	tian feng gou	850
+泽地萃	ze di cui	850
+地风升	di feng sheng	850
+泽水困	ze shui kun	850
+水风井	shui feng jing	850
+泽火革	ze huo ge	850
+火风鼎	huo feng ding	850
+震为雷	zhen wei lei	880
+艮为山	gen wei shan	880
+风山渐	feng shan jian	850
+雷泽归妹	lei ze gui mei	850
+雷火丰	lei huo feng	850
+火山旅	huo shan lv	850
+巽为风	xun wei feng	880
+兑为泽	dui wei ze	880
+风水涣	feng shui huan	850
+水泽节	shui ze jie	850
+风泽中孚	feng ze zhong fu	850
+雷山小过	lei shan xiao guo	850
+水火既济	shui huo ji ji	850
+火水未济	huo shui wei ji	850
+上卦	shang gua	820
+下卦	xia gua	820
+卦爻	gua yao	850
+六十四卦	liu shi si gua	900
+象曰	xiang yue	820
+彖曰	tuan yue	820
+文言	wen yan	820
+系辞	xi ci	820
+说卦	shuo gua	820
+序卦	xu gua	820
+杂卦	za gua	820
+否极泰来	pi ji tai lai	880
+亢龙有悔	kang long you hui	880
+群龙无首	qun long wu shou	880

@@ -1,0 +1,226 @@
+# Rimi 词库 — 紫微斗数·八字命理
+# 覆盖：紫微斗数十二宫、星曜、四化，以及八字干支、十神、五行、格局、运势
+# 编码格式：Rime 全拼（空格分隔音节）
+---
+name: rimi.zwds_bazi
+version: "1.0.0"
+sort: by_weight
+use_preset_vocabulary: false
+max_phrase_length: 9
+min_phrase_weight: 100
+...
+
+# 总纲
+紫微斗数	zi wei dou shu	1000
+八字命理	ba zi ming li	1000
+子平术	zi ping shu	850
+命盘	ming pan	900
+命局	ming ju	900
+命宫	ming gong	950
+身宫	shen gong	900
+本命盘	ben ming pan	850
+流年盘	liu nian pan	850
+排盘	pai pan	900
+起盘	qi pan	850
+命主	ming zhu	850
+身主	shen zhu	850
+星曜	xing yao	800
+宫位	gong wei	800
+四柱	si zhu	950
+年柱	nian zhu	900
+月柱	yue zhu	900
+日柱	ri zhu	900
+时柱	shi zhu	900
+日主	ri zhu	1000
+日元	ri yuan	950
+用神	yong shen	1000
+喜神	xi shen	950
+忌神	ji shen	950
+仇神	chou shen	800
+
+# 紫微斗数十二宫
+十二宫	shi er gong	950
+兄弟宫	xiong di gong	900
+夫妻宫	fu qi gong	900
+子女宫	zi nv gong	900
+财帛宫	cai bo gong	900
+疾厄宫	ji e gong	900
+迁移宫	qian yi gong	900
+仆役宫	pu yi gong	850
+交友宫	jiao you gong	850
+官禄宫	guan lu gong	900
+事业宫	shi ye gong	850
+田宅宫	tian zhai gong	900
+福德宫	fu de gong	900
+父母宫	fu mu gong	900
+三方四正	san fang si zheng	900
+命宫三方四正	ming gong san fang si zheng	850
+
+# 紫微斗数十四主星与常用星曜
+紫微	zi wei	1000
+天机	tian ji	1000
+太阳	tai yang	1000
+武曲	wu qu	1000
+天同	tian tong	1000
+廉贞	lian zhen	1000
+天府	tian fu	1000
+太阴	tai yin	1000
+贪狼	tan lang	1000
+巨门	ju men	1000
+天相	tian xiang	1000
+天梁	tian liang	1000
+七杀	qi sha	1000
+破军	po jun	1000
+左辅	zuo fu	850
+右弼	you bi	850
+文昌	wen chang	900
+文曲	wen qu	900
+天魁	tian kui	850
+天钺	tian yue	850
+禄存	lu cun	900
+天马	tian ma	900
+擎羊	qing yang	850
+陀罗	tuo luo	850
+火星	huo xing	850
+铃星	ling xing	850
+地空	de kong	850
+地劫	de jie	850
+红鸾	hong luan	800
+天喜	tian xi	800
+华盖	hua gai	750
+孤辰	gu chen	750
+寡宿	gua su	750
+
+# 四化、格局与限运
+四化	si hua	950
+化禄	hua lu	950
+化权	hua quan	950
+化科	hua ke	950
+化忌	hua ji	950
+生年四化	sheng nian si hua	850
+飞星	fei xing	850
+飞化	fei hua	850
+自化	zi hua	850
+宫干	gong gan	800
+同宫	tong gong	750
+会照	hui zhao	750
+杀破狼	sha po lang	900
+机月同梁	ji yue tong liang	850
+府相朝垣	fu xiang chao yuan	850
+昌曲同宫	chang qu tong gong	750
+禄马交驰	lu ma jiao chi	750
+羊陀夹命	yang tuo jia ming	750
+大限	da xian	950
+小限	xiao xian	850
+流年	liu nian	1000
+流月	liu yue	850
+太岁	tai sui	850
+斗君	dou jun	800
+流禄	liu lu	750
+流权	liu quan	750
+流科	liu ke	750
+流忌	liu ji	750
+
+# 天干地支与历法
+天干	tian gan	1000
+地支	de zhi	1000
+十天干	shi tian gan	900
+十二地支	shi er di zhi	900
+甲	jia	850
+乙	yi	850
+丙	bing	850
+丁	ding	850
+戊	wu	850
+己	ji	850
+庚	geng	850
+辛	xin	850
+壬	ren	850
+癸	gui	850
+子	zi	850
+丑	chou	850
+寅	yin	850
+卯	mao	850
+辰	chen	850
+巳	si	850
+午	wu	850
+未	wei	850
+申	shen	850
+酉	you	850
+戌	xu	850
+亥	hai	850
+干支	gan zhi	950
+六十甲子	liu shi jia zi	950
+纳音	na yin	900
+月令	yue ling	1000
+节气	jie qi	900
+
+# 八字十神、五行与旺衰
+十神	shi shen	1000
+比肩	bi jian	900
+劫财	jie cai	900
+食神	shi shen	950
+伤官	shang guan	950
+正财	zheng cai	950
+偏财	pian cai	950
+正官	zheng guan	950
+七杀	qi sha	950
+正印	zheng yin	950
+偏印	pian yin	950
+枭神	xiao shen	850
+财星	cai xing	850
+官星	guan xing	850
+印星	yin xing	850
+食伤	shi shang	850
+比劫	bi jie	850
+五行	wu xing	1000
+金	jin	850
+木	mu	850
+水	shui	850
+火	huo	850
+土	tu	850
+得令	de ling	900
+失令	shi ling	850
+得地	de di	850
+身强	shen qiang	900
+身弱	shen ruo	900
+从强	cong qiang	800
+从弱	cong ruo	800
+
+# 八字组合、格局与运势
+天干五合	tian gan wu he	850
+地支六合	de zhi liu he	850
+地支三合	de zhi san he	850
+地支三会	de zhi san hui	850
+地支六冲	de zhi liu chong	850
+地支相刑	de zhi xiang xing	850
+地支相害	de zhi xiang hai	850
+地支相破	de zhi xiang po	850
+合化	he hua	850
+透干	tou gan	900
+藏干	cang gan	900
+通根	tong gen	900
+刑冲合害	xing chong he hai	900
+正官格	zheng guan ge	850
+七杀格	qi sha ge	850
+正财格	zheng cai ge	850
+偏财格	pian cai ge	850
+正印格	zheng yin ge	850
+食神格	shi shen ge	850
+伤官格	shang guan ge	850
+建禄格	jian lu ge	800
+羊刃格	yang ren ge	800
+从格	cong ge	800
+调候	tiao hou	950
+寒暖燥湿	han nuan zao shi	850
+通关	tong guan	900
+扶抑	fu yi	850
+大运	da yun	1000
+起运	qi yun	900
+交运	jiao yun	900
+顺行	shun xing	800
+逆行	ni xing	800
+岁运并临	sui yun bing lin	850
+伏吟	fu yin	850
+反吟	fan yin	850
+天克地冲	tian ke di chong	900
+运势	yun shi	850

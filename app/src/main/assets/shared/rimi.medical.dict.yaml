@@ -1,0 +1,1550 @@
+# Rimi 词库 — 医学·中医 (伤寒金匮方剂/中药/穴位/病证)
+# 生成自倪海厦知识库 (raw/伤寒金匮讲稿等) + 经典白名单
+# 生成时间: 2026-08-16
+# 编码格式: rime 全拼 (空格分隔音节)
+---
+name: rimi.medical
+version: "1.0.0"
+sort: by_weight
+use_preset_vocabulary: false
+max_phrase_length: 9
+min_phrase_weight: 100
+...
+
+桂枝汤	gui zhi tang	2145
+麻黄汤	ma huang tang	1595
+小柴胡汤	xiao chai hu tang	1360
+大承气汤	da cheng qi tang	1355
+石膏	shi gao	1310
+葛根汤	ge gen tang	1065
+承气汤	cheng qi tang	980
+白虎汤	bai hu tang	930
+小建中汤	xiao jian zhong tang	910
+麻黄	ma huang	900
+桂枝	gui zhi	900
+紫苏叶	zi su ye	900
+生姜	sheng jiang	900
+荆芥	jing jie	900
+防风	fang feng	900
+羌活	qiang huo	900
+白芷	bai zhi	900
+细辛	xi xin	900
+藁本	gao ben	900
+苍耳子	cang er zi	900
+辛夷	xin yi	900
+薄荷	bo he	900
+牛蒡子	niu bang zi	900
+蝉蜕	chan tui	900
+桑叶	sang ye	900
+菊花	ju hua	900
+蔓荆子	man jing zi	900
+柴胡	chai hu	900
+升麻	sheng ma	900
+葛根	ge gen	900
+浮萍	fu ping	900
+知母	zhi mu	900
+芦根	lu gen	900
+天花粉	tian hua fen	900
+竹叶	zhu ye	900
+栀子	zhi zi	900
+夏枯草	xia ku cao	900
+决明子	jue ming zi	900
+黄芩	huang qin	900
+黄连	huang lian	900
+黄柏	huang bo	900
+龙胆草	long dan cao	900
+秦皮	qin pi	900
+苦参	ku shen	900
+白鲜皮	bai xian pi	900
+金银花	jin yin hua	900
+连翘	lian qiao	900
+蒲公英	pu gong ying	900
+紫花地丁	zi hua di ding	900
+野菊花	ye ju hua	900
+穿心莲	chuan xin lian	900
+大青叶	da qing ye	900
+板蓝根	ban lan gen	900
+青黛	qing dai	900
+鱼腥草	yu xing cao	900
+败酱草	bai jiang cao	900
+射干	she gan	900
+山豆根	shan dou gen	900
+马勃	ma bo	900
+白头翁	bai tou weng	900
+马齿苋	ma chi xian	900
+鸦胆子	ya dan zi	900
+地锦草	di jin cao	900
+蚤休	zao xiu	900
+拳参	quan shen	900
+漏芦	lou lu	900
+土茯苓	tu fu ling	900
+熊胆	xiong dan	900
+千里光	qian li guang	900
+白花蛇舌草	bai hua she she cao	900
+山慈菇	shan ci gu	900
+生地黄	sheng di huang	900
+玄参	xuan shen	900
+牡丹皮	mu dan pi	900
+赤芍	chi shao	900
+紫草	zi cao	900
+水牛角	shui niu jiao	900
+青蒿	qing hao	900
+白薇	bai wei	900
+地骨皮	di gu pi	900
+银柴胡	yin chai hu	900
+胡黄连	hu huang lian	900
+大黄	da huang	900
+芒硝	mang xiao	900
+番泻叶	fan xie ye	900
+芦荟	lu hui	900
+火麻仁	huo ma ren	900
+郁李仁	yu li ren	900
+甘遂	gan sui	900
+京大戟	jing da ji	900
+芫花	yuan hua	900
+商陆	shang lu	900
+牵牛子	qian niu zi	900
+巴豆	ba dou	900
+千金子	qian jin zi	900
+独活	du huo	900
+威灵仙	wei ling xian	900
+川乌	chuan wu	900
+蕲蛇	qi she	900
+乌梢蛇	wu shao she	900
+木瓜	mu gua	900
+蚕沙	can sha	900
+伸筋草	shen jin cao	900
+寻骨风	xun gu feng	900
+松节	song jie	900
+海风藤	hai feng teng	900
+老鹳草	lao guan cao	900
+路路通	lu lu tong	900
+秦艽	qin jiao	900
+防己	fang ji	900
+桑枝	sang zhi	900
+豨莶草	xi xian cao	900
+臭梧桐	chou wu tong	900
+海桐皮	hai tong pi	900
+络石藤	luo shi teng	900
+雷公藤	lei gong teng	900
+穿山龙	chuan shan long	900
+丝瓜络	si gua luo	900
+五加皮	wu jia pi	900
+桑寄生	sang ji sheng	900
+狗脊	gou ji	900
+千年健	qian nian jian	900
+雪莲花	xue lian hua	900
+鹿衔草	lu xian cao	900
+石楠叶	shi nan ye	900
+藿香	huo xiang	900
+苍术	cang zhu	900
+厚朴	hou po	900
+砂仁	sha ren	900
+豆蔻	dou kou	900
+草豆蔻	cao dou kou	900
+草果	cao guo	900
+茯苓	fu ling	900
+薏苡仁	yi yi ren	900
+猪苓	zhu ling	900
+泽泻	ze xie	900
+冬瓜皮	dong gua pi	900
+玉米须	yu mi xu	900
+葫芦	hu lu	900
+香加皮	xiang jia pi	900
+枳壳	zhi ke	900
+车前子	che qian zi	900
+滑石	hua shi	900
+木通	mu tong	900
+通草	tong cao	900
+瞿麦	qu mai	900
+萹蓄	bian xu	900
+地肤子	di fu zi	900
+海金沙	hai jin sha	900
+石韦	shi wei	900
+冬葵子	dong kui zi	900
+灯心草	deng xin cao	900
+萆薢	bi xie	900
+茵陈蒿	yin chen hao	900
+金钱草	jin qian cao	900
+虎杖	hu zhang	900
+垂盆草	chui pen cao	900
+陈皮	chen pi	900
+青皮	qing pi	900
+枳实	zhi shi	900
+木香	mu xiang	900
+沉香	chen xiang	900
+檀香	tan xiang	900
+川楝子	chuan lian zi	900
+乌药	wu yao	900
+小茴香	xiao hui xiang	900
+荔枝核	li zhi he	900
+大腹皮	da fu pi	900
+柿蒂	shi di	900
+刀豆	dao dou	900
+甘松	gan song	900
+薤白	xie bai	900
+山楂	shan zha	900
+神曲	shen qu	900
+麦芽	mai ya	900
+谷芽	gu ya	900
+莱菔子	lai fu zi	900
+鸡内金	ji nei jin	900
+使君子	shi jun zi	900
+苦楝皮	ku lian pi	900
+槟榔	bing lang	900
+南瓜子	nan gua zi	900
+鹤草芽	he cao ya	900
+榧子	fei zi	900
+芜荑	wu yi	900
+鹤虱	he shi	900
+雷丸	lei wan	900
+贯众	guan zhong	900
+三七	san qi	900
+茜草	qian cao	900
+蒲黄	pu huang	900
+花蕊石	hua rui shi	900
+降香	jiang xiang	900
+白及	bai ji	900
+仙鹤草	xian he cao	900
+紫珠	zi zhu	900
+棕榈炭	zong lv tan	900
+血余炭	xue yu tan	900
+藕节	ou jie	900
+刺猬皮	ci wei pi	900
+炮姜	pao jiang	900
+艾叶	ai ye	900
+灶心土	zao xin tu	900
+川芎	chuan xiong	900
+延胡索	yan hu suo	900
+郁金	yu jin	900
+姜黄	jiang huang	900
+乳香	ru xiang	900
+没药	mo yao	900
+五灵脂	wu ling zhi	900
+夏天无	xia tian wu	900
+枫香脂	feng xiang zhi	900
+丹参	dan shen	900
+红花	hong hua	900
+桃仁	tao ren	900
+益母草	yi mu cao	900
+泽兰	ze lan	900
+牛膝	niu xi	900
+鸡血藤	ji xue teng	900
+王不留行	wang bu liu xing	900
+月季花	yue ji hua	900
+凌霄花	ling xiao hua	900
+马钱子	ma qian zi	900
+骨碎补	gu sui bu	900
+血竭	xue jie	900
+儿茶	er cha	900
+刘寄奴	liu ji nu	900
+莪术	e zhu	900
+三棱	san leng	900
+水蛭	shui zhi	900
+虻虫	meng chong	900
+斑蝥	ban mao	900
+穿山甲	chuan shan jia	900
+半夏	ban xia	900
+天南星	tian nan xing	900
+禹白附	yu bai fu	900
+芥子	jie zi	900
+皂荚	zao jia	900
+旋覆花	xuan fu hua	900
+白前	bai qian	900
+猫爪草	mao zhao cao	900
+桔梗	jie geng	900
+前胡	qian hu	900
+苦杏仁	ku xing ren	900
+紫苏子	zi su zi	900
+百部	bai bu	900
+紫菀	zi wan	900
+款冬花	kuan dong hua	900
+马兜铃	ma dou ling	900
+枇杷叶	pi pa ye	900
+桑白皮	sang bai pi	900
+葶苈子	ting li zi	900
+白果	bai guo	900
+矮地茶	ai di cha	900
+洋金花	yang jin hua	900
+华山参	hua shan shen	900
+罗汉果	luo han guo	900
+满山红	man shan hong	900
+朱砂	zhu sha	900
+磁石	ci shi	900
+龙骨	long gu	900
+琥珀	hu po	900
+牡蛎	mu li	900
+珍珠	zhen zhu	900
+珍珠母	zhen zhu mu	900
+石决明	shi jue ming	900
+赭石	zhe shi	900
+刺蒺藜	ci ji li	900
+罗布麻	luo bu ma	900
+羚羊角	ling yang jiao	900
+牛黄	niu huang	900
+钩藤	gou teng	900
+天麻	tian ma	900
+地龙	di long	900
+全蝎	quan xie	900
+蜈蚣	wu gong	900
+僵蚕	jiang can	900
+麝香	she xiang	900
+冰片	bing pian	900
+苏合香	su he xiang	900
+石菖蒲	shi chang pu	900
+蟾酥	chan su	900
+安息香	an xi xiang	900
+人参	ren shen	900
+西洋参	xi yang shen	900
+党参	dang shen	900
+太子参	tai zi shen	900
+黄芪	huang qi	900
+白术	bai zhu	900
+山药	shan yao	900
+白扁豆	bai bian dou	900
+甘草	gan cao	900
+大枣	da zao	900
+刺五加	ci wu jia	900
+绞股蓝	jiao gu lan	900
+红景天	hong jing tian	900
+沙棘	sha ji	900
+饴糖	yi tang	900
+蜂蜜	feng mi	900
+鹿茸	lu rong	900
+紫河车	zi he che	900
+淫羊藿	yin yang huo	900
+巴戟天	ba ji tian	900
+仙茅	xian mao	900
+杜仲	du zhong	900
+续断	xu duan	900
+肉苁蓉	rou cong rong	900
+锁阳	suo yang	900
+补骨脂	bu gu zhi	900
+益智仁	yi zhi ren	900
+菟丝子	tu si zi	900
+沙苑子	sha yuan zi	900
+蛤蚧	ge jie	900
+核桃仁	he tao ren	900
+冬虫夏草	dong chong xia cao	900
+韭菜子	jiu cai zi	900
+阳起石	yang qi shi	900
+紫石英	zi shi ying	900
+海狗肾	hai gou shen	900
+黄精	huang jing	900
+枸杞子	gou qi zi	900
+墨旱莲	mo han lian	900
+女贞子	nv zhen zi	900
+桑椹	sang shen	900
+黑芝麻	hei zhi ma	900
+龟甲	gui jia	900
+鳖甲	bie jia	900
+百合	bai he	900
+麦冬	mai dong	900
+天冬	tian dong	900
+石斛	shi hu	900
+玉竹	yu zhu	900
+沙参	sha shen	900
+山茱萸	shan zhu yu	900
+五味子	wu wei zi	900
+乌梅	wu mei	900
+诃子	he zi	900
+肉豆蔻	rou dou kou	900
+赤石脂	chi shi zhi	900
+禹余粮	yu yu liang	900
+莲子	lian zi	900
+芡实	qian shi	900
+覆盆子	fu pen zi	900
+金樱子	jin ying zi	900
+桑螵蛸	sang piao xiao	900
+海螵蛸	hai piao xiao	900
+小青龙汤	xiao qing long tang	895
+小承气汤	xiao cheng qi tang	895
+大陷胸汤	da xian xiong tang	875
+大柴胡汤	da chai hu tang	855
+阿胶	e jiao	855
+柴胡汤	chai hu tang	850
+百会	bai hui	850
+上星	shang xing	850
+囟会	xin hui	850
+前顶	qian ding	850
+神庭	shen ting	850
+素髎	su liao	850
+水沟	shui gou	850
+兑端	dui duan	850
+龈交	ken jiao	850
+承浆	cheng jiang	850
+廉泉	lian quan	850
+天突	tian tu	850
+璇玑	xuan ji	850
+华盖	hua gai	850
+紫宫	zi gong	850
+玉堂	yu tang	850
+膻中	dan zhong	850
+中庭	zhong ting	850
+鸠尾	jiu wei	850
+巨阙	ju que	850
+上脘	shang wan	850
+中脘	zhong wan	850
+建里	jian li	850
+下脘	xia wan	850
+水分	shui fen	850
+神阙	shen que	850
+阴交	yin jiao	850
+气海	qi hai	850
+石门	shi men	850
+关元	guan yuan	850
+中极	zhong ji	850
+曲骨	qu gu	850
+会阴	hui yin	850
+中府	zhong fu	850
+云门	yun men	850
+天府	tian fu	850
+侠白	xia bai	850
+尺泽	chi ze	850
+孔最	kong zui	850
+列缺	lie que	850
+经渠	jing qu	850
+太渊	tai yuan	850
+鱼际	yu ji	850
+少商	shao shang	850
+商阳	shang yang	850
+二间	er jian	850
+三间	san jian	850
+合谷	he gu	850
+阳溪	yang xi	850
+偏历	pian li	850
+温溜	wen liu	850
+下廉	xia lian	850
+上廉	shang lian	850
+手三里	shou san li	850
+曲池	qu chi	850
+肘髎	zhou liao	850
+手五里	shou wu li	850
+臂臑	bi nao	850
+肩髃	jian yu	850
+巨骨	ju gu	850
+天鼎	tian ding	850
+扶突	fu tu	850
+口禾髎	kou he liao	850
+迎香	ying xiang	850
+地仓	di cang	850
+大迎	da ying	850
+颊车	jia che	850
+下关	xia guan	850
+头维	tou wei	850
+天枢	tian shu	850
+滑肉门	hua rou men	850
+外陵	wai ling	850
+大巨	da ju	850
+水道	shui dao	850
+归来	gui lai	850
+气冲	qi chong	850
+髀关	bi guan	850
+伏兔	fu tu	850
+阴市	yin shi	850
+梁丘	liang qiu	850
+犊鼻	du bi	850
+足三里	zu san li	850
+上巨虚	shang ju xu	850
+条口	tiao kou	850
+下巨虚	xia ju xu	850
+丰隆	feng long	850
+解溪	jie xi	850
+冲阳	chong yang	850
+陷谷	xian gu	850
+内庭	nei ting	850
+厉兑	li dui	850
+隐白	yin bai	850
+大都	da du	850
+太白	tai bai	850
+公孙	gong sun	850
+商丘	shang qiu	850
+三阴交	san yin jiao	850
+漏谷	lou gu	850
+地机	di ji	850
+阴陵泉	yin ling quan	850
+血海	xue hai	850
+箕门	ji men	850
+冲门	chong men	850
+府舍	fu she	850
+腹结	fu jie	850
+大横	da heng	850
+腹哀	fu ai	850
+食窦	shi dou	850
+天溪	tian xi	850
+胸乡	xiong xiang	850
+周荣	zhou rong	850
+大包	da bao	850
+极泉	ji quan	850
+青灵	qing ling	850
+少海	shao hai	850
+灵道	ling dao	850
+通里	tong li	850
+阴郄	yin xi	850
+神门	shen men	850
+少府	shao fu	850
+少冲	shao chong	850
+少泽	shao ze	850
+前谷	qian gu	850
+后溪	hou xi	850
+腕骨	wan gu	850
+阳谷	yang gu	850
+养老	yang lao	850
+支正	zhi zheng	850
+小海	xiao hai	850
+肩贞	jian zhen	850
+臑俞	nao shu	850
+天宗	tian zong	850
+秉风	bing feng	850
+曲垣	qu yuan	850
+肩外俞	jian wai shu	850
+肩中俞	jian zhong shu	850
+天窗	tian chuang	850
+天容	tian rong	850
+颧髎	quan liao	850
+听宫	ting gong	850
+睛明	jing ming	850
+攒竹	zan zhu	850
+眉冲	mei chong	850
+曲差	qu cha	850
+五处	wu chu	850
+承光	cheng guang	850
+通天	tong tian	850
+络却	luo que	850
+玉枕	yu zhen	850
+天柱	tian zhu	850
+大杼	da zhu	850
+风门	feng men	850
+肺俞	fei shu	850
+厥阴俞	jue yin shu	850
+心俞	xin shu	850
+督俞	du shu	850
+膈俞	ge shu	850
+肝俞	gan shu	850
+胆俞	dan shu	850
+脾俞	pi shu	850
+胃俞	wei shu	850
+三焦俞	san jiao shu	850
+肾俞	shen shu	850
+气海俞	qi hai shu	850
+大肠俞	da chang shu	850
+关元俞	guan yuan shu	850
+小肠俞	xiao chang shu	850
+膀胱俞	pang guang shu	850
+中膂俞	zhong lv shu	850
+白环俞	bai huan shu	850
+上髎	shang liao	850
+次髎	ci liao	850
+中髎	zhong liao	850
+下髎	xia liao	850
+会阳	hui yang	850
+承扶	cheng fu	850
+殷门	yin men	850
+浮郄	fu xi	850
+委阳	wei yang	850
+委中	wei zhong	850
+附分	fu fen	850
+魄户	po hu	850
+膏肓	gao huang	850
+神堂	shen tang	850
+譩譆	yi xi	850
+膈关	ge guan	850
+魂门	hun men	850
+阳纲	yang gang	850
+意舍	yi she	850
+胃仓	wei cang	850
+肓门	huang men	850
+志室	zhi shi	850
+胞肓	bao huang	850
+秩边	zhi bian	850
+合阳	he yang	850
+承筋	cheng jin	850
+承山	cheng shan	850
+飞扬	fei yang	850
+跗阳	fu yang	850
+昆仑	kun lun	850
+仆参	pu shen	850
+申脉	shen mai	850
+金门	jin men	850
+京骨	jing gu	850
+束骨	shu gu	850
+足通谷	zu tong gu	850
+至阴	zhi yin	850
+涌泉	yong quan	850
+然谷	ran gu	850
+太溪	tai xi	850
+大钟	da zhong	850
+水泉	shui quan	850
+照海	zhao hai	850
+复溜	fu liu	850
+交信	jiao xin	850
+筑宾	zhu bin	850
+阴谷	yin gu	850
+横骨	heng gu	850
+大赫	da he	850
+气穴	qi xue	850
+四满	si man	850
+中注	zhong zhu	850
+肓俞	huang shu	850
+商曲	shang qu	850
+石关	shi guan	850
+阴都	yin dou	850
+腹通谷	fu tong gu	850
+幽门	you men	850
+步廊	bu lang	850
+神封	shen feng	850
+灵墟	ling xu	850
+神藏	shen cang	850
+彧中	yu zhong	850
+俞府	shu fu	850
+天池	tian chi	850
+天泉	tian quan	850
+曲泽	qu ze	850
+郄门	xi men	850
+间使	jian shi	850
+内关	nei guan	850
+大陵	da ling	850
+劳宫	lao gong	850
+中冲	zhong chong	850
+关冲	guan chong	850
+液门	ye men	850
+中渚	zhong zhu	850
+阳池	yang chi	850
+外关	wai guan	850
+支沟	zhi gou	850
+会宗	hui zong	850
+三阳络	san yang luo	850
+四渎	si du	850
+天井	tian jing	850
+清泠渊	qing ling yuan	850
+消泺	xiao luo	850
+臑会	nao hui	850
+肩髎	jian liao	850
+天髎	tian liao	850
+天牖	tian you	850
+翳风	yi feng	850
+瘈脉	chi mai	850
+颅息	lu xi	850
+角孙	jiao sun	850
+耳门	er men	850
+耳和髎	er he liao	850
+丝竹空	si zhu kong	850
+瞳子髎	tong zi liao	850
+听会	ting hui	850
+上关	shang guan	850
+颔厌	han yan	850
+悬颅	xuan lu	850
+悬厘	xuan li	850
+曲鬓	qu bin	850
+率谷	shuai gu	850
+天冲	tian chong	850
+浮白	fu bai	850
+头窍阴	tou qiao yin	850
+完骨	wan gu	850
+本神	ben shen	850
+阳白	yang bai	850
+头临泣	tou lin qi	850
+目窗	mu chuang	850
+正营	zheng ying	850
+承灵	cheng ling	850
+脑空	nao kong	850
+风池	feng chi	850
+肩井	jian jing	850
+日月	ri yue	850
+京门	jing men	850
+带脉	dai mai	850
+五枢	wu shu	850
+维道	wei dao	850
+居髎	ju liao	850
+环跳	huan tiao	850
+风市	feng shi	850
+中渎	zhong du	850
+膝阳关	xi yang guan	850
+阳陵泉	yang ling quan	850
+阳交	yang jiao	850
+外丘	wai qiu	850
+光明	guang ming	850
+阳辅	yang fu	850
+悬钟	xuan zhong	850
+丘墟	qiu xu	850
+足临泣	zu lin qi	850
+地五会	di wu hui	850
+侠溪	xia xi	850
+足窍阴	zu qiao yin	850
+大敦	da dun	850
+行间	hang jian	850
+太冲	tai chong	850
+中封	zhong feng	850
+蠡沟	li gou	850
+中都	zhong du	850
+膝关	xi guan	850
+曲泉	qu quan	850
+阴包	yin bao	850
+足五里	zu wu li	850
+阴廉	yin lian	850
+急脉	ji mai	850
+章门	zhang men	850
+期门	qi men	850
+长强	chang qiang	850
+腰阳关	yao yang guan	850
+命门	ming men	850
+悬枢	xuan shu	850
+脊中	ji zhong	850
+中枢	zhong shu	850
+筋缩	jin suo	850
+至阳	zhi yang	850
+灵台	ling tai	850
+神道	shen dao	850
+身柱	shen zhu	850
+陶道	tao dao	850
+大椎	da zhui	850
+哑门	ya men	850
+风府	feng fu	850
+脑户	nao hu	850
+强间	qiang jian	850
+后顶	hou ding	850
+调胃承气汤	diao wei cheng qi tang	845
+大青龙汤	da qing long tang	835
+太阳病	tai yang bing	800
+阳明病	yang ming bing	800
+少阳病	shao yang bing	800
+太阴病	tai yin bing	800
+少阴病	shao yin bing	800
+厥阴病	jue yin bing	800
+中风	zhong feng	800
+伤寒	shang han	800
+温病	wen bing	800
+风温	feng wen	800
+湿温	shi wen	800
+暑温	shu wen	800
+秋燥	qiu zao	800
+冬温	dong wen	800
+表证	biao zheng	800
+里证	li zheng	800
+半表半里	ban biao ban li	800
+寒证	han zheng	800
+热证	re zheng	800
+虚证	xu zheng	800
+实证	shi zheng	800
+表寒	biao han	800
+表热	biao re	800
+里寒	li han	800
+里热	li re	800
+表虚	biao xu	800
+表实	biao shi	800
+里虚	li xu	800
+里实	li shi	800
+真寒假热	zhen han jia re	800
+真热假寒	zhen re jia han	800
+上热下寒	shang re xia han	800
+上寒下热	shang han xia re	800
+表里同病	biao li tong bing	800
+寒热错杂	han re cuo za	800
+虚实夹杂	xu shi jia za	800
+气虚	qi xu	800
+血虚	xue xu	800
+阴虚	yin xu	800
+阳虚	yang xu	800
+气陷	qi xian	800
+气滞	qi zhi	800
+气逆	qi ni	800
+气脱	qi tuo	800
+血瘀	xue yu	800
+血热	xue re	800
+血寒	xue han	800
+出血	chu xie	800
+亡阴	wang yin	800
+亡阳	wang yang	800
+营分证	ying fen zheng	800
+卫分证	wei fen zheng	800
+气分证	qi fen zheng	800
+血分证	xue fen zheng	800
+六经辨证	liu jing bian zheng	800
+卫气营血	wei qi ying xue	800
+三焦辨证	san jiao bian zheng	800
+八纲辨证	ba gang bian zheng	800
+恶寒	e han	800
+发热	fa re	800
+恶风	e feng	800
+汗出	han chu	800
+无汗	wu han	800
+头项强痛	tou xiang qiang tong	800
+身体疼痛	shen ti teng tong	800
+骨节疼痛	gu jie teng tong	800
+烦躁	fan zao	800
+口渴	kou ke	800
+口苦	kou ku	800
+咽干	yan gan	800
+目眩	mu xuan	800
+胸胁苦满	xiong xie ku man	800
+默默不欲饮食	mo mo bu yu yin shi	800
+心烦喜呕	xin fan xi ou	800
+往来寒热	wang lai han re	800
+潮热	chao re	800
+谵语	zhan yu	800
+手足濈然汗出	shou zu ji ran han chu	800
+腹满	fu man	800
+腹痛	fu tong	800
+便秘	bian mi	800
+下利	xia li	800
+便血	bian xie	800
+小便不利	xiao bian bu li	800
+小便自利	xiao bian zi li	800
+小便频数	xiao bian pin shuo	800
+遗尿	yi niao	800
+心悸	xin ji	800
+怔忡	zheng chong	800
+失眠	shi mian	800
+多梦	duo meng	800
+健忘	jian wang	800
+癫狂	dian kuang	800
+痫证	xian zheng	800
+痉病	jing bing	800
+湿病	shi bing	800
+暍病	ye bing	800
+百合病	bai he bing	800
+狐惑病	hu huo bing	800
+阴阳毒	yin yang du	800
+疟病	nve bing	800
+中风历节	zhong feng li jie	800
+血痹	xue bi	800
+虚劳	xu lao	800
+肺痿	fei wei	800
+肺痈	fei yong	800
+咳嗽上气	ke sou shang qi	800
+奔豚气	ben tun qi	800
+胸痹	xiong bi	800
+心痛	xin tong	800
+短气	duan qi	800
+寒疝	han shan	800
+宿食	su shi	800
+风寒积聚	feng han ji ju	800
+消渴	xiao ke	800
+淋病	lin bing	800
+水气病	shui qi bing	800
+黄疸	huang dan	800
+惊悸	jing ji	800
+吐衄	tu nv	800
+下血	xia xue	800
+胸满	xiong man	800
+瘀血	yu xue	800
+呕吐	ou tu	800
+痈肿	yong zhong	800
+肠痈	chang yong	800
+浸淫疮	jin yin chuang	800
+金疮	jin chuang	800
+趺蹶	fu jue	800
+转筋	zhuan jin	800
+妇人妊娠	fu ren ren shen	800
+产后病	chan hou bing	800
+妇人杂病	fu ren za bing	800
+梅核气	mei he qi	800
+脏躁	zang zao	800
+癥瘕	zheng jia	800
+积聚	ji ju	800
+痞满	pi man	800
+呃逆	e ni	800
+嗳气	ai qi	800
+反胃	fan wei	800
+噎膈	ye ge	800
+鼓胀	gu zhang	800
+水肿	shui zhong	800
+淋证	lin zheng	800
+癃闭	long bi	800
+遗精	yi jing	800
+早泄	zao xie	800
+阳痿	yang wei	800
+头痛	tou tong	800
+眩晕	xuan yun	800
+耳鸣	er ming	800
+耳聋	er long	800
+鼻渊	bi yuan	800
+喉痹	hou bi	800
+牙痛	ya tong	800
+口疮	kou chuang	800
+面瘫	mian tan	800
+痿证	wei zheng	800
+痹证	bi zheng	800
+腰痛	yao tong	800
+膝痛	xi tong	800
+肩周	jian zhou	800
+中风偏瘫	zhong feng pian tan	800
+脱证	tuo zheng	800
+闭证	bi zheng	800
+厥证	jue zheng	800
+昏迷	hun mi	800
+抽搐	chou chu	800
+角弓反张	jiao gong fan zhang	800
+目赤肿痛	mu chi zhong tong	800
+迎风流泪	ying feng liu lei	800
+视物昏花	shi wu hun hua	800
+吴茱萸汤	wu zhu yu tang	770
+猪苓汤	zhu ling tang	770
+真武汤	zhen wu tang	750
+胆汁	dan zhi	725
+栀子豉汤	zhi zi chi tang	720
+喝水	he shui	695
+甘草干姜汤	gan cao gan jiang tang	695
+葛芩连汤	ge qin lian tang	695
+白虎加人参汤	bai hu jia ren shen tang	690
+抵当汤	di dang tang	685
+半夏泻心汤	ban xia xie xin tang	680
+通脉四逆汤	tong mai si ni tang	675
+茵陈蒿汤	yin chen hao tang	670
+泻心汤	xie xin tang	655
+甘草泻心汤	gan cao xie xin tang	650
+附子汤	fu zi tang	650
+枝汤	zhi tang	645
+越婢汤	yue bi tang	635
+芍药甘草汤	shao yao gan cao tang	635
+小陷胸汤	xiao xian xiong tang	635
+桂枝附子汤	gui zhi fu zi tang	635
+炙甘草汤	zhi gan cao tang	635
+桂枝人参汤	gui zhi ren shen tang	630
+桃花汤	tao hua tang	630
+气汤	qi tang	625
+桃核承气汤	tao he cheng qi tang	625
+黄芩汤	huang qin tang	625
+生姜泻心汤	sheng jiang xie xin tang	620
+白通汤	bai tong tang	620
+乌梅丸	wu mei wan	620
+麻黄附子细辛汤	ma huang fu zi xi xin tang	615
+喝酒	he jiu	610
+大陷胸丸	da xian xiong wan	610
+所以桂枝汤	suo yi gui zhi tang	605
+桂枝二越婢一汤	gui zhi er yue bi yi tang	605
+经水	jing shui	605
+白头翁汤	bai tou weng tang	605
+姜半夏甘草人参汤	jiang ban xia gan cao ren shen tang	600
+茯苓四逆汤	fu ling si ni tang	600
+就是水	jiu shi shui	600
+麻子仁丸	ma zi ren wan	600
+柴胡加龙骨牡蛎汤	chai hu jia long gu mu li tang	595
+腹水	fu shui	595
+麦门冬汤	mai men dong tang	595
+甘草附子汤	gan cao fu zi tang	590
+麻杏甘石汤	ma xing gan shi tang	590
+胡汤	hu tang	590
+瓜蒂散	gua di san	590
+栀子蘗皮汤	zhi zi bo pi tang	590
+所以水	suo yi shui	590
+风水	feng shui	590
+葛根黄芩黄连汤	ge gen huang qin huang lian tang	585
+心下有水	xin xia you shui	585
+干姜附子汤	gan jiang fu zi tang	585
+桂枝甘草汤	gui zhi gan cao tang	585
+小半夏汤	xiao ban xia tang	585
+麻黄杏仁甘草石膏	ma huang xing ren gan cao shi gao	580
+所以小柴胡汤	suo yi xiao chai hu tang	580
+大黄甘草汤	da huang gan cao tang	580
+利水	li shui	575
+桂枝麻黄各半汤	gui zhi ma huang ge ban tang	575
+甘草汤	gan cao tang	575
+芍药甘草附子汤	shao yao gan cao fu zi tang	575
+漆龙骨牡蛎救逆汤	qi long gu mu li jiu ni tang	575
+桂枝加桂汤	gui zhi jia gui tang	575
+柴胡桂枝干姜汤	chai hu gui zhi gan jiang tang	575
+旋覆代赭石汤	xuan fu dai zhe shi tang	575
+黄连汤	huang lian tang	575
+麻黄连翘赤小豆汤	ma huang lian qiao chi xiao dou tang	575
+冷水	leng shui	570
+文蛤散	wen ge san	570
+大猪胆汁	da zhu dan zhi	570
+黄连阿胶汤	huang lian e jiao tang	570
+逆加吴茱萸生姜汤	ni jia wu zhu yu sheng jiang tang	570
+姜黄连黄芩人参汤	jiang huang lian huang qin ren shen tang	570
+杵为散	chu wei san	570
+开桂枝汤	kai gui zhi tang	565
+就是小柴胡汤	jiu shi xiao chai hu tang	565
+所以麻黄汤	suo yi ma huang tang	565
+苓桂术甘汤	ling gui zhu gan tang	565
+苓甘草龙骨牡蛎汤	ling gan cao long gu mu li tang	565
+大黄黄连泻心汤	da huang huang lian xie xin tang	565
+逆汤	ni tang	565
+桂枝加大黄汤	gui zhi jia da huang tang	565
+猪膏	zhu gao	565
+支饮	zhi yin	565
+朮附汤	shu fu tang	565
+苓桂朮甘汤	ling gui shu gan tang	565
+就是桂枝汤	jiu shi gui zhi tang	560
+桂枝二麻黄一汤	gui zhi er ma huang yi tang	560
+表水	biao shui	560
+茯苓甘草汤	fu ling gan cao tang	560
+赤石脂禹余粮汤	chi shi zhi yu yu liang tang	560
+黄芩加半夏生姜汤	huang qin jia ban xia sheng jiang tang	560
+麻黄加术汤	ma huang jia zhu tang	560
+猪胆汁	zhu dan zhi	560
+痰饮	tan yin	560
+所以四逆汤	suo yi si ni tang	560
+防己黄芪汤	fang ji huang qi tang	560
+所以小建中汤	suo yi xiao jian zhong tang	560
+发散	fa san	555
+青龙汤	qing long tang	555
+积水	ji shui	555
+桂枝加厚朴杏仁汤	gui zhi jia hou po xing ren tang	555
+中汤	zhong tang	555
+柴胡桂枝汤	chai hu gui zhi tang	555
+水饮	shui yin	555
+大黄附子细辛汤	da huang fu zi xi xin tang	555
+白通加猪胆汁汤	bai tong jia zhu dan zhi tang	555
+乌头汤	wu tou tang	555
+理中汤	li zhong tang	555
+寒水	han shui	550
+汗水	han shui	550
+桂枝加附子汤	gui zhi jia fu zi tang	550
+生姜是散	sheng jiang shi san	550
+想喝水	xiang he shui	550
+苓桂枝白朮甘草汤	ling gui zhi bai shu gan cao tang	550
+栀子甘草豉汤	zhi zi gan cao chi tang	550
+大半夏汤	da ban xia tang	550
+所以大陷胸汤	suo yi da xian xiong tang	550
+陷胸汤	xian xiong tang	550
+就是麻黄汤	jiu shi ma huang tang	550
+麻黄附子甘草汤	ma huang fu zi gan cao tang	550
+猪肤汤	zhu fu tang	550
+桔梗汤	jie geng tang	550
+大建中汤	da jian zhong tang	550
+皮水	pi shui	550
+人参汤	ren shen tang	545
+所以五苓散	suo yi wu ling san	545
+就是五苓散	jiu shi wu ling san	545
+姜半夏人参甘草汤	jiang ban xia ren shen gan cao tang	545
+大黄牡丹皮汤	da huang mu dan pi tang	545
+抵当丸	di dang wan	545
+白散	bai san	545
+附子泻心汤	fu zi xie xin tang	545
+草汤	cao tang	545
+桂枝加芍药汤	gui zhi jia shao yao tang	545
+桂枝芍药知母汤	gui zhi shao yao zhi mu tang	545
+射干麻黄汤	she gan ma huang tang	545
+甘遂半夏汤	gan sui ban xia tang	545
+防己茯苓汤	fang ji fu ling tang	545
+肾气丸	shen qi wan	545
+肾水	shen shui	545
+黄汤	huang tang	545
+桂附八味丸	gui fu ba wei wan	545
+口水	kou shui	545
+桂枝加葛根汤	gui zhi jia ge gen tang	540
+桂枝去芍药汤	gui zhi qu shao yao tang	540
+根汤	gen tang	540
+葛根加半夏汤	ge gen jia ban xia tang	540
+龙汤	long tang	540
+枣汤	zao tang	540
+就是承气汤	jiu shi cheng qi tang	540
+栀子厚朴枳实汤	zhi zi hou po zhi shi tang	540
+建中汤	jian zhong tang	540
+柴胡加芒硝汤	chai hu jia mang xiao tang	540
+结果水	jie guo shui	540
+茵陈篙汤	yin chen gao tang	540
+所以胆汁	suo yi dan zhi	540
+胶艾汤	jiao ai tang	540
+我们用承气汤	wo men yong cheng qi tang	540
+里水	li shui	540
+个水	ge shui	535
+病人水	bing ren shui	535
+奶水	nai shui	535
+热水	re shui	535
+糜粥	mi zhou	535
+逐水	zhu shui	535
+就是葛芩连汤	jiu shi ge qin lian tang	535
+天雄散	tian xiong san	535
+灸甘草汤	jiu gan cao tang	535
+乌头桂枝汤	wu tou gui zhi tang	535
+蒲灰散	pu hui san	535
+甘草麻黄汤	gan cao ma huang tang	535
+猪苓散	zhu ling san	535
+桂枝茯苓丸	gui zhi fu ling wan	535
+半夏厚朴汤	ban xia hou po tang	535
+所以大承气汤	suo yi da cheng qi tang	535
+留饮	liu yin	535
+就是白虎汤	jiu shi bai hu tang	535
+所以吴茱萸汤	suo yi wu zhu yu tang	535
+化水	hua shui	535
+胃承气汤	wei cheng qi tang	530
+更饮	geng yin	530
+干姜汤	gan jiang tang	530
+术附汤	zhu fu tang	530
+赤豆当归散	chi dou dang gui san	530
+桂技汤	gui ji tang	530
+新加汤	xin jia tang	530
+都是水	dou shi shui	530
+代表水	dai biao shui	530
+栀子干姜豉汤	zhi zi gan jiang chi tang	530
+禹余粮丸	yu yu liang wan	530
+呕家不可用建中汤	ou jia bu ke yong jian zhong tang	530
+肺积水	fei ji shui	530
+牡蛎汤	mu li tang	530
+铅丹	qian dan	530
+大黄三两酒	da huang san liang jiu	530
+大黄甘遂汤	da huang gan sui tang	530
+痰水	tan shui	530
+胃里面有水	wei li mian you shui	530
+排水	pai shui	530
+全身水	quan shen shui	530
+复脉汤	fu mai tang	530
+大黄四两酒	da huang si liang jiu	530
+炼蜜为丸	lian mi wei wan	530
+先食饮	xian shi yin	530
+理中丸	li zhong wan	530
+白朮附子汤	bai shu fu zi tang	530
+大黄蟅虫丸	da huang zhe chong wan	530
+皂荚丸	zao jia wan	530
+葶苈大枣泻肺汤	ting li da zao xie fei tang	530
+茯苓杏仁甘草汤	fu ling xing ren gan cao tang	530
+厚朴三物汤	hou po san wu tang	530
+赤丸	chi wan	530
+茵陈五苓散	yin chen wu ling san	530
+排脓汤	pai nong tang	530
+下瘀血汤	xia yu xue tang	530
+温经汤	wen jing tang	530
+在水	zai shui	530
+没有水	mo you shui	530
+金匮肾气丸	jin kui shen qi wan	530
+蜜丸	mi wan	530
+婢汤	bi tang	530
+夏汤	xia tang	530
+所以承气汤	suo yi cheng qi tang	530
+虎汤	hu tang	530
+越婢加术汤	yue bi jia zhu tang	530
+所以喝水	suo yi he shui	530
+麻黄和石膏	ma huang he shi gao	530
+所以大青龙汤	suo yi da qing long tang	530
+就是麻杏甘石汤	jiu shi ma xing gan shi tang	530
+你桂枝汤	ni gui zhi tang	525
+脱水	tuo shui	525
+枝去芍药加附子汤	zhi qu shao yao jia fu zi tang	525
+所以葛根汤	suo yi ge gen tang	525
+开麻黄汤	kai ma huang tang	525
+苓桂枝甘草大枣汤	ling gui zhi gan cao da zao tang	525
+吃桂枝汤	chi gui zhi tang	525
+枝甘草茯苓大枣汤	zhi gan cao fu ling da zao tang	525
+子汤	zi tang	525
+所以真武汤	suo yi zhen wu tang	525
+就是大柴胡汤	jiu shi da chai hu tang	525
+血散	xue san	525
+反以冷水	fan yi leng shui	525
+红枣汤	hong zao tang	525
+胁下有水	xie xia you shui	525
+睾丸	gao wan	525
+附子去桂加白朮汤	fu zi qu gui jia bai shu tang	525
+脏结汤	zang jie tang	525
+薏苡附子败酱散	yi yi fu zi bai jiang san	525
+苓汤	ling tang	525
+麻仁丸	ma ren wan	525
+就是茵陈蒿汤	jiu shi yin chen hao tang	525
+故引水	gu yin shui	525
+白水	bai shui	525
+蜀漆散	shu qi san	525
+黄芪桂枝五物汤	huang qi gui zhi wu wu tang	525
+薯蓣丸	shu yu wan	525
+酸枣仁汤	suan zao ren tang	525
+厚朴麻黄汤	hou po ma huang tang	525
+泽漆汤	ze qi tang	525
+奔豚汤	ben tun tang	525
+乌头赤石脂丸	wu tou chi shi zhi wan	525
+附子粳米汤	fu zi jing mi tang	525
+木防己汤	mu fang ji tang	525
+厚朴大黄汤	hou po da huang tang	525
+己椒苈黄丸	ji jiao li huang wan	525
+小半夏加茯苓汤	xiao ban xia jia fu ling tang	525
+桂枝加黄芪汤	gui zhi jia huang qi tang	525
+枳术汤	zhi zhu tang	525
+大黄硝石汤	da huang xiao shi tang	525
+文蛤汤	wen ge tang	525
+生姜半夏汤	sheng jiang ban xia tang	525
+橘皮汤	ju pi tang	525
+紫参汤	zi shen tang	525
+阳和汤	yang he tang	525
+蜘蛛散	zhi zhu san	525
+甘草粉蜜汤	gan cao fen mi tang	525
+甘麦大枣汤	gan mai da zao tang	525
+竹叶石膏汤	zhu ye shi gao tang	525
+金生水	jin sheng shui	525
+小续命汤	xiao xu ming tang	525
+炼蜜和丸	lian mi he wan	525
+苇茎汤	wei jing tang	525
+就是水饮	jiu shi shui yin	525
+平常喝水	ping chang he shui	525
+悬饮	xuan yin	525
+所以小青龙汤	suo yi xiao qing long tang	525
+心下有支饮	xin xia you zhi yin	525
+渴饮	ke yin	525
+心脏积水	xin zang ji shui	525
+所以酒	suo yi jiu	525
+就吃桂枝汤	jiu chi gui zhi tang	525
+个薏苡附子败酱散	ge yi yi fu zi bai jiang san	525
+大小承气汤	da xiao cheng qi tang	525
+就是大承气汤	jiu shi da cheng qi tang	525
+笃落丸	du luo wan	525
+跳到水	tiao dao shui	520
+啜热稀粥	chuai re xi zhou	520
+辛甘发散	xin gan fa san	520
+解酒	jie jiu	520
+芍药方中加附子汤	shao yao fang zhong jia fu zi tang	520
+所以石膏	suo yi shi gao	520
+结果桂枝汤	jie guo gui zhi tang	520
+馀如桂枝汤	yu ru gui zhi tang	520
+或葛根汤	huo ge gen tang	520
+余依桂枝汤	yu yi gui zhi tang	520
+你水	ni shui	520
+所以苓桂术甘汤	suo yi ling gui zhu gan tang	520
+少少与饮	shao shao yu yin	520
+栀子生姜豉汤	zhi zi sheng jiang chi tang	520
+停水	ting shui	520
+就是栀子豉汤	jiu shi zhi zi chi tang	520
+胃中之水	wei zhong zhi shui	520
+就是桃核承气汤	jiu shi tao he cheng qi tang	520
+走马汤	zou ma tang	520
+救逆汤	jiu ni tang	520
+现在水	xian zai shui	520
+胃里面有停水	wei li mian you ting shui	520
+皮汤	pi tang	520
+大黄酒	da huang jiu	520
+就用小柴胡汤	jiu yong xiao chai hu tang	520
+补气建中汤	bu qi jian zhong tang	520
+肺水	fei shui	520
+尿如皂角汁	niao ru zao jiao zhi	520
+原汤	yuan tang	520
+先以水	xian yi shui	520
+稍加至二十丸	shao jia zhi er shi wan	520
+栝蒌桂枝汤	gua lou gui zhi tang	520
+黄杏仁薏苡甘草汤	huang xing ren yi yi gan cao tang	520
+黄耆建中汤	huang qi jian zhong tang	520
+消肿溃坚汤	xiao zhong kui jian tang	520
+千金苇茎汤	qian jin wei jing tang	520
+栝蒌薤白半夏汤	gua lou xie bai ban xia tang	520
+枳实薤白桂枝汤	zhi shi xie bai gui zhi tang	520
+薏苡附子散	yi yi fu zi san	520
+厚朴七物汤	hou po qi wu tang	520
+泽泻汤	ze xie tang	520
+栝蒌瞿麦丸	gua lou qu mai wan	520
+茯苓戎盐汤	fu ling rong yan tang	520
+麻黄附子汤	ma huang fu zi tang	520
+柏叶汤	bai ye tang	520
+排脓散	pai nong san	520
+竹叶汤	zhu ye tang	520
+土瓜根散	tu gua gen san	520
+矾石丸	fan shi wan	520
+狼牙汤	lang ya tang	520
+牡蛎泽泻散	mu li ze xie san	520
+人参四逆汤	ren shen si ni tang	520
+己黄芪汤	ji huang qi tang	520
+柴胡姜桂汤	chai hu jiang gui tang	520
+辛香发散	xin xiang fa san	520
+让水	rang shui	520
+我们用小柴胡汤	wo men yong xiao chai hu tang	520
+伏饮	fu yin	520
+苓散	ling san	520
+人参白虎汤	ren shen bai hu tang	520
+名曰水	ming yue shui	520
+肝水	gan shui	520
+脾水	pi shui	520
+心水	xin shui	520
+所以喝酒	suo yi he jiu	520
+艾汤	ai tang	520
+心汤	xin tang	520
+后思水	hou si shui	520
+牡丹	mu dan	520
+藜芦甘草汤	li lu gan cao tang	520
+大麦粥	da mai zhou	520
+所以要把水	suo yi yao ba shui	520
+喝桂枝汤	he gui zhi tang	520
+所以白虎汤	suo yi bai hu tang	520
+明明是桂枝汤	ming ming shi gui zhi tang	520
+姜汤	jiang tang	520
+就是葛根汤	jiu shi ge gen tang	520
+所以用石膏	suo yi yong shi gao	520
+大小青龙汤	da xiao qing long tang	520
+就桂枝汤	jiu gui zhi tang	520
+平常开麻黄汤	ping chang kai ma huang tang	520
+药生姜人参新加汤	yao sheng jiang ren shen xin jia tang	520
+证或葛根汤	zheng huo ge gen tang	520
+就用桂枝汤	jiu yong gui zhi tang	520
+所以用茯苓甘草汤	suo yi yong fu ling gan cao tang	520
+会用到四逆汤	hui yong dao si ni tang	520
+所以泻心汤	suo yi xie xin tang	520
+降水	jiang shui	520
+就可以用小柴胡汤	jiu ke yi yong xiao chai hu tang	520
+就把小柴胡汤	jiu ba xiao chai hu tang	520
+白虎汤和承气汤	bai hu tang he cheng qi tang	520
+就是肺积水	jiu shi fei ji shui	520
+所以用丸	suo yi yong wan	520
+胸汤	xiong tang	520
+消块丸	xiao kuai wan	520
+陷胸丸	xian xiong wan	520
+甘遂利水	gan sui li shui	520
+枯痔散	ku zhi san	520
+结果胆汁	jie guo dan zhi	520
+津液发散	jin ye fa san	520
+结果是小柴胡汤	jie guo shi xiao chai hu tang	520
+健胃整脾汤	jian wei zheng pi tang	520
+所以栀子蘗皮汤	suo yi zhi zi bo pi tang	520
+像通脉四逆汤	xiang tong mai si ni tang	520
+像真武汤	xiang zhen wu tang	520
+所以炙甘草汤	suo yi zhi gan cao tang	520
+就是真武汤	jiu shi zhen wu tang	520
+什么时机用白通汤	shen me shi ji yong bai tong tang	520
+太阳为寒水	tai yang wei han shui	515
+到水	dao shui	515
+都有水	dou you shui	515
+我们要用汤	wo men yao yong tang	515
+什么时候用汤	shen me shi hou yong tang	515
+乌梅汤	wu mei tang	515
+就是十枣汤	jiu shi shi zao tang	515
+还是桂枝汤	hai shi gui zhi tang	515
+吃完桂枝汤	chi wan gui zhi tang	515
+麻黄桂枝各半汤	ma huang gui zhi ge ban tang	515
+喝冷水	he leng shui	515
+在风水	zai feng shui	515
+本方当裁为越婢汤	ben fang dang cai wei yue bi tang	515
+草干姜汤	cao gan jiang tang	515
+他水	ta shui	515
+汤泡去黄汁	tang pao qu huang zhi	515
+你用桂枝汤	ni yong gui zhi tang	515
+你开大承气汤	ni kai da cheng qi tang	515
+就是大青龙汤	jiu shi da qing long tang	515
+比如说桂枝汤	bi ru shuo gui zhi tang	515
+你开麻黄汤	ni kai ma huang tang	515
+附子散	fu zi san	515
+要桂枝汤	yao gui zhi tang	515
+石汤	shi tang	515
+甘石汤	gan shi tang	515
+像桂枝汤	xiang gui zhi tang	515
+我们用五苓散	wo men yong wu ling san	515
+多饮暖水	duo yin nuan shui	515
+大量喝水	da liang he shui	515
+医以丸	yi yi wan	515
+默默不欲饮	mo mo bu yu yin	515
+开柴胡汤	kai chai hu tang	515
+知医以药丸	zhi yi yi yao wan	515
+知医以丸	zhi yi yi wan	515
+调味承气汤	tiao wei cheng qi tang	515
+西医就把硫磺跟膏	xi yi jiu ba liu huang gen gao	515
+都是吴茱萸汤	dou shi wu zhu yu tang	515
+急则以汤	ji ze yi tang	515
+缓则以丸	huan ze yi wan	515
+快利者就是抵当汤	kuai li zhe jiu shi di dang tang	515
+杵分为四丸	chu fen wei si wan	515
+所以小陷胸汤	suo yi xiao xian xiong tang	515
+进热粥	jin re zhou	515
+进冷粥	jin leng zhou	515
+酒汤	jiu tang	515
+能去大腹积水	neng qu da fu ji shui	515
+所以肺里面积水	suo yi fei li mian ji shui	515
+芩连汤	qin lian tang	515
+还是可以用桂枝汤	hai shi ke yi yong gui zhi tang	515
+时候用桂枝人参汤	shi hou yong gui zhi ren shen tang	515
+半夏生姜汤	ban xia sheng jiang tang	515
+米酒	mi jiu	515
+就是小建中汤	jiu shi xiao jian zhong tang	515
+所以桂附八味丸	suo yi gui fu ba wei wan	515
+像潮水	xiang chao shui	515
+就是大黄甘草汤	jiu shi da huang gan cao tang	515
+就是小承气汤	jiu shi xiao cheng qi tang	515
+也是大承气汤	ye shi da cheng qi tang	515
+会用到猪苓汤	hui yong dao zhu ling tang	515
+泻汁	xie zhi	515
+浊水	zhuo shui	515
+变成胆汁	bian cheng dan zhi	515
+半夏散	ban xia san	515
+半夏散及汤	ban xia san ji tang	515
+自利清水	zi li qing shui	515
+吴茱荚汤	wu zhu jia tang	515
+复与之水	fu yu zhi shui	515
+栝萎牡蛎散	gua wei mu li san	515
+白虎加桂枝汤	bai hu jia gui zhi tang	515
+侯氏黑散	hou shi hei san	515
+风引汤	feng yin tang	515
+头风摩散	tou feng mo san	515
+补阳还五汤	bu yang hai wu tang	515
+矾石汤	fan shi tang	515
+桂枝龙骨牡蛎汤	gui zhi long gu mu li tang	515
+越婢加半夏汤	yue bi jia ban xia tang	515
+小青龙加石膏汤	xiao qing long jia shi gao tang	515
+栝蒌薤白白酒汤	gua lou xie bai bai jiu tang	515
+桔枳生姜汤	jie zhi sheng jiang tang	515
+桂枝生姜枳实汤	gui zhi sheng jiang zhi shi tang	515
+大黄附子汤	da huang fu zi tang	515
+旋复花汤	xuan fu hua tang	515
+滑石白鱼散	hua shi bai yu san	515
+甘姜枣麻辛附子汤	gan jiang zao ma xin fu zi tang	515
+硝石矾石散	xiao shi fan shi san	515
+栀子大黄汤	zhi zi da huang tang	515
+漆牡蛎龙骨救逆汤	qi mu li long gu jiu ni tang	515
+半夏麻黄丸	ban xia ma huang wan	515
+黄土汤	huang tu tang	515
+茯苓泽泻汤	fu ling ze xie tang	515
+橘皮竹茹汤	ju pi zhu ru tang	515
+诃梨勒散	he li lei san	515
+仙方活命饮	xian fang huo ming yin	515
+王不留行散	wang bu liu xing san	515
+干姜人参半夏丸	gan jiang ren shen ban xia wan	515
+白朮散	bai shu san	515
+枳实芍药散	zhi shi shao yao san	515
+竹皮大丸	zhu pi da wan	515
+白头翁加甘草阿胶	bai tou weng jia gan cao e jiao	515
+红蓝花酒	hong lan hua jiu	515
+蛇床子散	she chuang zi san	515
+烧裩散	shao kun san	515
+枳实栀子豉汤	zhi shi zhi zi chi tang	515
+开大青龙汤	kai da qing long tang	515
+打散	da san	515
+自能饮	zi neng yin	515
+麻杏薏甘汤	ma xing yi gan tang	515
+里面都是水	li mian dou shi shui	515
+个桂枝芍药知母汤	ge gui zhi shao yao zhi mu tang	515
+我们石膏	wo men shi gao	515
+别以泉水	bie yi quan shui	515
+还魂汤	huan hun tang	515
+芍药知母汤	shao yao zhi mu tang	515
+桔梗甘草汤	jie geng gan cao tang	515
+苓桂甘枣汤	ling gui gan zao tang	515
+甜酒	tian jiu	515
+面有水	mian you shui	515
+枳实汤	zhi shi tang	515
+物汤	wu tang	515
+就不叫大柴胡汤	jiu bu jiao da chai hu tang	515
+个大黄附子细辛汤	ge da huang fu zi xi xin tang	515
+个当归生姜羊肉汤	ge dang gui sheng jiang yang rou tang	515
+我们用桂枝汤	wo men yong gui zhi tang	515
+甘姜苓术汤	gan jiang ling zhu tang	515
+变成水	bian cheng shui	515
+本来是麻黄汤	ben lai shi ma huang tang	515
+朱雀汤	zhu que tang	515
+溢饮	yi yin	515
+到葶苈大枣泻肺汤	dao ting li da zao xie fei tang	515
+也是五苓散	ye shi wu ling san	515
+我们用石膏	wo men yong shi gao	515
+来利水	lai li shui	515
+气强则为水	qi qiang ze wei shui	515
+常常吃桂枝汤	chang chang chi gui zhi tang	515
+沉则为水	chen ze wei shui	515
+心脏有水	xin zang you shui	515
+胃没有办法把水	wei mo you ban fa ba shui	515
+造成水	zao cheng shui	515
+辛汤	xin tang	515
+腹如水	fu ru shui	515
+半夏来利水	ban xia lai li shui	515
+拉出来都是水	la chu lai dou shi shui	515
+思水	si shui	515
+脓水	nong shui	515
+鹿角胶	lu jiao jiao	515
+所以阿胶	suo yi e jiao	515
+胶姜汤	jiao jiang tang	515
+归四逆汤	gui si ni tang	515
+例如桂枝汤	li ru gui zhi tang	515
+本来是桂枝汤	ben lai shi gui zhi tang	515
+胃里面没有水	wei li mian mo you shui	515
+就变成葛根汤	jiu bian cheng ge gen tang	515
+病人会想喝水	bing ren hui xiang he shui	515
+所以是大柴胡汤	suo yi shi da chai hu tang	515
+所以桂枝人参汤	suo yi gui zhi ren shen tang	515
+所以白虎加人参汤	suo yi bai hu jia ren shen tang	515
+芩汤	qin tang	515
+证或麻黄汤	zheng huo ma huang tang	515
+越婢加朮汤	yue bi jia shu tang	515
+猪瞻汁	zhu zhan zhi	515
+所以茵陈蒿汤	suo yi yin chen hao tang	515
+所以附子汤	suo yi fu zi tang	515
+黄芪建中汤	huang qi jian zhong tang	500
+麻杏石甘汤	ma xing shi gan tang	500
+旋覆代赭汤	xuan fu dai zhe tang	500
+牡蛎散	mu li san	500
+大黄蛰虫丸	da huang zhe chong wan	500
+葵子茯苓散	kui zi fu ling san	500
+瓜蒌薤白白酒汤	gua lou xie bai bai jiu tang	500
+瓜蒌薤白半夏汤	gua lou xie bai ban xia tang	500
+防己地黄汤	fang ji di huang tang	500
+大黄牡丹汤	da huang mu dan tang	500
+白术散	bai zhu san	500
+芎归胶艾汤	xiong gui jiao ai tang	500
+苓甘五味姜辛汤	ling gan wu wei jiang xin tang	500
+茯苓桂枝甘草大枣汤	fu ling gui zhi gan cao da zao tang	500
+桂枝甘草龙骨牡蛎汤	gui zhi gan cao long gu mu li tang	500
+桂枝去芍药加附子汤	gui zhi qu shao yao jia fu zi tang	500
+阳旦汤	yang dan tang	500
+阴旦汤	yin dan tang	500
+逍遥散	xiao yao san	500
+补中益气汤	bu zhong yi qi tang	500
+生脉散	sheng mai san	500
+独参汤	du shen tang	500
+参附汤	shen fu tang	500
+回阳救急汤	hui yang jiu ji tang	500
+安宫牛黄丸	an gong niu huang wan	500
+紫雪丹	zi xue dan	500
+至宝丹	zhi bao dan	500
+犀角地黄汤	xi jiao di huang tang	500
+清营汤	qing ying tang	500
+增液汤	zeng ye tang	500
+增液承气汤	zeng ye cheng qi tang	500
+新加黄龙汤	xin jia huang long tang	500
+宣白承气汤	xuan bai cheng qi tang	500
+导赤承气汤	dao chi cheng qi tang	500
+牛黄承气汤	niu huang cheng qi tang	500
+大定风珠	da ding feng zhu	500
+小定风珠	xiao ding feng zhu	500
+青蒿鳖甲汤	qing hao bie jia tang	500
+秦艽鳖甲散	qin jiao bie jia san	500
+银翘散	yin qiao san	500
+桑菊饮	sang ju yin	500
+桑杏汤	sang xing tang	500
+清燥救肺汤	qing zao jiu fei tang	500
+沙参麦冬汤	sha shen mai dong tang	500
+益胃汤	yi wei tang	500
+养阴清肺汤	yang yin qing fei tang	500
+藿香正气散	huo xiang zheng qi san	500
+平胃散	ping wei san	500
+甘露消毒丹	gan lu xiao du dan	500
+连朴饮	lian po yin	500
+茵陈四逆汤	yin chen si ni tang	500
+温胆汤	wen dan tang	500
+清气化痰丸	qing qi hua tan wan	500
+贝母瓜蒌散	bei mu gua lou san	500
+止嗽散	zhi sou san	500
+定喘汤	ding chuan tang	500
+苏子降气汤	su zi jiang qi tang	500
+川芎茶调散	chuan xiong cha diao san	500
+天麻钩藤饮	tian ma gou teng yin	500
+镇肝熄风汤	zhen gan xi feng tang	500
+羚角钩藤汤	ling jiao gou teng tang	500
+地黄饮子	di huang yin zi	500
+血府逐瘀汤	xue fu zhu yu tang	500
+膈下逐瘀汤	ge xia zhu yu tang	500
+少腹逐瘀汤	shao fu zhu yu tang	500
+身痛逐瘀汤	shen tong zhu yu tang	500
+生化汤	sheng hua tang	500
+失笑散	shi xiao san	500
+活络效灵丹	huo luo xiao ling dan	500
+复元活血汤	fu yuan huo xue tang	500
+咳血方	ke xie fang	500
+小蓟饮子	xiao ji yin zi	500
+槐花散	huai hua san	500
+归脾汤	gui pi tang	500
+人参养荣汤	ren shen yang rong tang	500
+泰山磐石散	tai shan pan shi san	500
+左归丸	zuo gui wan	500
+左归饮	zuo gui yin	500
+右归丸	you gui wan	500
+右归饮	you gui yin	500
+大补阴丸	da bu yin wan	500
+金锁固精丸	jin suo gu jing wan	500
+桑螵蛸散	sang piao xiao san	500
+缩泉丸	suo quan wan	500
+固冲汤	gu chong tang	500
+完带汤	wan dai tang	500
+真人养脏汤	zhen ren yang zang tang	500
+驻车丸	zhu che wan	500
+天王补心丹	tian wang bu xin dan	500
+朱砂安神丸	zhu sha an shen wan	500
+磁朱丸	ci zhu wan	500
+养心汤	yang xin tang	500
+孔圣枕中丹	kong sheng zhen zhong dan	500
+越鞠丸	yue ju wan	500
+柴胡疏肝散	chai hu shu gan san	500
+金铃子散	jin ling zi san	500
+枳实消痞丸	zhi shi xiao pi wan	500
+厚朴温中汤	hou po wen zhong tang	500
+天台乌药散	tian tai wu yao san	500
+橘核丸	ju he wan	500
+行气散	xing qi san	500
+丹参饮	dan shen yin	500

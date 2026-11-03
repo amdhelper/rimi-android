@@ -67,6 +67,25 @@ object DataManager {
         return defaultPath.absolutePath
     }
 
+    /**
+     * Rimi：把 assets 里内置的 rimi_opencc（emoji/others 符号表）合并进 shared/opencc。
+     *
+     * 不能直接把这三个文件放进 assets/shared/opencc：Gradle 的 installOpenCCData
+     * 任务会整目录重建 assets/shared/opencc，把外部放入的文件清掉。
+     */
+    fun syncExtraOpenCC() {
+        val srcDir = File(externalFilesDir, "shared/rimi_opencc")
+        if (!srcDir.isDirectory) return
+        val dstDir = File(sharedDataDir, "opencc").also { it.mkdirs() }
+        srcDir.listFiles()?.forEach { src ->
+            if (!src.isFile) return@forEach
+            val dst = File(dstDir, src.name)
+            if (!dst.exists() || dst.length() != src.length()) {
+                src.copyTo(dst, overwrite = true)
+            }
+        }
+    }
+
     fun sync() = lock.withLock {
         val destChecksumsFile = File(dataDir, DATA_CHECKSUMS_NAME)
         val oldChecksums =
