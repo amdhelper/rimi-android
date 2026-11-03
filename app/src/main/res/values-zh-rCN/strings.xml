@@ -250,4 +250,33 @@
     <string name="word_segment">分词</string>
     <string name="star_success">收藏成功</string>
     <string name="ignore_system_gesture_insets">忽略系统手势边衬区</string>
+
+    <string name="rimi_cloud_sync_short">日弥云同步</string>
+    <string name="rimi_cloud_account">日弥账户</string>
+    <string name="rimi_cloud_account_title">账户</string>
+    <string name="rimi_cloud_account_not_logged_in">未登录 · 点此用 wumi 助记词登录</string>
+    <string name="rimi_cloud_account_logged_in">已登录 %1$s · 级别 %2$s</string>
+    <string name="rimi_cloud_already_logged_in">已登录；如需切换账户请先退出登录</string>
+    <string name="rimi_cloud_login">登录日弥云</string>
+    <string name="rimi_cloud_login_message">使用 wumi 账户的 12 词助记词，或桌面端 ~/.config/rimi/ed25519.seed 的 64 位十六进制密钥。词条会在同一 wumi 账户的手机与电脑之间同步。</string>
+    <string name="rimi_cloud_login_hint">12 个助记词（空格分隔）或 64 位十六进制 seed</string>
+    <string name="rimi_cloud_login_success">登录成功</string>
+    <string name="rimi_cloud_login_failed">登录失败：%1$s</string>
+    <string name="rimi_cloud_logout">退出登录</string>
+    <string name="rimi_cloud_logout_message">退出后本机不再同步词库；已经学到的词不会被删除。</string>
+    <string name="rimi_cloud_sync_category">词库同步</string>
+    <string name="rimi_cloud_sync_now">立即同步</string>
+    <string name="rimi_cloud_sync_now_summary">上传本机新学的词，并拉取其他设备的词</string>
+    <string name="rimi_cloud_sync_success">同步完成：上传 %1$d 条，拉取 %2$d 条，写入 %3$d 条</string>
+    <string name="rimi_cloud_sync_failed">同步失败：%1$s</string>
+    <string name="rimi_cloud_auto_sync">自动同步</string>
+    <string name="rimi_cloud_auto_sync_summary">后台定期同步，联网时进行</string>
+    <string name="rimi_cloud_sync_interval">同步间隔</string>
+    <string name="rimi_cloud_minutes">分钟</string>
+    <string name="rimi_cloud_status">同步状态</string>
+    <string name="rimi_cloud_last_sync">上次同步：%1$s</string>
+    <string name="rimi_cloud_last_error">上次同步出错：%1$s</string>
+    <string name="rimi_cloud_never_synced">尚未同步过</string>
+    <string name="rimi_cloud_server_category">服务器</string>
+    <string name="rimi_cloud_server">服务器地址</string>
 </resources>

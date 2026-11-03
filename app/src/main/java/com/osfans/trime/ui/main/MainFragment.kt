@@ -60,6 +60,11 @@ class MainFragment : PaddingPreferenceFragment() {
                 R.drawable.ic_baseline_snippet_folder_24,
                 NavigationRoute.Profile,
             )
+            addDestinationPreference(
+                R.string.rimi_cloud_sync_short,
+                R.drawable.ic_baseline_sync_24,
+                NavigationRoute.RimiSync,
+            )
             addCategory("") {
                 isIconSpaceReserved = false
                 addDestinationPreference(

@@ -68,6 +68,13 @@ import timber.log.Timber
 /** [輸入法][InputMethodService]主程序  */
 
 open class TrimeInputMethodService : LifecycleInputMethodService() {
+    companion object {
+        /** 键盘是否正在显示（后台词库同步会主动给打字让路）。 */
+        @Volatile
+        var isInputViewShowing: Boolean = false
+            private set
+    }
+
     private lateinit var rime: RimeSession
     private val jobs = Channel<Job>(capacity = Channel.UNLIMITED)
 
@@ -568,6 +575,7 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
         restarting: Boolean,
     ) {
         Timber.d("onStartInputView: restarting=$restarting")
+        isInputViewShowing = true
         InputFeedbackManager.startInput()
         postRimeJob {
             updateRimeOption(this)
@@ -591,6 +599,7 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
 
     override fun onFinishInputView(finishingInput: Boolean) {
         Timber.d("onFinishInputView: finishingInput=$finishingInput")
+        isInputViewShowing = false
         decorLocationUpdated = false
         inputView?.dismissCandidateActionMenu()
         candidatesView?.dismissCandidateActionMenu()

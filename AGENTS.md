@@ -56,6 +56,30 @@ python3 ../rimi/scripts/build_mobile_assets.py --with-english   # 重新生成 c
   所以我们保留源码也不会触发 18MB 重编译
 - 注意 APK 体积：预编译数据让 debug APK 从 30MB 涨到 48MB，release 需评估裁剪
 
+
+## 日弥云同步（M3，2026-11-04）
+
+手机端与桌面 rimid 共用一套 wumi 身份与 `/rimi/dict` 协议，同步的就是 RIME 自己学出来的
+个人短语库（`user.userdb`），不另建一套词库。
+
+- 账户登录：wumi 12/24 词助记词或 64 位十六进制 seed（桌面 `~/.config/rimi/ed25519.seed`）。
+  `seed = SHA256(entropy)`（wumi 口径，不是 BIP39 PBKDF2），seed 用 AndroidKeyStore AES/GCM 落盘。
+- 同步：读本地 userdb → 与上次快照比对 push 增量（含墓碑）→ pull 远端增量 → 直接写回 userdb
+  → 有写入则 `updateConfig()` 重启引擎，让新词立刻参与候选排序。
+- 触发：设置页「立即同步」；`RimiCloudSyncWork` 周期后台同步（默认 360 分钟，可调，≥15）。
+  键盘可见时后台任务主动让路（`TrimeInputMethodService.isInputViewShowing`）。
+- 代码地图（`app/src/main/java/com/osfans/trime/data/rimi/`）：
+  `RimiCloud`（认证 + HTTP）、`RimiDictSync`（同步算法/快照）、`RimiUserDb`（JNI TSV 桥）、
+  `RimiSeedVault`、`RimiBip39`；设置页 `ui/main/settings/RimiSyncFragment.kt`；
+  周期任务 `worker/RimiCloudSyncWork.kt`。
+- JNI：`app/src/main/jni/librime_jni/rimi_sync.cc` 直接开 userdb 写 `c=1 d=<weight> t=0`。
+  **不要用 librime levers 的 import_user_dict 代替**：它只写 commits、`dee` 恒为 0，拉下来的词权重丢失。
+- ⚠️ 新增 native 源文件必须显式写进 `librime_jni/CMakeLists.txt`：`aux_source_directory` 的结果在
+  CMake configure 时固化，只放文件不重新 configure 不会进 so，运行期报 UnsatisfiedLinkError。
+- ⚠️ Kotlin 块注释可嵌套：KDoc 里写 `/rimi/dict/*` 会开启嵌套注释，编译报 "Unclosed comment"。
+- 实测（PLR-AL30 / Android 12）：seed 登录 → 云端 push `云同步测试` → 手机同步（拉取 1 应用 1）
+  → 打 `yuntongbuceshi` 候选出现该词；手机提交候选生成 `你好` → 同步上传 1 → 云端 `/rimi/dict/status` = 2 条。
+
 ## 品牌与主题
 
 - applicationId `com.rimi.ime`（debug 变体 `.debug`）；namespace 暂留 `com.osfans.trime`
