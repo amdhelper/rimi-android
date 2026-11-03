@@ -61,6 +61,18 @@ class TrimeApplication : Application() {
         }
     }
 
+    /**
+     * 熄屏补同步：WorkManager 无法用 constraint 表达「屏幕熄灭」，
+     * 只能靠动态注册的系统广播在熄屏瞬间把一次性同步任务推进队列。
+     * 应用进程由输入法服务常驻，正常使用中这个接收器一直有效。
+     */
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != Intent.ACTION_SCREEN_OFF) return
+            RimiCloudSyncWork.onScreenOff(context)
+        }
+    }
+
     private fun registerBroadcastReceiver() {
         val intentFilter =
             IntentFilter().apply {
@@ -75,6 +87,14 @@ class TrimeApplication : Application() {
             null,
             ContextCompat.RECEIVER_EXPORTED,
         )
+        if (!isDirectBootMode) {
+            ContextCompat.registerReceiver(
+                this,
+                screenOffReceiver,
+                IntentFilter(Intent.ACTION_SCREEN_OFF),
+                ContextCompat.RECEIVER_NOT_EXPORTED,
+            )
+        }
     }
 
     var isDirectBootMode = false

@@ -271,6 +271,8 @@
     <string name="rimi_cloud_sync_failed">同步失败：%1$s</string>
     <string name="rimi_cloud_auto_sync">自动同步</string>
     <string name="rimi_cloud_auto_sync_summary">后台定期同步，联网时进行</string>
+    <string name="rimi_cloud_screen_off_only">仅熄屏时同步</string>
+    <string name="rimi_cloud_screen_off_only_summary">屏幕亮着时不做后台同步，熄屏后才上传、拉取词库；手动同步不受影响</string>
     <string name="rimi_cloud_sync_interval">同步间隔</string>
     <string name="rimi_cloud_minutes">分钟</string>
     <string name="rimi_cloud_status">同步状态</string>

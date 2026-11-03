@@ -272,6 +272,8 @@
     <string name="rimi_cloud_sync_failed">Sync failed: %1$s</string>
     <string name="rimi_cloud_auto_sync">Auto sync</string>
     <string name="rimi_cloud_auto_sync_summary">Periodic background sync while online</string>
+    <string name="rimi_cloud_screen_off_only">Sync only when screen off</string>
+    <string name="rimi_cloud_screen_off_only_summary">Skip automatic background sync while the screen is on; upload and pull once the screen turns off. Manual sync is not affected.</string>
     <string name="rimi_cloud_sync_interval">Sync interval</string>
     <string name="rimi_cloud_minutes">min</string>
     <string name="rimi_cloud_status">Sync status</string>

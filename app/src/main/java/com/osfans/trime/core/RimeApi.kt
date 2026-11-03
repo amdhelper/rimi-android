@@ -28,6 +28,14 @@ interface RimeApi {
 
     suspend fun updateConfig()
 
+    /**
+     * 临时释放 RIME 引擎（leveldb 的独占锁随之释放），执行 [block] 后重新启动引擎。
+     *
+     * 同步写回 userdb 时用：引擎运行期间 userdb 被 flock 独占，同进程 JNI 也打不开；
+     * 只在键盘不可见 / 熄屏的同步路径调用，重启不会打断输入。
+     */
+    suspend fun <T> withEngineReleased(block: suspend () -> T): T
+
     suspend fun syncUserData(): Boolean
 
     suspend fun processKey(

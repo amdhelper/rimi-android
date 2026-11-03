@@ -8,7 +8,6 @@ package com.osfans.trime.data.rimi
 import com.osfans.trime.core.RimeApi
 import com.osfans.trime.util.appContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.abs
@@ -42,8 +41,6 @@ object RimiDictSync {
     private const val MAX_TERM_LENGTH = 32
     private const val MAX_CODE_LENGTH = 128
     private const val MAX_PULL_PAGES = 20
-    private const val USERDB_RETRIES = 3
-    private const val USERDB_RETRY_DELAY_MS = 300L
 
     fun resetSyncState() {
         RimiCloud.since = 0
@@ -55,17 +52,15 @@ object RimiDictSync {
      */
     suspend fun sync(rime: RimeApi): Report = withContext(Dispatchers.Default) {
         val dictName = RimiUserDb.DEFAULT_DICT
-        var local = RimiUserDb.read(dictName)
-        var readTries = 0
-        while (local == null && readTries < USERDB_RETRIES) {
-            // 输入法引擎（会话）正握着 userdb：重启引擎释放句柄后重读
-            rime.updateConfig()
-            delay(USERDB_RETRY_DELAY_MS)
-            local = RimiUserDb.read(dictName)
-            readTries++
+        // 读：直读 → 无锁快照副本 → 停引擎直读（三级降级）。
+        // 引擎运行期间 userdb 被 leveldb flock 独占，而 updateConfig() 重启后引擎会立刻重新占住，
+        // 所以「重启一下再读」在真机上必然失败（2026-11-04 实测），必须用副本或真正停掉引擎。
+        var local = RimiUserDb.read(dictName) ?: RimiUserDb.readSnapshot(dictName)
+        if (local == null) {
+            local = rime.withEngineReleased { RimiUserDb.readAtPath(RimiUserDb.dbPath(dictName)) }
         }
         if (local == null) {
-            throw RimiCloudException("读取本地词库失败（userdb 被输入法占用），请收起键盘后再试")
+            throw RimiCloudException("读取本地词库失败（userdb 被输入法占用），请稍后重试")
         }
         val localMap = HashMap<String, RimiUserDb.Entry>(local.size)
         for (e in local) localMap[e.key] = e
@@ -123,6 +118,7 @@ object RimiDictSync {
         var since = RimiCloud.since
         var pulled = 0
         var appliedTotal = 0
+        var engineRestarted = false
         var pages = 0
         while (pages < MAX_PULL_PAGES) {
             pages++
@@ -138,14 +134,13 @@ object RimiDictSync {
                 }
             if (toApply.isNotEmpty()) {
                 var n = RimiUserDb.apply(dictName, toApply)
-                var writeTries = 0
-                while (n < 0 && writeTries < USERDB_RETRIES) {
-                    // 引擎（输入法会话）可能还握着 userdb：重启引擎释放句柄后重试。
-                    // 这里只在「键盘已收起」的同步路径上发生，重启不会打断用户输入。
-                    rime.updateConfig()
-                    delay(USERDB_RETRY_DELAY_MS)
-                    n = RimiUserDb.apply(dictName, toApply)
-                    writeTries++
+                if (n < 0) {
+                    // 引擎握着 userdb（leveldb flock）：真正停掉引擎再按路径写，写完立刻重启。
+                    // 注意停引擎后 Rime Service 已销毁，必须用 applyAtPath（不经 UserDb::Require）。
+                    n = rime.withEngineReleased {
+                        RimiUserDb.applyAtPath(RimiUserDb.dbPath(dictName), toApply)
+                    }
+                    engineRestarted = true
                 }
                 if (n < 0) {
                     throw RimiCloudException("本地词库写入失败（userdb 打不开，可能正被输入法占用），稍后重试")
@@ -158,11 +153,14 @@ object RimiDictSync {
         RimiCloud.since = since
 
         // 3. 记录同步后的本地状态，作为下一轮增量比对的基线
-        val after = RimiUserDb.read(dictName) ?: local
+        //    写回若走了「停引擎」路径，引擎已重启并重新占住 userdb，直读会失败 →
+        //    再用无锁快照读一次，避免把拉下来的词漏出基线（否则下次会重复上传）。
+        val after = RimiUserDb.read(dictName) ?: RimiUserDb.readSnapshot(dictName) ?: local
         saveSnapshot(after)
 
         // 4. 有远端写入 → 重启引擎（exit/start，不重部署），让新词参与候选排序
-        if (appliedTotal > 0) {
+        //    写回走 withEngineReleased 时引擎已经重启过，不必再重启一次
+        if (appliedTotal > 0 && !engineRestarted) {
             rime.updateConfig()
         }
 

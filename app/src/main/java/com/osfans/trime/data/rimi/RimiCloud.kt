@@ -46,6 +46,7 @@ object RimiCloud {
     private const val KEY_SERVER = "server"
     private const val KEY_DEVICE_ID = "device_id"
     private const val KEY_AUTO_SYNC = "auto_sync"
+    private const val KEY_SYNC_ONLY_SCREEN_OFF = "sync_only_when_screen_off"
     private const val KEY_SYNC_INTERVAL = "sync_interval_minutes"
     private const val KEY_LAST_SYNC_AT = "last_sync_at"
     private const val KEY_LAST_SYNC_DETAIL = "last_sync_detail"
@@ -81,6 +82,17 @@ object RimiCloud {
     var autoSync: Boolean
         get() = prefs.getBoolean(KEY_AUTO_SYNC, true)
         set(value) = prefs.edit().putBoolean(KEY_AUTO_SYNC, value).apply()
+
+    /**
+     * 后台自动同步是否只在屏幕熄灭时执行（默认开）。
+     *
+     * 亮屏时用户可能正在打字：同步要读写 userdb 并在写回后 `updateConfig()` 重启引擎，
+     * 既抢 IO/网络也会打断输入。熄屏后再跑可以把这两类干扰都降到零。
+     * 「立即同步」是用户主动操作，不受此开关影响。
+     */
+    var syncOnlyWhenScreenOff: Boolean
+        get() = prefs.getBoolean(KEY_SYNC_ONLY_SCREEN_OFF, true)
+        set(value) = prefs.edit().putBoolean(KEY_SYNC_ONLY_SCREEN_OFF, value).apply()
 
     var syncIntervalMinutes: Int
         get() = prefs.getInt(KEY_SYNC_INTERVAL, DEFAULT_SYNC_INTERVAL_MINUTES)

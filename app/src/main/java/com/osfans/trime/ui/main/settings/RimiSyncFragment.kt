@@ -35,6 +35,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     private lateinit var logoutPreference: Preference
     private lateinit var syncNowPreference: Preference
     private lateinit var autoSyncPreference: SwitchPreferenceCompat
+    private lateinit var screenOffOnlyPreference: SwitchPreferenceCompat
     private lateinit var intervalPreference: EditTextIntPreference
     private lateinit var statusPreference: Preference
     private lateinit var serverPreference: Preference
@@ -105,6 +106,21 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                         },
                     )
                     addPreference(
+                        SwitchPreferenceCompat(ctx).apply {
+                            screenOffOnlyPreference = this
+                            key = "rimi_cloud_screen_off_only"
+                            isPersistent = false
+                            isIconSpaceReserved = false
+                            setTitle(R.string.rimi_cloud_screen_off_only)
+                            setSummary(R.string.rimi_cloud_screen_off_only_summary)
+                            setOnPreferenceChangeListener { _, newValue ->
+                                RimiCloud.syncOnlyWhenScreenOff = newValue as Boolean
+                                RimiCloudSyncWork.restart(requireContext())
+                                true
+                            }
+                        },
+                    )
+                    addPreference(
                         EditTextIntPreference(ctx).apply {
                             intervalPreference = this
                             key = "rimi_cloud_sync_interval_pref"
@@ -167,6 +183,8 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
         syncNowPreference.isEnabled = loggedIn
         autoSyncPreference.isChecked = RimiCloud.autoSync
         autoSyncPreference.isEnabled = loggedIn
+        screenOffOnlyPreference.isChecked = RimiCloud.syncOnlyWhenScreenOff
+        screenOffOnlyPreference.isEnabled = loggedIn && RimiCloud.autoSync
         intervalPreference.isEnabled = loggedIn && RimiCloud.autoSync
         serverPreference.summary = RimiCloud.server
         statusPreference.summary =

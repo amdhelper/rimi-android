@@ -137,6 +137,15 @@ class Rime :
         startRime(false)
     }
 
+    override suspend fun <T> withEngineReleased(block: suspend () -> T): T = withRimeContext {
+        exitRime()
+        try {
+            block()
+        } finally {
+            startRime(false)
+        }
+    }
+
     override suspend fun syncUserData(): Boolean = lock.withLock {
         UserDataManager.sync()
         // RimeSyncUserData schedules maintenance asynchronously and returns once the

@@ -13,6 +13,7 @@
 
 #include <rime/dict/db.h>
 #include <rime/dict/db_utils.h>
+#include <rime/dict/level_db.h>
 #include <rime/dict/user_db.h>
 #include <rime/service.h>
 
@@ -93,44 +94,9 @@ Db* create_user_db(const std::string& name) {
   return component->Create(name);
 }
 
-}  // namespace
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_osfans_trime_data_rimi_RimiUserDb_nativeReadUserDict(JNIEnv* env,
-                                                             jclass /*clazz*/,
-                                                             jstring dict_name) {
-  std::string name = *CString(env, dict_name);
-  the<Db> db(create_user_db(name));
-  if (!db)
-    return nullptr;
-  if (!db->OpenReadOnly())
-    return nullptr;
-  std::string out;
-  {
-    DbSource source(db.get());
-    CollectSink sink(db.get(), &out);
-    source.Dump(&sink);
-  }
-  db->Close();
-  return env->NewStringUTF(out.c_str());
-}
-
-extern "C" JNIEXPORT jint JNICALL
-Java_com_osfans_trime_data_rimi_RimiUserDb_nativeApplyUserDict(JNIEnv* env,
-                                                              jclass /*clazz*/,
-                                                              jstring dict_name,
-                                                              jstring tsv) {
-  std::string name = *CString(env, dict_name);
-  std::string data = *CString(env, tsv);
-  the<Db> db(create_user_db(name));
-  if (!db)
-    return -1;
-  if (!db->Open())
-    return -1;
-  // 全新库（还没打过字）没有 metadata，librime 之后会认不出这是 userdb
-  if (!UserDbHelper(db.get()).IsUserDb()) {
-    db->CreateMetadata();
-  }
+/// TSV 行格式：term \t code \t weight \t deleted(0/1)。
+/// 返回实际写入/删除条数；db 必须已经 Open。
+int apply_entries(Db* db, const std::string& data) {
   int applied = 0;
   size_t start = 0;
   while (start < data.size()) {
@@ -168,6 +134,89 @@ Java_com_osfans_trime_data_rimi_RimiUserDb_nativeApplyUserDict(JNIEnv* env,
     if (db->Update(key, buf))
       ++applied;
   }
+  return applied;
+}
+
+}  // namespace
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_osfans_trime_data_rimi_RimiUserDb_nativeReadUserDict(JNIEnv* env,
+                                                             jclass /*clazz*/,
+                                                             jstring dict_name) {
+  std::string name = *CString(env, dict_name);
+  the<Db> db(create_user_db(name));
+  if (!db)
+    return nullptr;
+  if (!db->OpenReadOnly())
+    return nullptr;
+  std::string out;
+  {
+    DbSource source(db.get());
+    CollectSink sink(db.get(), &out);
+    source.Dump(&sink);
+  }
+  db->Close();
+  return env->NewStringUTF(out.c_str());
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_osfans_trime_data_rimi_RimiUserDb_nativeReadUserDictAtPath(
+    JNIEnv* env,
+    jclass /*clazz*/,
+    jstring db_path) {
+  std::string db_dir = *CString(env, db_path);
+  the<Db> db(new LevelDb(path(db_dir), "snapshot"));
+  if (!db->OpenReadOnly())
+    return nullptr;
+  std::string out;
+  {
+    DbSource source(db.get());
+    CollectSink sink(db.get(), &out);
+    source.Dump(&sink);
+  }
+  db->Close();
+  return env->NewStringUTF(out.c_str());
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_osfans_trime_data_rimi_RimiUserDb_nativeApplyUserDict(JNIEnv* env,
+                                                              jclass /*clazz*/,
+                                                              jstring dict_name,
+                                                              jstring tsv) {
+  std::string name = *CString(env, dict_name);
+  std::string data = *CString(env, tsv);
+  the<Db> db(create_user_db(name));
+  if (!db)
+    return -1;
+  if (!db->Open())
+    return -1;
+  // 全新库（还没打过字）没有 metadata，librime 之后会认不出这是 userdb
+  if (!UserDbHelper(db.get()).IsUserDb()) {
+    db->CreateMetadata();
+  }
+  int applied = apply_entries(db.get(), data);
+  db->Close();
+  return applied;
+}
+
+// 按绝对路径写 userdb：引擎已停（Rime Service 也被销毁）时走这里。
+// withEngineReleased 窗口内 UserDb::Require("userdb") 拿不到组件，
+// nativeApplyUserDict 必然返回 -1；这里直接用 LevelDb 打开路径，不依赖 Service。
+extern "C" JNIEXPORT jint JNICALL
+Java_com_osfans_trime_data_rimi_RimiUserDb_nativeApplyUserDictAtPath(
+    JNIEnv* env,
+    jclass /*clazz*/,
+    jstring db_path,
+    jstring tsv) {
+  std::string db_dir = *CString(env, db_path);
+  std::string data = *CString(env, tsv);
+  the<Db> db(new LevelDb(path(db_dir), "user", "userdb"));
+  if (!db->Open())  // create_if_missing，首次同步时本地还没 userdb
+    return -1;
+  if (!UserDbHelper(db.get()).IsUserDb()) {
+    db->CreateMetadata();  // 只写 /db_name、/rime_version、/db_type，不依赖 Service
+  }
+  int applied = apply_entries(db.get(), data);
   db->Close();
   return applied;
 }
