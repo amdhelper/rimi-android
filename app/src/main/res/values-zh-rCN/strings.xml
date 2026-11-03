@@ -279,6 +279,11 @@
     <string name="rimi_cloud_last_sync">上次同步：%1$s</string>
     <string name="rimi_cloud_last_error">上次同步出错：%1$s</string>
     <string name="rimi_cloud_never_synced">尚未同步过</string>
+    <string name="rimi_voice_category">语音输入</string>
+    <string name="rimi_voice_permission">录音权限</string>
+    <string name="rimi_voice_permission_granted">已授权，键盘上的 🎤 可以直接说话</string>
+    <string name="rimi_voice_permission_denied">未授权：点击这里授予麦克风权限</string>
+    <string name="rimi_voice_summary">说话直接上屏（识别走日弥 paraformer 通道，需要登录 wumi 账户）</string>
     <string name="rimi_cloud_server_category">服务器</string>
     <string name="rimi_cloud_server">服务器地址</string>
 </resources>

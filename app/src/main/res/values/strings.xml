@@ -280,6 +280,11 @@
     <string name="rimi_cloud_last_sync">Last sync: %1$s</string>
     <string name="rimi_cloud_last_error">Last error: %1$s</string>
     <string name="rimi_cloud_never_synced">Never synced</string>
+    <string name="rimi_voice_category">Voice input</string>
+    <string name="rimi_voice_permission">Microphone permission</string>
+    <string name="rimi_voice_permission_granted">Granted — the 🎤 key on the keyboard is ready</string>
+    <string name="rimi_voice_permission_denied">Not granted — tap here to allow the microphone</string>
+    <string name="rimi_voice_summary">Dictate straight into the text field via the Rimi paraformer channel (requires a wumi account)</string>
     <string name="rimi_cloud_server_category">Server</string>
     <string name="rimi_cloud_server">Server address</string>
 </resources>

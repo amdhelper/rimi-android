@@ -280,6 +280,56 @@ object RimiCloud {
         parse<StatusData>(request("GET", "/rimi/dict/status", null, token)).entryCount
     }
 
+    // ---------------- 语音识别（M4） ----------------
+
+    /**
+     * 语音转文字：`POST /asr/transcribe`（body = 原始音频，服务端 ffmpeg 探测解码）。
+     *
+     * 与桌面 rimi_voice / wumi App 同一条 paraformer 通道，用同一个 wumi JWT 鉴权。
+     * 返回纯文本（可能为空串 = 没听清）。
+     */
+    suspend fun transcribe(wav: ByteArray): String = withContext(Dispatchers.IO) {
+        withAuth { token -> transcribeWithToken(token, wav) }
+    }
+
+    private fun transcribeWithToken(
+        token: String,
+        wav: ByteArray,
+    ): String {
+        val conn = URL("${server.trimEnd('/')}/asr/transcribe").openConnection() as HttpURLConnection
+        return try {
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.connectTimeout = 15_000
+            conn.readTimeout = 90_000
+            conn.setRequestProperty("Accept", "application/json")
+            conn.setRequestProperty("Content-Type", "audio/wav")
+            conn.setRequestProperty("Authorization", "Bearer $token")
+            conn.setFixedLengthStreamingMode(wav.size)
+            conn.outputStream.use { it.write(wav) }
+            val code = conn.responseCode
+            val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+            val text = stream?.bufferedReader()?.use { it.readText() } ?: ""
+            if (code == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw RimiUnauthorizedException(text.take(300))
+            }
+            if (code !in 200..299) {
+                throw RimiCloudException("语音识别失败（HTTP $code）${text.take(120)}")
+            }
+            // ⚠️ /asr/transcribe 返回的是扁平对象 {text,duration,...}，没有 wumi 的 {success,data} 信封，
+            // 不能走 parse<T>()（那会误判 success=false → "0: 未知错误"）。
+            val result =
+                runCatching { json.decodeFromString<AsrResult>(text) }.getOrElse {
+                    throw RimiCloudException("语音识别响应无法解析：${text.take(120)}")
+                }
+            result.text.trim()
+        } catch (e: IOException) {
+            throw RimiCloudException("语音识别网络错误：${e.message}", e)
+        } finally {
+            conn.disconnect()
+        }
+    }
+
     private suspend fun <T> withAuth(block: suspend (String) -> T): T {
         val token = ensureToken()
         return try {
@@ -426,4 +476,7 @@ object RimiCloud {
 
     @Serializable
     private data class StatusData(@SerialName("entry_count") val entryCount: Long = 0)
+
+    @Serializable
+    private data class AsrResult(val text: String = "")
 }

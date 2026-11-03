@@ -73,6 +73,11 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
         @Volatile
         var isInputViewShowing: Boolean = false
             private set
+
+        /** 当前服务实例（语音输入面板需要从单例里收回叠加视图）。 */
+        @Volatile
+        var instance: TrimeInputMethodService? = null
+            private set
     }
 
     private lateinit var rime: RimeSession
@@ -188,6 +193,7 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     }
 
     override fun onCreate() {
+        instance = this
         rime = RimeDaemon.createSession(javaClass.name)
         lifecycleScope.launch {
             jobs.consumeEach { it.join() }
@@ -338,6 +344,8 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     }
 
     override fun onDestroy() {
+        if (instance === this) instance = null
+        overlayView = null
         InputFeedbackManager.destroy()
         inputView = null
         recreateInputViewPrefs.forEach {
@@ -1011,6 +1019,35 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     override fun onEvaluateFullscreenMode(): Boolean = false
 
     private var showingDialog: Dialog? = null
+
+    private var overlayView: View? = null
+
+    /**
+     * 在输入法窗口内部叠加一个全屏视图（语音输入面板用）。
+     *
+     * 为什么不用 Dialog：EMUI 上 APPLICATION_ATTACHED_DIALOG 能显示、能收 BACK，
+     * 但触摸会被系统手势窗口（GestureSildeOut）吃掉，按钮点不动（2026-11-04 真机实证）。
+     * 加在 IME 自己的 contentView 里就与键盘同一窗口，触摸可靠。
+     */
+    fun showOverlay(view: View) {
+        hideOverlay()
+        overlayView = view
+        contentView.addView(
+            view,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        view.bringToFront()
+    }
+
+    fun hideOverlay() {
+        overlayView?.let { v ->
+            runCatching { contentView.removeView(v) }
+        }
+        overlayView = null
+    }
 
     fun showDialog(dialog: Dialog) {
         showingDialog?.dismiss()

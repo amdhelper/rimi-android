@@ -5,15 +5,20 @@
 
 package com.osfans.trime.ui.main.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 import com.osfans.trime.R
 import com.osfans.trime.daemon.RimeDaemon
 import com.osfans.trime.data.rimi.RimiCloud
@@ -39,6 +44,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     private lateinit var intervalPreference: EditTextIntPreference
     private lateinit var statusPreference: Preference
     private lateinit var serverPreference: Preference
+    private lateinit var voicePermissionPreference: Preference
 
     override fun onCreatePreferences(
         savedInstanceState: Bundle?,
@@ -160,6 +166,31 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                         },
                     )
                 }
+                addCategory(R.string.rimi_voice_category) {
+                    isIconSpaceReserved = false
+                    addPreference(
+                        Preference(ctx).apply {
+                            voicePermissionPreference = this
+                            isIconSpaceReserved = false
+                            setTitle(R.string.rimi_voice_permission)
+                            setOnPreferenceClickListener {
+                                if (ContextCompat.checkSelfPermission(
+                                        ctx,
+                                        Manifest.permission.RECORD_AUDIO,
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    ctx.toast(R.string.rimi_voice_permission_granted)
+                                } else {
+                                    XXPermissions
+                                        .with(requireActivity())
+                                        .permission(Permission.RECORD_AUDIO)
+                                        .request(null)
+                                }
+                                true
+                            }
+                        },
+                    )
+                }
             }
     }
 
@@ -187,6 +218,16 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
         screenOffOnlyPreference.isEnabled = loggedIn && RimiCloud.autoSync
         intervalPreference.isEnabled = loggedIn && RimiCloud.autoSync
         serverPreference.summary = RimiCloud.server
+        voicePermissionPreference.summary =
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO,
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                getString(R.string.rimi_voice_permission_granted)
+            } else {
+                getString(R.string.rimi_voice_permission_denied)
+            }
         statusPreference.summary =
             when {
                 !loggedIn -> getString(R.string.rimi_cloud_account_not_logged_in)
