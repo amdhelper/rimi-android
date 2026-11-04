@@ -199,7 +199,13 @@ class CommonKeyboardActionListener(override val di: DI) : DIAware {
                     "switch_schema" -> if (arg.isNotEmpty()) {
                         // selectSchema 是 suspend，launchOnReady 的 lambda 不是挂起上下文
                         rime.launchOnReady { api ->
-                            service.lifecycleScope.launch { api.selectSchema(arg) }
+                            service.lifecycleScope.launch {
+                                api.selectSchema(arg)
+                                // ascii_mode 是全局开关，不随方案走：若上次留在西文模式，
+                                // 切进九宫格后按数字会直接上屏数字、不进候选（2026-11-04 实测）。
+                                // 切入任何中文方案都强制回中文。
+                                api.setRuntimeOption("ascii_mode", false)
+                            }
                         }
                     }
                     "select_candidate" -> handleSelectCandidate(arg)

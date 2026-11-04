@@ -1248,9 +1248,9 @@ preset_keyboards:
     - {click: Keyboard_symbols, label: '符'}
     - {click: space, long_click: '0', label: '空格'}
     - {click: BackSpace, repeatable: true, label: '⌫'}
-    - {click: Mode_switch, label: '中/英'}
-    - {click: SwitchToQwerty, label: '26'}
-    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎'}
+    # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
+    - {click: SwitchToQwerty, label: '26', width: 50}
+    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎', width: 50}
 
   us_intl:
     name: 美式國際
