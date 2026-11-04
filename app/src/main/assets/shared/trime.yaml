@@ -1248,7 +1248,7 @@ preset_keyboards:
     - {click: '7', label: '7', hint: 'pqrs'}
     - {click: '8', label: '8', hint: 'tuv'}
     - {click: '9', label: '9', hint: 'wxyz'}
-    - {click: Keyboard_symbols, label: '符'}
+    - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number}
     - {click: '1', label: '1', hint: '0', long_click: '0'}
     - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫'}
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）

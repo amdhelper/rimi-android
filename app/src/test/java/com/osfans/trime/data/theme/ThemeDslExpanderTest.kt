@@ -318,6 +318,10 @@ class ThemeDslExpanderTest :
                 bottomRowWidth shouldBe 100f
                 val oneKey = keyMaps.first { it.pairs["click"]?.string == "1" }
                 oneKey.pairs["long_click"]?.string shouldBe "0"
+                // 2026-11-05 爸爸令：九宫格「符」键改「符/数」——点=符号键盘、长按=数字键盘（与 26 键一致）
+                val symbolKey = keyMaps.first { it.pairs["click"]?.string == "Keyboard_symbols" }
+                symbolKey.pairs["label"]?.string shouldBe "符/数"
+                symbolKey.pairs["long_click"]?.string shouldBe "Keyboard_number"
             }
 
             Then("every keyboard defines visible gaps and a key border") {
