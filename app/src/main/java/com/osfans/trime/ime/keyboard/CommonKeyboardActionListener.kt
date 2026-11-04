@@ -193,6 +193,15 @@ class CommonKeyboardActionListener(override val di: DI) : DIAware {
                     "apply" -> handleApplyCommand(arg)
                     "share_text" -> service.shareText()
                     "voice_input" -> VoiceInputController.start(service)
+                    // 切方案（如 全键盘 rimi ⇄ 九宫格 t9）。键盘会随后自动跟随：
+                    // KeyboardWindow.onRimeSchemaUpdated → switchKeyboard(".default")
+                    // → smartMatchKeyboard() 优先选与 schema id 同名的键盘。
+                    "switch_schema" -> if (arg.isNotEmpty()) {
+                        // selectSchema 是 suspend，launchOnReady 的 lambda 不是挂起上下文
+                        rime.launchOnReady { api ->
+                            service.lifecycleScope.launch { api.selectSchema(arg) }
+                        }
+                    }
                     "select_candidate" -> handleSelectCandidate(arg)
                     "switch_hide_key_symbol" -> switchHideKeySymbol()
                     "switch_hide_key_hint" -> switchHideKeyHint()

@@ -45,6 +45,7 @@ object UserDataManager {
       patch:
         schema_list:
           - schema: rimi
+          - schema: t9
           - schema: luna_pinyin
           - schema: luna_pinyin_simp
     """
@@ -133,8 +134,13 @@ object UserDataManager {
      */
     fun ensureDefaultCustomConfig() {
         val custom = File(userDataDir, DEFAULT_CUSTOM_FILE_NAME)
-        if (!custom.exists() && custom.createNewFile()) {
-            custom.writeText(SCHEMA_LIST_CUSTOM_PATCH.trimIndent())
+        val expected = SCHEMA_LIST_CUSTOM_PATCH.trimIndent()
+        if (!custom.exists()) {
+            if (custom.createNewFile()) custom.writeText(expected)
+        } else if (custom.readText().trim() != expected.trim()) {
+            // 这个文件由 App 维护（决定方案列表）。老版本只写了 rimi/luna_pinyin，
+            // 升级后必须补上 t9 九宫格方案，否则 switch_schema 切不过去。
+            custom.writeText(expected)
         }
     }
 

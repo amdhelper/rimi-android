@@ -974,6 +974,9 @@ preset_keys:
   RepeatCommit: { label: 重复,  command: commit, option: "%1$s" } #重复输入刚上屏的内容
   # 日弥：语音输入（M4）——录音 → paraformer 通道 → 直接上屏
   VoiceInput: {label: "🎤", command: voice_input}
+  # 九宫格 / 全键盘互切（切方案 → 键盘自动跟随，见 smartMatchKeyboard）
+  SwitchToT9: {label: "9", send: FUNCTION, command: switch_schema, option: t9}
+  SwitchToQwerty: {label: "26", send: FUNCTION, command: switch_schema, option: rimi}
 
 preset_keyboards:
   default:
@@ -1215,11 +1218,40 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
-    - {click: space, width: 20}
+    - {click: space, width: 14}
     - {click: VoiceInput, width: 10}
+    - {click: SwitchToT9, width: 6}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
+  # 日弥九宫格（T9）：键只发数字，拼音由 t9 方案把音节映射成数字来匹配。
+  # 1 键留给标点（拼音没有 1 开头的音节），0 键是空格（长按出数字 0）。
+  t9:
+    name: 日弥九宫格
+    author: "rimi"
+    ascii_mode: 0
+    # ⚠️ width 是「每个键占屏宽的百分比权重」，MAX_TOTAL_WEIGHT=100：
+    #    33.3 → 每键 1/3 屏宽，三键正好一行，第四个键自动换行。
+    width: 33.3
+    height: 52
+    lock: true
+    keys:
+    - {click: ',', long_click: '。', label: '，'}
+    - {click: '2', label: '2', hint: 'abc'}
+    - {click: '3', label: '3', hint: 'def'}
+    - {click: '4', label: '4', hint: 'ghi'}
+    - {click: '5', label: '5', hint: 'jkl'}
+    - {click: '6', label: '6', hint: 'mno'}
+    - {click: '7', label: '7', hint: 'pqrs'}
+    - {click: '8', label: '8', hint: 'tuv'}
+    - {click: '9', label: '9', hint: 'wxyz'}
+    - {click: Keyboard_symbols, label: '符'}
+    - {click: space, long_click: '0', label: '空格'}
+    - {click: BackSpace, repeatable: true, label: '⌫'}
+    - {click: Mode_switch, label: '中/英'}
+    - {click: SwitchToQwerty, label: '26'}
+    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎'}
+
   us_intl:
     name: 美式國際
     author: "Terry Tsang <archerindigo@gmail.com>"

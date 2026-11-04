@@ -1,0 +1,95 @@
+# Rimi 日弥 · 九宫格（T9）方案
+#
+# 键盘只发 2-9 数字，这里用 algebra 把词典的拼音音节映射成数字，
+# 于是 "ni hao" 的编码变成 "64 426"：用户连按 64426，librime 按音节表
+# 自动切分成 64+426 命中「你好」。词库直接复用日弥 188 万词的 rimi.mobile，
+# 不新增任何词典文件；prism 必须独立（algebra 与全拼方案不同）。
+#
+# ⚠️ 不要删音节间的空格：RIME 的 prism 靠空格分隔的音节表切分连续数字，
+#    一旦 xform/ // 把空格吃掉，整个音节表塌成一个长串，候选全灭。
+#
+# 切换：键盘上的「9键/26键」键发 switch_schema 命令（见 CommonKeyboardActionListener）。
+schema:
+  schema_id: t9
+  name: "日弥九宫格"
+  version: "0.1.0"
+  author:
+    - rimi
+  description: |-
+    九宫格拼音：2-9 数字键对应 abc/def/ghi/jkl/mno/pqrs/tuv/wxyz，
+    词库复用日弥全拼方案（医学/中医/易经 + 雾凇 188 万词）。
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: simplification
+    reset: 1
+    states: [ 漢字, 汉字 ]
+  - name: ascii_punct
+    states: [ 。，, ．， ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator
+  filters:
+    - simplifier
+    - uniquifier
+
+speller:
+  # 0 不做编码字符（拼音没有以 0 开头的音节），九宫格的 0 键留给空格
+  alphabet: "123456789"
+  delimiter: " '"
+  algebra:
+    - xform/[abc]/2/
+    - xform/[def]/3/
+    - xform/[ghi]/4/
+    - xform/[jkl]/5/
+    - xform/[mno]/6/
+    - xform/[pqrs]/7/
+    - xform/[tuv]/8/
+    - xform/[wxyz]/9/
+
+translator:
+  dictionary: rimi.mobile
+  prism: t9
+  # 与全拼方案共用一个 userdb：编码前缀不同（拼音 vs 数字），不会串词，
+  # 但用户自造词/词频能在九宫格和全键盘之间共享。
+  user_dict: user
+  db_class: userdb
+  initial_quality: 10
+  enable_user_dict: true
+  enable_sentence: true
+  enable_encoder: true
+  encode_commit_history: true
+  max_phrase_length: 9
+  enable_completion: true
+  # 数字编码对用户没有阅读价值，不显示拼音注释
+  spelling_hints: 0
+
+punctuator:
+  import_preset: default
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default

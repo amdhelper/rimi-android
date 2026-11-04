@@ -115,15 +115,15 @@ class ThemeGoldenTest :
 
                 Then("color schemes and preset keys are decoded") {
                     theme.presetColorSchemes.size shouldBe 37
-                    // 107 = 106 + 日弥语音输入键（VoiceInput，M4 2026-11-04）
-                    theme.presetKeys.size shouldBe 107
+                    // 109 = 106 + 语音输入键 + 九宫格/全键盘切换键（M4/M5 2026-11-04）
+                    theme.presetKeys.size shouldBe 109
                     val brightnessDown = theme.presetKeys.getValue("BRIGHTNESS_DOWN")
                     brightnessDown.label shouldBe "亮度-"
                     brightnessDown.send shouldBe "BRIGHTNESS_DOWN"
                 }
 
-                Then("all 18 plain keyboards are decoded with their keys") {
-                    theme.presetKeyboards.size shouldBe 18
+                Then("all 19 plain keyboards are decoded with their keys") {
+                    theme.presetKeyboards.size shouldBe 19
                     theme.presetKeyboards shouldContainKey "default"
                     theme.presetKeyboards shouldContainKey "qwerty0"
                     theme.presetKeyboards shouldContainKey "cangjie5"
