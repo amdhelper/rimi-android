@@ -98,7 +98,8 @@ class KeyView(
                         dismissPopupPreview()
                     }
                     setPressedState(false)
-                } else if (isRepeatable) {
+                } else if (isRepeatable && !hasLongPress) {
+                    // 退格长按已有 Escape 动作：释放时不再补退格，避免清空后多删一个已上屏字。
                     key.getAction(KeyBehavior.CLICK)?.let { processKeyAction(it, KeyBehavior.CLICK) }
                 }
             } else {

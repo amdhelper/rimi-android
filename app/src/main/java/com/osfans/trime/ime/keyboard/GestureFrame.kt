@@ -229,10 +229,11 @@ open class GestureFrame(context: Context) : FrameLayout(context) {
 
             if (vibrateOnKeyPress) InputFeedbackManager.keyPressVibrate(this@GestureFrame, true)
 
-            if (isRepeatable) {
-                startRepeatJob()
-            } else {
-                performLongClick()
+            // 有显式长按动作时优先长按（退格 = Escape 清空整个待选词组），不可连发才重复。
+            when {
+                hasLongPress -> performLongClick()
+                isRepeatable -> startRepeatJob()
+                else -> performLongClick()
             }
         }
     }

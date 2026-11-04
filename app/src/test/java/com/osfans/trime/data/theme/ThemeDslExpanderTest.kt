@@ -12,6 +12,7 @@ import com.osfans.trime.util.mapping
 import com.osfans.trime.util.pairs
 import com.osfans.trime.util.string
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import java.io.File
@@ -254,6 +255,26 @@ class ThemeDslExpanderTest :
                     theme.presetKeyboards.getValue("default").keys.size
                 theme.presetKeyboards.getValue("scj6").keys.size shouldBe
                     theme.presetKeyboards.getValue("cangjie5").keys.size
+            }
+
+            Then("every BackSpace key clears the whole composition on long press") {
+                // 2026-11-04 爸爸需求：打出一串待选词时长按退格 = 整串清空（Escape）。
+                // 只加 long_click 不够——GestureFrame 必须把长按优先于 repeatable，
+                // 这里锁住键盘定义，防止后续改 trime.yaml 时把该动作静默删掉。
+                val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
+                var checked = 0
+                for ((name, kbNode) in keyboards.pairs) {
+                    val keys = kbNode.mapping?.pairs?.get("keys") as? YamlList ?: continue
+                    for (keyNode in keys.items) {
+                        val keyMap = keyNode.mapping ?: continue
+                        if (keyMap.pairs["click"]?.string != "BackSpace") continue
+                        checked++
+                        withClue("keyboard=$name") {
+                            keyMap.pairs["long_click"]?.string shouldBe "Escape"
+                        }
+                    }
+                }
+                (checked > 0) shouldBe true
             }
         }
     })

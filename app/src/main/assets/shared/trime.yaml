@@ -1034,7 +1034,7 @@ preset_keyboards:
       - {click: Mode_switch, long_click: Menu}
       - {click: space, width: 30}
       - {click: "'", long_click: '"'}
-      - {click: BackSpace, width: 15}
+      - {click: BackSpace, long_click: Escape, width: 15}
       - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
   mini:
     name: 精简键盘
@@ -1118,7 +1118,7 @@ preset_keyboards:
     - {click: 'b', long_click: '~'}
     - {click: 'n', long_click: '"'}
     - {click: 'm', long_click: "MoeDict"}
-    - {click: BackSpace, width: 15}
+    - {click: BackSpace, long_click: Escape, width: 15}
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
@@ -1168,7 +1168,7 @@ preset_keyboards:
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: Mode_switch, long_click: Menu}
     - {click: space, width: 40}
-    - {click: BackSpace, width: 15}
+    - {click: BackSpace, long_click: Escape, width: 15}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
   qwerty:
     name: 預設26鍵
@@ -1216,7 +1216,7 @@ preset_keyboards:
     - {click: 'b', long_click: Time, swipe_up: Date}
     - {click: 'n', long_click: '"'}
     - {click: 'm', long_click: "'"}
-    - {click: BackSpace, swipe_left: Escape, width: 15}
+    - {click: BackSpace, long_click: Escape, swipe_left: Escape, width: 15}
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
@@ -1248,7 +1248,7 @@ preset_keyboards:
     - {click: '9', label: '9', hint: 'wxyz'}
     - {click: Keyboard_symbols, label: '符'}
     - {click: space, long_click: '0', label: '空格'}
-    - {click: BackSpace, repeatable: true, label: '⌫'}
+    - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫'}
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
     - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎', width: 100}
@@ -1306,7 +1306,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu}
     - {click: space, long_click: VOICE_ASSIST, width: 30}
     - {click: "'", long_click: '"'}
-    - {click: BackSpace, swipe_right: Delete, swipe_left: Escape, width: 15}
+    - {click: BackSpace, long_click: Escape, swipe_right: Delete, swipe_left: Escape, width: 15}
     - {click: Return, long_click: CommitComment, width: 15}
   number:
     name: 預設數字
@@ -1337,7 +1337,7 @@ preset_keyboards:
     - {click: '='}
     - {click: Keyboard_default, long_click: Keyboard_symbols}
     - {click: space}
-    - {click: BackSpace}
+    - {click: BackSpace, long_click: Escape}
     - {click: Return}
   symbols:
     name: 符號
@@ -1542,7 +1542,7 @@ preset_keyboards:
     - {click: b, label: "月", long_click: "~"}
     - {click: n, label: "弓", long_click: '"'}
     - {click: m, label: "一", long_click: Delete}
-    - {click: BackSpace, width: 13.8}
+    - {click: BackSpace, long_click: Escape, width: 13.8}
     - {width: 2}
     - {width: 3}
     - {click: Menu, long_click: Color_switch, width: 14}
@@ -1601,7 +1601,7 @@ preset_keyboards:
     - {click: ':', label: '：'}
     - {click: '0'}
     - {click: '.', label: '。'}
-    - {click: BackSpace}
+    - {click: BackSpace, long_click: Escape}
     - {click: Keyboard_letter, long_click: Menu}
     - {click: space, width: 60}
     - {click: Return, composing: Return1}
@@ -1702,7 +1702,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu}
     - {click: space, long_click: VOICE_ASSIST, width: 30}
     - {click: "'", long_click: '"'}
-    - {click: BackSpace, swipe_right: Delete, swipe_left: Escape, width: 15}
+    - {click: BackSpace, long_click: Escape, swipe_right: Delete, swipe_left: Escape, width: 15}
     - {click: Return, long_click: CommitComment, width: 15}
   quick5:
     ascii_mode: 0
@@ -1752,7 +1752,7 @@ preset_keyboards:
     - {click: b, label: "月", long_click: "~"}
     - {click: n, label: "弓", long_click: '"'}
     - {click: m, label: "一", long_click: Delete}
-    - {click: BackSpace, width: 13.8}
+    - {click: BackSpace, long_click: Escape, width: 13.8}
     - {width: 2}
     - {width: 3}
     - {click: Menu, long_click: Color_switch, width: 14}
