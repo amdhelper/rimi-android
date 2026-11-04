@@ -1226,7 +1226,8 @@ preset_keyboards:
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
   # 日弥九宫格（T9）：键只发数字，拼音由 t9 方案把音节映射成数字来匹配。
-  # 1 键留给标点（拼音没有 1 开头的音节），0 键是空格（长按出数字 0）。
+  # 2026-11-04 爸爸令：底排整行大键（原回车键）改成大空格键（拇指最顺手），回车保留长按；
+  # 原小空格键让位给 '1'（拼音没有 1 开头音节，'1' 直发），'0' 挂 '1' 键长按（小字 0 提示）。
   t9:
     name: 日弥九宫格
     author: "rimi"
@@ -1247,11 +1248,11 @@ preset_keyboards:
     - {click: '8', label: '8', hint: 'tuv'}
     - {click: '9', label: '9', hint: 'wxyz'}
     - {click: Keyboard_symbols, label: '符'}
-    - {click: space, long_click: '0', label: '空格'}
+    - {click: '1', label: '1', hint: '0', long_click: '0'}
     - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫'}
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
-    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎', width: 100}
+    - {click: space, long_click: Return, label: '空格', width: 100}
 
   us_intl:
     name: 美式國際

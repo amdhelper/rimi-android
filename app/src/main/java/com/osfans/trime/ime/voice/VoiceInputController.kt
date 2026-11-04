@@ -38,7 +38,7 @@ import kotlin.math.max
 /**
  * 日弥语音输入（M4）。
  *
- * 交互：键盘底排 🎤 键 → 输入法窗口内浮出录音面板（立即开始录音）→「上屏」结束并识别。
+ * 交互：长按键盘底排空格键 → 输入法窗口内浮出录音面板（立即开始录音）→「上屏」结束并识别。
  * 识别走 wumi 的 paraformer 通道 `POST /asr/transcribe`（body = 原始音频，JWT 鉴权），
  * 与桌面 rimi_voice / wumi App 同一条链路。结果直接 commitText 到当前输入框。
  *
@@ -69,8 +69,8 @@ object VoiceInputController {
             return
         }
         if (!RimiCloud.isLoggedIn) {
-            service.toast("语音输入需要 wumi 账户：日弥设置 → 日弥云同步 → 登录")
-            AppUtils.launchMainActivity(service)
+            showLoginPrompt(service)
+            Timber.i("Voice input blocked: not logged in, login prompt shown")
             return
         }
         val rec = Recorder()
@@ -81,6 +81,82 @@ object VoiceInputController {
         recorder = rec
         showPanel(service, rec)
         Timber.i("Voice input recording started")
+    }
+
+    /**
+     * 未登录时的语音入口引导弹窗（2026-11-04 爸爸令）：toast 一闪而过用户看不懂，
+     * 改成输入法窗口内 overlay 弹窗——问用户要不要登录、写清免费级别、给登录入口。
+     * ⚠️ 必须走 showOverlay（同 showPanel 的教训：Dialog 触摸会被系统手势窗吞掉），
+     * 且面板贴窗口底部（IME touchable region 只覆盖键盘区）。
+     * 免费规则与桌面 rimi_voice 同口径：站长（founder）/医者（elder）免费云端，
+     * 其余级别暂不提供免费云端转写。
+     */
+    private fun showLoginPrompt(service: TrimeInputMethodService) {
+        val ctx = service
+        val root =
+            FrameLayout(ctx).apply {
+                setBackgroundColor(0x99000000.toInt())
+                isClickable = true
+            }
+        val box =
+            LinearLayout(ctx).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(ctx, 18), dp(ctx, 18), dp(ctx, 18), dp(ctx, 18))
+                background =
+                    GradientDrawable().apply {
+                        cornerRadius = dp(ctx, 20).toFloat()
+                        setColor(0xFF1E1E2E.toInt())
+                    }
+            }
+        val title =
+            TextView(ctx).apply {
+                text = "🎤 语音输入"
+                setTextColor(0xFFCDD6F4.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+                gravity = Gravity.CENTER
+            }
+        val body =
+            TextView(ctx).apply {
+                text = "语音转写需要登录 wumi 账户，要登录吗？\n\n" +
+                    "免费范围：站长、医者——免费使用云端语音转写。\n" +
+                    "其他级别（地纪行者、天纪卦师、人纪学员、麻瓜）：暂不提供免费云端转写。\n\n" +
+                    "登录后在「日弥设置 → 日弥云同步 → 账户」用助记词恢复账户即可使用。"
+                setTextColor(0xFFCDD6F4.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+                setPadding(0, dp(ctx, 12), 0, dp(ctx, 16))
+            }
+        val buttons =
+            LinearLayout(ctx).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+        val later =
+            actionButton(ctx, "先不用", 0xFF45475A.toInt()).apply {
+                setOnClickListener { closePanel() }
+            }
+        val login =
+            actionButton(ctx, "去登录", 0xFF89B4FA.toInt()).apply {
+                setOnClickListener {
+                    closePanel()
+                    AppUtils.launchMainActivity(service)
+                }
+            }
+        buttons.addView(later, rowParams(ctx))
+        buttons.addView(login, rowParams(ctx))
+        box.addView(title)
+        box.addView(body)
+        box.addView(buttons)
+        val width = minOf(service.resources.displayMetrics.widthPixels - dp(ctx, 24), dp(ctx, 360))
+        root.addView(
+            box,
+            FrameLayout.LayoutParams(
+                width,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+            ).apply { bottomMargin = dp(ctx, 36) },
+        )
+        panel = root
+        service.showOverlay(root)
     }
 
     private fun showPanel(service: TrimeInputMethodService, rec: Recorder) {

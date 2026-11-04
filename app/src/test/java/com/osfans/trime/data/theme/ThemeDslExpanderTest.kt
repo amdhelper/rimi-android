@@ -297,5 +297,18 @@ class ThemeDslExpanderTest :
                 }
                 spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
             }
+
+            Then("t9 bottom full-width key is the space bar, Return on long press") {
+                // 2026-11-04 爸爸令：九宫格底排整行大键（原回车）改成大空格键，
+                // 回车保留长按；原小空格让位给 '1'，'0' 挂 '1' 键长按。
+                val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
+                val t9Keys = keyboards.pairs["t9"]!!.mapping!!.pairs["keys"] as YamlList
+                val keyMaps = t9Keys.items.mapNotNull { it.mapping }
+                val bottomKey = keyMaps.first { it.pairs["width"]?.string == "100" }
+                bottomKey.pairs["click"]?.string shouldBe "space"
+                bottomKey.pairs["long_click"]?.string shouldBe "Return"
+                val oneKey = keyMaps.first { it.pairs["click"]?.string == "1" }
+                oneKey.pairs["long_click"]?.string shouldBe "0"
+            }
         }
     })
