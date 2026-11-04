@@ -8,7 +8,7 @@
 # ⚠️ 不要删音节间的空格：RIME 的 prism 靠空格分隔的音节表切分连续数字，
 #    一旦 xform/ // 把空格吃掉，整个音节表塌成一个长串，候选全灭。
 #
-# 切换：键盘上的「9键/26键」键发 switch_schema 命令（见 CommonKeyboardActionListener）。
+# 切换：左上角三点菜单里的「26键全键盘 / 9键九宫格」项发 switch_schema 命令（见 CommonKeyboardActionListener）。
 schema:
   schema_id: t9
   name: "日弥九宫格"

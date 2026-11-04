@@ -23,7 +23,9 @@ import com.osfans.trime.ime.bar.ui.ToolButton
 import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.dialog.EnabledSchemaPickerDialog
+import com.osfans.trime.ime.keyboard.KeyboardWindow
 import com.osfans.trime.ime.window.BoardWindow
+import com.osfans.trime.ime.window.BoardWindowManager
 import com.osfans.trime.ui.main.settings.ThemePickerDialog
 import com.osfans.trime.util.AppUtils
 import kotlinx.coroutines.launch
@@ -43,10 +45,22 @@ class SwitchOptionWindow(di: DI) :
     private val service: TrimeInputMethodService by instance()
     private val rime: RimeSession by instance()
     private val scope: ThemeScope by instance()
+    private val windowManager: BoardWindowManager by instance()
     private val theme: Theme get() = scope.theme
 
+    // 左上角三点菜单 = 本窗口。26/9 一键切换放这里，不占底排键盘（易误触）。
     private val staticEntries by lazy {
         arrayOf(
+            SwitchOptionEntry.Static(
+                "26键全键盘",
+                R.drawable.ic_baseline_keyboard_24,
+                SwitchOptionEntry.Static.Type.KeyboardQwerty,
+            ),
+            SwitchOptionEntry.Static(
+                "9键九宫格",
+                R.drawable.ic_baseline_phone_24,
+                SwitchOptionEntry.Static.Type.KeyboardT9,
+            ),
             SwitchOptionEntry.Static(
                 context.getString(R.string.theme),
                 R.drawable.ic_baseline_color_lens_24,
@@ -95,6 +109,21 @@ class SwitchOptionWindow(di: DI) :
         }
     }
 
+    private fun switchToSchema(schemaId: String) {
+        // selectSchema 是 suspend：launchOnReady 的 lambda 不是挂起上下文，
+        // 必须在 lifecycleScope 里包一层（与 CommonKeyboardActionListener.switch_schema 同款）。
+        rime.launchOnReady { api ->
+            service.lifecycleScope.launch {
+                api.selectSchema(schemaId)
+                // ascii_mode 是全局开关，不随方案走：切入任何中文方案都强制回中文
+                // （西文残留会让九宫格数字键直接上屏，不进候选）。
+                api.setRuntimeOption("ascii_mode", false)
+                // 切完回到键盘：KeyboardWindow.onRimeSchemaUpdated 会按方案名自动跟换键盘。
+                windowManager.attachWindow(KeyboardWindow)
+            }
+        }
+    }
+
     private val adapter: SwitchOptionAdapter by lazy {
         object : SwitchOptionAdapter() {
             override val scope: ThemeScope = this@SwitchOptionWindow.scope
@@ -105,6 +134,14 @@ class SwitchOptionWindow(di: DI) :
             ) {
                 when (entry) {
                     is SwitchOptionEntry.Static -> when (entry.type) {
+                        // 与 preset_keys SwitchToT9/SwitchToQwerty 同款切法：切方案 +
+                        // 强制中文（ascii_mode 是全局开关）。切完直接回到键盘。
+                        SwitchOptionEntry.Static.Type.KeyboardQwerty ->
+                            switchToSchema("rimi")
+
+                        SwitchOptionEntry.Static.Type.KeyboardT9 ->
+                            switchToSchema("t9")
+
                         SwitchOptionEntry.Static.Type.SchemaList -> showDialog { r ->
                             EnabledSchemaPickerDialog.build(r, service.lifecycleScope, context) {
                                 setNegativeButton(R.string.enable_schemata) { _, _ ->

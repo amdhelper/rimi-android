@@ -20,6 +20,10 @@ sealed class SwitchOptionEntry(
             UpdateConfig,
             Keyboard,
             ThemeList,
+            // 26键全键盘 / 9键九宫格：底排键易误触（2026-11-04 爸爸令），
+            // 一键切方案只放在左上角三点菜单里。
+            KeyboardQwerty,
+            KeyboardT9,
         }
     }
 

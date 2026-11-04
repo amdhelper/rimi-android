@@ -975,6 +975,8 @@ preset_keys:
   # 日弥：语音输入（M4）——录音 → paraformer 通道 → 直接上屏
   VoiceInput: {label: "🎤", command: voice_input}
   # 九宫格 / 全键盘互切（切方案 → 键盘自动跟随，见 smartMatchKeyboard）
+  # 2026-11-04 爸爸令：切换键不再占底排键盘（易误触），26/9 一键切换只放左上角三点菜单。
+  # 这两个 preset_keys 留作命令备查，键盘里已无引用。
   SwitchToT9: {label: "9", send: FUNCTION, command: switch_schema, option: t9}
   SwitchToQwerty: {label: "26", send: FUNCTION, command: switch_schema, option: rimi}
 
@@ -1220,7 +1222,6 @@ preset_keyboards:
     - {click: ',', long_click: '<'}
     - {click: space, width: 14}
     - {click: VoiceInput, width: 10}
-    - {click: SwitchToT9, width: 6}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
@@ -1249,8 +1250,8 @@ preset_keyboards:
     - {click: space, long_click: '0', label: '空格'}
     - {click: BackSpace, repeatable: true, label: '⌫'}
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
-    - {click: SwitchToQwerty, label: '26', width: 50}
-    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎', width: 50}
+    # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
+    - {click: Return, composing: Return1, long_click: CommitComment, label: '⏎', width: 100}
 
   us_intl:
     name: 美式國際
