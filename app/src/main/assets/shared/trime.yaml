@@ -1233,6 +1233,10 @@ preset_keyboards:
     name: 日弥九宫格
     author: "rimi"
     ascii_mode: 0
+    # 2026-11-05 爸爸反馈「从数字键盘切回九宫格后只能打一个中文就只剩数字」：
+    # 九宫格按键全是数字，一旦 ascii_mode 残留为 true 就只会上屏数字。
+    # 这里声明 reset_ascii_mode: true → 每次显示九宫格都强制回到中文（不吃上次的西文状态）。
+    reset_ascii_mode: true
     # ⚠️ width 是「每个键占屏宽的百分比权重」，MAX_TOTAL_WEIGHT=100：
     #    33.3 → 每键 1/3 屏宽，三键正好一行，第四个键自动换行。
     width: 33.3

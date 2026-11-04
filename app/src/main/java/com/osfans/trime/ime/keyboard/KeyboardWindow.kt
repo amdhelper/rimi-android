@@ -180,11 +180,15 @@ class KeyboardWindow(di: DI) :
             if (it.isLock) lastLockKeyboardId = target
             dispatchCapsState(it::setShifted)
 
-            val currentMode = rime.run { statusCached }.isAsciiMode
             val targetMode = if (it.resetAsciiMode) it.asciiMode else it.lastAsciiMode
 
-            if (currentMode != targetMode) {
-                service.postRimeJob {
+            // 2026-11-05 爸爸反馈：从「数字」键盘切回九宫格后，只能打出一个中文就变成只能输数字。
+            // 根因：这里原先拿 statusCached 判断要不要改 ascii_mode，而 statusCached 是上一轮
+            // 异步 setRuntimeOption 的 StatusMessage 回写，切换够快时读到的是旧值——两值相等
+            // 就把「恢复中文」整段跳过，ascii_mode 永久留在 true（九宫格按数字直出）。
+            // 修法：判断挪进 postRimeJob，用引擎里的真实 option 值决定（幂等、不吃缓存）。
+            service.postRimeJob {
+                if (getRuntimeOption("ascii_mode") != targetMode) {
                     commitComposition()
                     setRuntimeOption("ascii_mode", targetMode)
                 }

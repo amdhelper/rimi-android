@@ -29,3 +29,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# 2026-11-05 release 包（R8）首次开启：net.i2p.crypto.eddsa 引用了 JDK 内部的
+# sun.security.x509.X509Key（Android 上不存在），只在签名实现里做类型判断，缺类不影响运行。
+-dontwarn sun.security.**

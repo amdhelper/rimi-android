@@ -322,6 +322,9 @@ class ThemeDslExpanderTest :
                 val symbolKey = keyMaps.first { it.pairs["click"]?.string == "Keyboard_symbols" }
                 symbolKey.pairs["label"]?.string shouldBe "符/数"
                 symbolKey.pairs["long_click"]?.string shouldBe "Keyboard_number"
+                // 2026-11-05 爸爸反馈：从数字键盘切回九宫格后只能打一个中文就只剩数字。
+                // 九宫格按键只有数字，ascii_mode 一旦残留 true 就只上屏数字 —— 必须每次显示都强制回中文。
+                keyboards.pairs["t9"]!!.mapping!!.pairs["reset_ascii_mode"]?.string shouldBe "true"
             }
 
             Then("every keyboard defines visible gaps and a key border") {
