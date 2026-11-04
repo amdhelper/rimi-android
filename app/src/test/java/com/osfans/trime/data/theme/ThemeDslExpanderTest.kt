@@ -298,17 +298,38 @@ class ThemeDslExpanderTest :
                 spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
             }
 
-            Then("t9 bottom full-width key is the space bar, Return on long press") {
-                // 2026-11-04 爸爸令：九宫格底排整行大键（原回车）改成大空格键，
-                // 回车保留长按；原小空格让位给 '1'，'0' 挂 '1' 键长按。
+            Then("t9 bottom row is a big space bar plus a small Return key") {
+                // 2026-11-04 爸爸令：九宫格底排整行大键（原回车）→ 大空格键 + 右侧小回车；
+                // 空格长按 = 语音转写（与 26 键一致），回车改由小键负责。
                 val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
                 val t9Keys = keyboards.pairs["t9"]!!.mapping!!.pairs["keys"] as YamlList
                 val keyMaps = t9Keys.items.mapNotNull { it.mapping }
-                val bottomKey = keyMaps.first { it.pairs["width"]?.string == "100" }
-                bottomKey.pairs["click"]?.string shouldBe "space"
-                bottomKey.pairs["long_click"]?.string shouldBe "Return"
+                val spaceKey = keyMaps.first { it.pairs["click"]?.string == "space" }
+                spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
+                spaceKey.pairs["width"]?.string shouldBe "82"
+                val returnKey = keyMaps.first { it.pairs["click"]?.string == "Return" }
+                returnKey.pairs["width"]?.string shouldBe "18"
+                returnKey.pairs["label"]?.string shouldBe "回车"
+                val bottomRowWidth =
+                    listOfNotNull(
+                        spaceKey.pairs["width"]?.string?.toFloat(),
+                        returnKey.pairs["width"]?.string?.toFloat(),
+                    ).sum()
+                bottomRowWidth shouldBe 100f
                 val oneKey = keyMaps.first { it.pairs["click"]?.string == "1" }
                 oneKey.pairs["long_click"]?.string shouldBe "0"
+            }
+
+            Then("every keyboard defines visible gaps and a key border") {
+                // 爸爸 2026-11-04 反馈「所有键位的区隔界限看的并不是很明显」：
+                // 1dp 间距 + 无描边在大屏手机上几乎看不出分界。
+                val style = expanded.pairs!!["style"]!!.mapping!!
+                val hGap = style.pairs["horizontal_gap"]?.string?.toFloat() ?: 0f
+                val vGap = style.pairs["vertical_gap"]?.string?.toFloat() ?: 0f
+                val keyBorder = style.pairs["key_border"]?.string?.toInt() ?: 0
+                (hGap >= 3f) shouldBe true
+                (vGap >= 3f) shouldBe true
+                (keyBorder >= 1) shouldBe true
             }
         }
     })

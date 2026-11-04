@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.SparseArray
 import android.view.KeyEvent
+import com.osfans.trime.data.rimi.RimiLoginRequest
 import com.osfans.trime.ui.main.ClipEditActivity
 import com.osfans.trime.ui.main.LogActivity
 import com.osfans.trime.ui.main.MainActivity
@@ -63,6 +64,20 @@ object AppUtils {
     fun launchMainToSchemaList(context: Context) = launchMainToDest(context, NavigationRoute.SchemaList)
 
     fun launchMainToKeyboard(context: Context) = launchMainToDest(context, NavigationRoute.VirtualKeyboard)
+
+    /**
+     * 直接打开「日弥云同步 → 账户」页（wumi 登录界面所在页）。
+     *
+     * [promptLogin] = true 时同时挂一条一次性请求，页面 onResume 会立刻弹出登录框，
+     * 用户不用自己再点「账户」——键盘语音入口点「去登录」走的就是这条路径。
+     */
+    fun launchMainToRimiSync(
+        context: Context,
+        promptLogin: Boolean = false,
+    ) {
+        if (promptLogin) RimiLoginRequest.request()
+        launchMainToDest(context, NavigationRoute.RimiSync)
+    }
 
     fun launchLogActivity(context: Context) {
         context.startActivity<LogActivity>()

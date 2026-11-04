@@ -24,13 +24,14 @@ style:
   comment_vertical_bias: 0.0 #编码提示垂直偏移位置（仅 overlay 模式使用，需要间隙空间足够，范围 0.0~1.0，0.0=top，0.5=center，1.0=bottom）
   comment_text_size: 10 #編碼提示字號
   hanb_font: hanb.ttf #擴充字型
-  horizontal_gap: 1 #鍵水平間距
+  horizontal_gap: 4 #鍵水平間距（1→4dp：键位区隔更清楚，2026-11-04 爸爸反馈）
   keyboard_padding: 0 #竖屏模式下，屏幕左右两侧与键盘的距离（曲面屏减少误触）
   keyboard_padding_left: 0 #竖屏屏模式下，左手键盘布局，屏幕左侧与键盘的距离
   keyboard_padding_right: 40 #竖屏屏模式下，左手键盘布局，屏幕右侧与键盘的距离
   keyboard_padding_bottom: 0 #竖屏模式下，屏幕下边缘与键盘的距离（避免误触发全面屏手势）
   keyboard_padding_land: 40 #横屏模式下，屏幕左右两侧与键盘的距离（避免横屏按键过度拉伸变形）
   keyboard_padding_land_bottom: 0 #横屏模式下，屏幕下侧与键盘的距离
+  key_border: 1 #按鍵描邊寬度（dp，0=不描邊；配合間距讓鍵位界限清楚）
   key_font: symbol.ttf #鍵盤字型
   key_height: 44 #鍵高
   key_long_text_size: 14 #長標籤字號
@@ -51,7 +52,7 @@ style:
   symbol_font: symbol.ttf #符號字型
   symbol_text_size: 10 #符號字號
   text_font: latin.ttf #編碼字型
-  vertical_gap: 1 #鍵盤行距
+  vertical_gap: 4 #鍵盤行距（1→4dp：键位区隔更清楚）
   #background_folder: #背景图保存在background目录下的哪个子目录
   enter_label_mode: 0  #是否使用App提供的ActionLabel内容作为Enter键的文本（由于多数App没有适配ActionLable，实际影响不大）。0不使用，1只使用actionlabel，2优先使用，3当其他方式没有获得label时才读取actionlabel
   enter_labels:  # 定义Enter键的文本
@@ -160,7 +161,7 @@ preset_color_schemes:
     hilited_on_key_text_color: 0x1e1e2e #標明按鍵打開狀態文字
     hilited_text_color: 0x89b4fa #標明編碼
     key_back_color: 0x313244 #按鍵背景
-    #key_border_color: 0x313244 #按鍵邊框
+    key_border_color: 0x45475a #按鍵邊框（比鍵底亮一級，鍵位界限更清楚）
     key_symbol_color: 0x9399b2 #按鍵符號
     key_text_color: 0xcdd6f4 #按鍵文字
     keyboard_back_color: 0x181825 #鍵盤背景
@@ -1252,7 +1253,9 @@ preset_keyboards:
     - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫'}
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
-    - {click: space, long_click: Return, label: '空格', width: 100}
+    # 2026-11-04 爸爸令：空格长按 = 语音转写（与 26 键一致）；回车改成底排右侧小键。
+    - {click: space, long_click: VoiceInput, label: '空格', width: 82}
+    - {click: Return, label: '回车', key_text_color: '0xcdd6f4', width: 18}
 
   us_intl:
     name: 美式國際

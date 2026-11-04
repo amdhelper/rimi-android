@@ -257,7 +257,7 @@
     <string name="rimi_cloud_account_not_logged_in">未登录 · 点此用 wumi 助记词登录</string>
     <string name="rimi_cloud_account_logged_in">已登录 %1$s · 级别 %2$s</string>
     <string name="rimi_cloud_already_logged_in">已登录；如需切换账户请先退出登录</string>
-    <string name="rimi_cloud_login">登录日弥云</string>
+    <string name="rimi_cloud_login">登录 wumi 账户</string>
     <string name="rimi_cloud_login_message">使用 wumi 账户的 12 词助记词，或桌面端 ~/.config/rimi/ed25519.seed 的 64 位十六进制密钥。词条会在同一 wumi 账户的手机与电脑之间同步。</string>
     <string name="rimi_cloud_login_hint">12 个助记词（空格分隔）或 64 位十六进制 seed</string>
     <string name="rimi_cloud_login_success">登录成功</string>

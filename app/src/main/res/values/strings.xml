@@ -258,7 +258,7 @@
     <string name="rimi_cloud_account_not_logged_in">Not signed in · Tap to sign in with your wumi mnemonic</string>
     <string name="rimi_cloud_account_logged_in">Signed in as %1$s · level %2$s</string>
     <string name="rimi_cloud_already_logged_in">Already signed in; sign out first to switch accounts</string>
-    <string name="rimi_cloud_login">Sign in to Rimi Cloud</string>
+    <string name="rimi_cloud_login">Sign in to wumi</string>
     <string name="rimi_cloud_login_message">Use your wumi 12-word mnemonic, or the 64-hex seed from ~/.config/rimi/ed25519.seed on desktop. Entries sync between phones and computers that share the same wumi account.</string>
     <string name="rimi_cloud_login_hint">12 mnemonic words (space separated) or 64-hex seed</string>
     <string name="rimi_cloud_login_success">Signed in</string>

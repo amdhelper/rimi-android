@@ -40,7 +40,7 @@ class GeneralStyleTest :
                     style.commentHeight shouldBe 12
                     style.commentPosition shouldBe GeneralStyle.CommentPosition.RIGHT
                     style.commentTextSize shouldBe 10f
-                    style.horizontalGap shouldBe 1
+                    style.horizontalGap shouldBe 4
                     style.keyHeight shouldBe 44
                     style.keyLongTextSize shouldBe 14f
                     style.keyTextSize shouldBe 22f

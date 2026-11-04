@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
+import android.view.WindowManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +24,7 @@ import com.osfans.trime.R
 import com.osfans.trime.daemon.RimeDaemon
 import com.osfans.trime.data.rimi.RimiCloud
 import com.osfans.trime.data.rimi.RimiDictSync
+import com.osfans.trime.data.rimi.RimiLoginRequest
 import com.osfans.trime.ui.common.PaddingPreferenceFragment
 import com.osfans.trime.ui.common.withLoadingDialog
 import com.osfans.trime.util.addCategory
@@ -197,6 +199,10 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     override fun onResume() {
         super.onResume()
         refreshUi()
+        // 键盘语音入口点「去登录」→ 直接落到本页并立刻弹登录框（2026-11-04 爸爸反馈）
+        if (RimiLoginRequest.consume() && !RimiCloud.isLoggedIn) {
+            promptLogin()
+        }
     }
 
     private fun refreshUi() {
@@ -264,15 +270,22 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                 setPadding(pad, pad / 2, pad, 0)
                 addView(input)
             }
-        AlertDialog
-            .Builder(ctx)
-            .setTitle(R.string.rimi_cloud_login)
-            .setMessage(R.string.rimi_cloud_login_message)
-            .setView(container)
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                login(input.text.toString())
-            }.show()
+        val dialog =
+            AlertDialog
+                .Builder(ctx)
+                .setTitle(R.string.rimi_cloud_login)
+                .setMessage(R.string.rimi_cloud_login_message)
+                .setView(container)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    login(input.text.toString())
+                }.create()
+        dialog.setOnShowListener {
+            // 直达登录页时用户下一步就是贴助记词：自动聚焦并拉起软键盘，少点一次
+            input.requestFocus()
+            dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        }
+        dialog.show()
     }
 
     private fun login(secret: String) {

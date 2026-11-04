@@ -65,7 +65,8 @@ object VoiceInputController {
             PackageManager.PERMISSION_GRANTED
         ) {
             service.toast("请先授予录音权限：日弥设置 → 日弥云同步 → 录音权限")
-            AppUtils.launchMainActivity(service)
+            // 直接落到「日弥云同步」页（录音权限开关就在这一页），不让用户自己在设置里找
+            AppUtils.launchMainToRimiSync(service)
             return
         }
         if (!RimiCloud.isLoggedIn) {
@@ -120,7 +121,7 @@ object VoiceInputController {
                 text = "语音转写需要登录 wumi 账户，要登录吗？\n\n" +
                     "免费范围：站长、医者——免费使用云端语音转写。\n" +
                     "其他级别（地纪行者、天纪卦师、人纪学员、麻瓜）：暂不提供免费云端转写。\n\n" +
-                    "登录后在「日弥设置 → 日弥云同步 → 账户」用助记词恢复账户即可使用。"
+                    "点「去登录」会直接打开登录界面：贴入 12 个助记词（wumi 备份里那串）或 64 位 seed 即可。"
                 setTextColor(0xFFCDD6F4.toInt())
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
                 setPadding(0, dp(ctx, 12), 0, dp(ctx, 16))
@@ -138,7 +139,9 @@ object VoiceInputController {
             actionButton(ctx, "去登录", 0xFF89B4FA.toInt()).apply {
                 setOnClickListener {
                     closePanel()
-                    AppUtils.launchMainActivity(service)
+                    // 2026-11-04 爸爸反馈：点「去登录」只打开设置首页，还要用户自己找
+                    // 「日弥云同步 → 账户」。改成直达登录页并自动弹出登录框。
+                    AppUtils.launchMainToRimiSync(service, promptLogin = true)
                 }
             }
         buttons.addView(later, rowParams(ctx))

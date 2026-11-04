@@ -110,7 +110,10 @@ class ThemeGoldenTest :
                     val style = theme.style
                     style.candidateTextSize shouldBe 22f
                     style.keyHeight shouldBe 44
-                    style.horizontalGap shouldBe 1
+                    // 2026-11-04 爸爸反馈「键位区隔不明显 → 1dp 加大到 4dp + 1dp 描边」
+                    style.horizontalGap shouldBe 4
+                    style.verticalGap shouldBe 4
+                    style.keyBorder shouldBe 1
                 }
 
                 Then("color schemes and preset keys are decoded") {
