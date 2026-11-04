@@ -276,5 +276,26 @@ class ThemeDslExpanderTest :
                 }
                 (checked > 0) shouldBe true
             }
+
+            Then("voice input lives on space long press, no standalone mic key") {
+                // 2026-11-04 爸爸令：🎤 独立键拿掉，语音改挂空格长按（省底排空间）。
+                // 锁两点：① 任何键盘不得再有 click==VoiceInput 的独立麦克风键；
+                // ② 26 键主键盘（qwerty）的空格键 long_click 必须是 VoiceInput。
+                val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
+                for ((name, kbNode) in keyboards.pairs) {
+                    val keys = kbNode.mapping?.pairs?.get("keys") as? YamlList ?: continue
+                    for (keyNode in keys.items) {
+                        val keyMap = keyNode.mapping ?: continue
+                        withClue("keyboard=$name must not have a standalone VoiceInput key") {
+                            (keyMap.pairs["click"]?.string == "VoiceInput") shouldBe false
+                        }
+                    }
+                }
+                val qwertyKeys = keyboards.pairs["qwerty"]!!.mapping!!.pairs["keys"] as YamlList
+                val spaceKey = qwertyKeys.items.mapNotNull { it.mapping }.first {
+                    it.pairs["click"]?.string == "space"
+                }
+                spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
+            }
         }
     })

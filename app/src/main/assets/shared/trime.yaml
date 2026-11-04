@@ -973,6 +973,7 @@ preset_keys:
   updateConfig: {label: 更新配置, send: FUNCTION, command: apply, option: "UPDATE_CONFIG"} #更新配置文件
   RepeatCommit: { label: 重复,  command: commit, option: "%1$s" } #重复输入刚上屏的内容
   # 日弥：语音输入（M4）——录音 → paraformer 通道 → 直接上屏
+  # 2026-11-04 爸爸令：🎤 独立键拿掉，语音改挂空格长按（省出一块底排空间，空格加宽吸收）
   VoiceInput: {label: "🎤", command: voice_input}
   # 九宫格 / 全键盘互切（切方案 → 键盘自动跟随，见 smartMatchKeyboard）
   # 2026-11-04 爸爸令：切换键不再占底排键盘（易误触），26/9 一键切换只放左上角三点菜单。
@@ -1220,8 +1221,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
-    - {click: space, width: 14}
-    - {click: VoiceInput, width: 10}
+    - {click: space, long_click: VoiceInput, width: 24}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
