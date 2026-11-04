@@ -11,6 +11,7 @@ import android.graphics.drawable.GradientDrawable
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.animation.ValueAnimator
 import android.os.SystemClock
 import android.util.TypedValue
 import android.view.Gravity
@@ -38,7 +39,7 @@ import kotlin.math.max
 /**
  * 日弥语音输入（M4）。
  *
- * 交互：长按键盘底排空格键 → 输入法窗口内浮出录音面板（立即开始录音）→「上屏」结束并识别。
+ * 交互：按住键盘底排空格键 → 输入法窗口内浮出录音面板（按住开始录音）→松开自动结束并发送识别到输入框。
  * 识别走 wumi 的 paraformer 通道 `POST /asr/transcribe`（body = 原始音频，JWT 鉴权），
  * 与桌面 rimi_voice / wumi App 同一条链路。结果直接 commitText 到当前输入框。
  *
@@ -58,6 +59,8 @@ object VoiceInputController {
     private var recorder: Recorder? = null
     private var panel: View? = null
     private var ticker: Job? = null
+    private var statusView: TextView? = null
+    private val animators = mutableListOf<ValueAnimator>()
 
     fun start(service: TrimeInputMethodService) {
         if (recorder != null) return
@@ -165,7 +168,8 @@ object VoiceInputController {
     private fun showPanel(service: TrimeInputMethodService, rec: Recorder) {
         val ctx = service
 
-        // 半透明遮罩 + 居中面板，全部落在输入法窗口内，触摸不会被系统手势窗吞掉
+        // 按住说话、松开发送：面板无按钮，只给录音动画反馈。
+        // 面板仍贴输入法窗口底部（IME touchable region 只覆盖键盘区，见下）。
         val root =
             FrameLayout(ctx).apply {
                 setBackgroundColor(0x99000000.toInt())
@@ -188,48 +192,84 @@ object VoiceInputController {
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
                 gravity = Gravity.CENTER
             }
-        val status =
-            TextView(ctx).apply {
-                text = "正在录音…"
-                setTextColor(0xFF89B4FA.toInt())
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
-                gravity = Gravity.CENTER
-                setPadding(0, dp(ctx, 10), 0, dp(ctx, 14))
-            }
-        val buttons =
+        // 录音动画：呼吸红灯（缩放脉冲）+ 均衡器音量柱（高度起伏）。动画随面板一起启停。
+        val animRow =
             LinearLayout(ctx).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER
+                setPadding(0, dp(ctx, 10), 0, dp(ctx, 6))
             }
-        val cancel =
-            actionButton(ctx, "取消", 0xFF45475A.toInt()).apply {
-                setOnClickListener { cancelRecording() }
-            }
-        val send =
-            actionButton(ctx, "上屏", 0xFF89B4FA.toInt()).apply {
-                setOnClickListener {
-                    val wav = rec.stop()
-                    if (wav.size <= 44 + MIN_RECORD_BYTES) {
-                        service.toast("录音太短，请说久一点")
-                        closePanel()
-                        recorder = null
-                        return@setOnClickListener
+        val pulse =
+            View(ctx).apply {
+                background =
+                    GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(0xFFF38BA8.toInt())
                     }
-                    status.text = "识别中…"
-                    isEnabled = false
-                    cancel.isEnabled = false
-                    Timber.i("Voice input sending %d bytes (%.1fs)", wav.size, (wav.size - 44) / 32000.0)
-                    transcribeAndCommit(service, wav)
-                }
+                val size = dp(ctx, 14)
+                layoutParams = LinearLayout.LayoutParams(size, size)
             }
-        buttons.addView(cancel, rowParams(ctx))
-        buttons.addView(send, rowParams(ctx))
+        animRow.addView(pulse)
+        animators +=
+            ValueAnimator.ofFloat(0.6f, 1.1f).apply {
+                duration = 600
+                repeatMode = ValueAnimator.REVERSE
+                repeatCount = ValueAnimator.INFINITE
+                addUpdateListener { v ->
+                    pulse.scaleX = v.animatedValue as Float
+                    pulse.scaleY = v.animatedValue as Float
+                }
+                start()
+            }
+        val barsRow =
+            LinearLayout(ctx).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(ctx, 10), 0, 0, 0)
+            }
+        val barColor = 0xFF89B4FA.toInt()
+        repeat(5) { i ->
+            val bar =
+                View(ctx).apply {
+                    background =
+                        GradientDrawable().apply {
+                            cornerRadius = dp(ctx, 3).toFloat()
+                            setColor(barColor)
+                        }
+                }
+            val lp =
+                LinearLayout.LayoutParams(dp(ctx, 6), dp(ctx, 12)).apply {
+                    marginStart = dp(ctx, 3)
+                    marginEnd = dp(ctx, 3)
+                }
+            bar.layoutParams = lp
+            barsRow.addView(bar)
+            animators +=
+                ValueAnimator.ofFloat(0f, 1f).apply {
+                    duration = 350L + i * 110L
+                    repeatMode = ValueAnimator.REVERSE
+                    repeatCount = ValueAnimator.INFINITE
+                    addUpdateListener { v ->
+                        val f = v.animatedValue as Float
+                        (bar.layoutParams as LinearLayout.LayoutParams).height =
+                            dp(ctx, 10) + (f * dp(ctx, 26)).toInt()
+                    }
+                    start()
+                }
+        }
+        animRow.addView(barsRow)
+        val status =
+            TextView(ctx).apply {
+                text = "按住空格录音，松开发送"
+                setTextColor(0xFF89B4FA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+                gravity = Gravity.CENTER
+                setPadding(0, dp(ctx, 4), 0, dp(ctx, 2))
+            }
         box.addView(title)
+        box.addView(animRow)
         box.addView(status)
-        box.addView(buttons)
 
-        // ⚠️ 必须贴在输入法窗口底部：IME 窗口的 touchable region 只有键盘那一块
-        // （真机实测 touchable region=(0,1640,1316,2832)），面板放在屏幕中间时按钮点不到。
         val width = minOf(service.resources.displayMetrics.widthPixels - dp(ctx, 24), dp(ctx, 360))
         root.addView(
             box,
@@ -240,6 +280,7 @@ object VoiceInputController {
             ).apply { bottomMargin = dp(ctx, 36) },
         )
         panel = root
+        statusView = status
         service.showOverlay(root)
 
         val startedAt = SystemClock.elapsedRealtime()
@@ -257,15 +298,40 @@ object VoiceInputController {
                     val elapsed = (SystemClock.elapsedRealtime() - startedAt) / 1000
                     withContext(Dispatchers.Main) {
                         if (recorder === rec) {
-                            status.text = "正在录音… ${elapsed}s（最长 ${MAX_RECORD_MS / 1000}s）"
+                            status.text = "正在录音… ${elapsed}s（松开发送）"
                         }
                     }
                     if (SystemClock.elapsedRealtime() - startedAt >= MAX_RECORD_MS) {
-                        withContext(Dispatchers.Main) { send.performClick() }
+                        withContext(Dispatchers.Main) { stopAndSend() }
                         break
                     }
                 }
             }
+    }
+
+    /**
+     * 松开空格自动发送（按住-松开语义）：停止录音并立即识别上屏，不再等待用户点按钮。
+     * 由 [KeyView] 在空格键长按释放时调用；也用于 120s 上限兜底。
+     */
+    fun stopAndSend() {
+        val rec = recorder ?: return
+        val service = TrimeInputMethodService.instance ?: run {
+            rec.stop()
+            recorder = null
+            return
+        }
+        ticker?.cancel()
+        ticker = null
+        val wav = rec.stop()
+        recorder = null
+        if (wav.size <= 44 + MIN_RECORD_BYTES) {
+            service.toast("录音太短，请说久一点")
+            closePanel()
+            return
+        }
+        statusView?.text = "识别中…"
+        Timber.i("Voice input sending %d bytes (%.1fs)", wav.size, (wav.size - 44) / 32000.0)
+        transcribeAndCommit(service, wav)
     }
 
     /** 取消录音：停掉麦克风并关面板。 */
@@ -277,7 +343,14 @@ object VoiceInputController {
         closePanel()
     }
 
+    private fun stopAnimators() {
+        animators.forEach { it.cancel() }
+        animators.clear()
+    }
+
     private fun closePanel() {
+        stopAnimators()
+        statusView = null
         panel = null
         runCatching { TrimeInputMethodService.instance?.hideOverlay() }
     }

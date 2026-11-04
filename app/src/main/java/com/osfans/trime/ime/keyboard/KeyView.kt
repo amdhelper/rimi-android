@@ -20,6 +20,7 @@ import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.popup.PopupAction
 import com.osfans.trime.ime.popup.PopupDelegate
+import com.osfans.trime.ime.voice.VoiceInputController
 import com.osfans.trime.util.sp
 import splitties.dimensions.dp
 import timber.log.Timber
@@ -97,6 +98,10 @@ class KeyView(
                         keyboardActionListener.onAction(theme.resolveAction(action))
                         dismissPopupPreview()
                     }
+                    setPressedState(false)
+                } else if (key.getAction(KeyBehavior.LONG_CLICK)?.command == "voice_input") {
+                    // 按住空格录音、松开自动发送：长按已触发录音，释放即停录并上屏。
+                    VoiceInputController.stopAndSend()
                     setPressedState(false)
                 } else if (isRepeatable && !hasLongPress) {
                     // 退格长按已有 Escape 动作：释放时不再补退格，避免清空后多删一个已上屏字。
