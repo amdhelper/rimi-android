@@ -77,10 +77,11 @@ class RimiSyncDialogSafetyTest :
             val src = mainActivityFile.readText()
 
             Then("已经在目标页时必须直接返回，不能再 popBackStack + navigate 销毁 Fragment") {
-                val guard = src.indexOf("hasRoute(route::class)")
+                val guard = src.indexOf("if (isNavigatedTo(route)) return")
                 val pop = src.indexOf("popBackStack(NavigationRoute.Main, false)")
                 (guard > 0) shouldBe true
                 (pop > guard) shouldBe true
+                src shouldContain "hasRoute(route::class)"
             }
         }
     })
