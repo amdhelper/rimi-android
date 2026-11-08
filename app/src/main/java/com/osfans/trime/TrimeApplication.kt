@@ -133,22 +133,28 @@ class TrimeApplication : Application() {
                     // continuous crashes within 10 seconds, maybe in a crash loop. just bail
                     exitProcess(10)
                 }
-                startActivity(
-                    Intent(ctx, LogActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        putExtra(LogActivity.FROM_CRASH, true)
-                        // avoid transaction overflow
-                        val truncated =
-                            e.stackTraceToString().let {
-                                if (it.length > MAX_STACKTRACE_SIZE) {
-                                    it.take(MAX_STACKTRACE_SIZE) + "<truncated>"
-                                } else {
-                                    it
-                                }
-                            }
-                        putExtra(LogActivity.CRASH_STACK_TRACE, truncated)
-                    },
-                )
+                // 直启（尚未解锁）阶段弹全屏崩溃页会盖住锁屏/桌面，此时用户也无从处理；
+                // 只留下日志，进程退出后系统会按需重新拉起。
+                if (!isDirectBootMode) {
+                    runCatching {
+                        startActivity(
+                            Intent(ctx, LogActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                putExtra(LogActivity.FROM_CRASH, true)
+                                // avoid transaction overflow
+                                val truncated =
+                                    e.stackTraceToString().let {
+                                        if (it.length > MAX_STACKTRACE_SIZE) {
+                                            it.take(MAX_STACKTRACE_SIZE) + "<truncated>"
+                                        } else {
+                                            it
+                                        }
+                                    }
+                                putExtra(LogActivity.CRASH_STACK_TRACE, truncated)
+                            },
+                        )
+                    }.onFailure { Log.e("TrimeApplication", "Failed to show the crash log", it) }
+                }
                 exitProcess(10)
             }
         }

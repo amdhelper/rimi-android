@@ -10,6 +10,7 @@ import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.YamlNode
 import com.osfans.trime.core.Rime
 import com.osfans.trime.core.data.DataManager
+import com.osfans.trime.util.appContext
 import com.osfans.trime.util.mapping
 import com.osfans.trime.util.pairs
 import com.osfans.trime.util.yamlMapOf
@@ -26,6 +27,9 @@ import java.io.File
  */
 object ThemeLoader {
     const val CONFIG_VERSION_KEY = "config_version"
+
+    /** Directory inside the APK assets that holds the bundled themes. */
+    private const val BUNDLED_DIR = "shared/"
 
     private const val INCLUDE = "__include"
     private const val PATCH = "__patch"
@@ -93,6 +97,57 @@ object ThemeLoader {
      * [ThemeLoadResult.Failure] with a structured [ThemeLoadError].
      */
     fun loadTheme(themeId: String): ThemeLoadResult = loadFromSource(themeId) ?: loadDeployedTheme(themeId)
+
+    /**
+     * Loads [themeId] from the copy shipped inside the APK assets.
+     *
+     * This is the last resort when neither the user data dir nor the deployed
+     * artifact can be read — most notably while the input method service runs
+     * in direct boot mode, where `/storage/emulated` is not available yet. The
+     * assets always are, so the runtime can render a keyboard instead of
+     * failing to start at all.
+     */
+    fun loadBundledTheme(themeId: String): ThemeLoadResult = loadBundledTheme(themeId, ::readBundledAsset)
+
+    /**
+     * Same as the other [loadBundledTheme], with the asset reader injected so the
+     * bundled themes can be exercised in unit tests.
+     */
+    internal fun loadBundledTheme(
+        themeId: String,
+        readAsset: (String) -> String?,
+    ): ThemeLoadResult {
+        val path = "$BUNDLED_DIR$themeId.yaml"
+        val node =
+            try {
+                ThemeYaml.parser.parseToYamlNode(readAsset(path) ?: error("asset '$path' is missing"))
+            } catch (e: Exception) {
+                return ThemeLoadResult.Failure(
+                    themeId,
+                    ThemeLoadError.FileUnreadable(themeId, "assets:/$path", e),
+                )
+            }
+        return try {
+            decodeAndReport(themeId, expandSource(themeId, node) { id -> readBundledNode(id, readAsset) })
+        } catch (e: Exception) {
+            ThemeLoadResult.Failure(
+                themeId,
+                ThemeLoadError.InvalidStructure(themeId, "cannot be decoded from bundled assets", e),
+            )
+        }
+    }
+
+    /** Reads an asset as text, or null when it does not exist. */
+    private fun readBundledAsset(path: String): String? = runCatching {
+        appContext.assets.open(path).bufferedReader().use { it.readText() }
+    }.getOrNull()
+
+    /** Parses another bundled resource by id; null when it is not shipped. */
+    private fun readBundledNode(
+        resourceId: String,
+        readAsset: (String) -> String?,
+    ): YamlNode? = readAsset("$BUNDLED_DIR$resourceId.yaml")
+        ?.let { runCatching { ThemeYaml.parser.parseToYamlNode(it) }.getOrNull() }
 
     /**
      * Reads [themeId] and its dependencies from source files, expands the

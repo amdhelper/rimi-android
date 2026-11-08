@@ -17,8 +17,12 @@ import com.osfans.trime.util.appContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 
 object ThemeManager {
+    /** The theme shipped inside the APK, used when the data dirs are unreadable. */
+    private const val BUNDLED_THEME_ID = "trime"
+
     fun interface OnThemeChangeListener {
         fun onThemeChange(theme: Theme)
     }
@@ -32,6 +36,9 @@ object ThemeManager {
     private lateinit var _activeTheme: Theme
 
     private var _activeFindings: List<ThemeDiagnostics.Finding>? = null
+
+    /** True while [activeTheme] is the bundled stopgap instead of a real theme. */
+    private var _bundledFallback = false
 
     /**
      * What static checks found in the active theme, or null when it was read
@@ -81,22 +88,31 @@ object ThemeManager {
         val configId: String,
         val theme: Theme,
         val findings: List<ThemeDiagnostics.Finding>?,
+        /** True when this theme came from the APK assets because nothing else could be read. */
+        val bundled: Boolean = false,
     )
 
     private fun getThemeById(id: String): ResolvedTheme {
-        when (val result = ThemeLoader.loadTheme(id)) {
-            is ThemeLoader.ThemeLoadResult.Success -> return ResolvedTheme(id, result.theme, result.findings)
-            is ThemeLoader.ThemeLoadResult.Failure -> Timber.w(result.error)
+        val failures = mutableListOf<String>()
+        fun note(error: ThemeLoader.ThemeLoadError): ThemeLoader.ThemeLoadError {
+            Timber.w(error)
+            failures += error.message.orEmpty()
+            return error
         }
 
-        if (id != "trime") {
-            when (val result = ThemeLoader.loadTheme("trime")) {
+        when (val result = ThemeLoader.loadTheme(id)) {
+            is ThemeLoader.ThemeLoadResult.Success -> return ResolvedTheme(id, result.theme, result.findings)
+            is ThemeLoader.ThemeLoadResult.Failure -> note(result.error)
+        }
+
+        if (id != BUNDLED_THEME_ID) {
+            when (val result = ThemeLoader.loadTheme(BUNDLED_THEME_ID)) {
                 is ThemeLoader.ThemeLoadResult.Success -> {
-                    Timber.w("Theme '$id' is unavailable, fallback to default theme 'trime'")
-                    return ResolvedTheme("trime", result.theme, result.findings)
+                    Timber.w("Theme '$id' is unavailable, fallback to default theme '$BUNDLED_THEME_ID'")
+                    return ResolvedTheme(BUNDLED_THEME_ID, result.theme, result.findings)
                 }
 
-                is ThemeLoader.ThemeLoadResult.Failure -> Timber.w(result.error)
+                is ThemeLoader.ThemeLoadResult.Failure -> note(result.error)
             }
         }
 
@@ -108,19 +124,50 @@ object ThemeManager {
                     return ResolvedTheme(fallbackId, result.theme, result.findings)
                 }
 
-                is ThemeLoader.ThemeLoadResult.Failure -> lastFailure = result.error
+                is ThemeLoader.ThemeLoadResult.Failure -> lastFailure = note(result.error)
             }
         }
 
-        Timber.w(lastFailure, "No valid theme available")
+        // Last resort: the copy shipped inside the APK. Reading it never depends on
+        // external storage, which is exactly what is missing when the input method
+        // service starts in direct boot mode before the user unlocks the device.
+        // Without this the whole process used to die on "No valid theme available",
+        // leaving a crash log as the first screen after a reboot.
+        when (val result = ThemeLoader.loadBundledTheme(BUNDLED_THEME_ID)) {
+            is ThemeLoader.ThemeLoadResult.Success -> {
+                Timber.w("Theme '$id' and every user theme are unavailable, using the bundled theme")
+                recordFallback(failures)
+                return ResolvedTheme(BUNDLED_THEME_ID, result.theme, result.findings, bundled = true)
+            }
+
+            is ThemeLoader.ThemeLoadResult.Failure -> lastFailure = note(result.error)
+        }
+
+        Timber.e(lastFailure, "No valid theme available")
         error("No valid theme available")
+    }
+
+    /**
+     * Leaves a trace of why the bundled theme was needed. The reason used to be lost
+     * with the log buffer before anyone could look at it, which made this failure
+     * impossible to diagnose after a reboot; the file is world-readable through adb.
+     */
+    private fun recordFallback(failures: List<String>) {
+        runCatching {
+            val dir = appContext.getExternalFilesDir(null) ?: return@runCatching
+            File(dir, "theme_fallback.log").appendText(
+                "${System.currentTimeMillis()} ${failures.joinToString(" | ")}\n",
+            )
+        }
     }
 
     private fun evaluateActiveTheme(): Theme {
         val selectedThemeId = prefs.selectedTheme.getValue()
         val resolvedTheme = getThemeById(selectedThemeId)
         val newTheme = resolvedTheme.theme
-        if (resolvedTheme.configId != selectedThemeId) {
+        // A bundled fallback is a stopgap, not the user's choice: remembering it
+        // would silently rewrite the selected theme on every boot.
+        if (!resolvedTheme.bundled && resolvedTheme.configId != selectedThemeId) {
             prefs.selectedTheme.setValue(resolvedTheme.configId)
         }
         applyTheme(resolvedTheme)
@@ -132,6 +179,7 @@ object ThemeManager {
         // The findings describe the file this load read; they are not tied to the
         // views, so they are refreshed even when the theme itself is unchanged.
         _activeFindings = resolvedTheme.findings
+        _bundledFallback = resolvedTheme.bundled
         // A structurally equal theme suppresses the change notification below, so the
         // UI tree keeps its views and their injected scope. Replace neither the
         // caches nor the scope in that case, or later scheme changes would update
@@ -142,6 +190,13 @@ object ThemeManager {
     }
 
     fun init(configuration: Configuration) {
+        if (_bundledFallback) {
+            // The previous load ran before the data dirs were readable (direct boot or
+            // storage still mounting). Now that the service is (re)initialized, try the
+            // real theme again instead of keeping the stopgap for the whole session.
+            Timber.w("Reloading theme: the previous load fell back to the bundled theme")
+            _activeTheme = evaluateActiveTheme()
+        }
         ensureActiveTheme()
         ColorManager.init(configuration)
     }
@@ -155,7 +210,9 @@ object ThemeManager {
         val resolvedTheme = withContext(Dispatchers.IO) { getThemeById(configId) }
         return withContext(Dispatchers.Main.immediate) {
             applyTheme(resolvedTheme)
-            prefs.selectedTheme.setValue(resolvedTheme.configId)
+            if (!resolvedTheme.bundled) {
+                prefs.selectedTheme.setValue(resolvedTheme.configId)
+            }
             resolvedTheme.configId
         }
     }
