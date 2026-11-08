@@ -308,11 +308,11 @@ class ThemeDslExpanderTest :
                 val keyMaps = (t9Node.pairs["keys"] as YamlList).items.mapNotNull { it.mapping }
                 keyMaps.mapNotNull { it.pairs["click"]?.string } shouldBe
                     listOf(
-                        "T9_COMMA", "T9_1", "T9_2", "T9_3",
+                        "T9_COMMA", "T9_SLASH", "T9_2", "T9_3",
                         "T9_PERIOD", "T9_4", "T9_5", "T9_6",
                         "T9_QUESTION", "T9_7", "T9_8", "T9_9",
-                        "Keyboard_symbols", "T9_0", "BackSpace",
-                        "space", "Return",
+                        "T9_EXCLAM", "T9_QUOTE", "T9_PAREN", "BackSpace",
+                        "Keyboard_symbols", "space", "Return",
                     )
 
                 val theme = ThemeTestSupport.yaml.decodeFromYamlNode<Theme>(expanded.yamlMap)
@@ -324,25 +324,40 @@ class ThemeDslExpanderTest :
                 }
                 theme.presetKeys.getValue("T9_9").states shouldBe listOf("WXYZ", "9")
                 theme.presetKeys.getValue("T9_COMMA").states shouldBe listOf("，", ",")
-                theme.presetKeys.getValue("T9_1").label shouldBe "1"
+                // 2026-11-09 爸爸令：九个主力键里多出来的「1」改成斜杠键
+                theme.presetKeys.getValue("T9_SLASH").let {
+                    it.label shouldBe "/"
+                    it.send shouldBe "/"
+                }
 
                 val t9 = theme.presetKeyboards.getValue("t9")
-                t9.keys.size shouldBe 17
+                t9.keys.size shouldBe 19
                 t9.keys.first().click shouldBe KeyActionToken.Plain("T9_COMMA")
-                // 底排仍是 82% 空格 + 18% 回车；空格长按 = 语音转写
+                // 2026-11-09 爸爸令：底排「符/数 25% + 空格 57% + 回车 18%」，
+                // 空格左侧腾出一个键位放「符/数」；空格长按 = 语音转写
                 val spaceKey = keyMaps.first { it.pairs["click"]?.string == "space" }
                 spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
-                spaceKey.pairs["width"]?.string shouldBe "82"
+                spaceKey.pairs["width"]?.string shouldBe "57"
                 val returnKey = keyMaps.first { it.pairs["click"]?.string == "Return" }
                 returnKey.pairs["width"]?.string shouldBe "18"
                 returnKey.pairs["label"]?.string shouldBe "回车"
-                // 0 有独立键（加宽），不再挂在 1 的长按
-                keyMaps.first { it.pairs["click"]?.string == "T9_1" }.pairs["long_click"] shouldBe null
-                keyMaps.first { it.pairs["click"]?.string == "T9_0" }.pairs["width"]?.string shouldBe "50"
+                // 2026-11-09 爸爸令：原 50% 宽的 0 键拆成「引号」「括号」两键
+                theme.presetKeys.getValue("T9_QUOTE").let {
+                    it.send shouldBe "\""
+                    it.states shouldBe listOf("“”", "\"\"")
+                }
+                theme.presetKeys.getValue("T9_PAREN").let {
+                    it.label shouldBe "（）"
+                    it.text shouldBe "()"
+                }
+                theme.presetKeys.getValue("T9_EXCLAM").states shouldBe listOf("！", "!")
+                keyMaps.first { it.pairs["click"]?.string == "T9_SLASH" }.pairs["long_click"] shouldBe null
                 // 2026-11-05 爸爸令：九宫格「符」键改「符/数」——点=符号键盘、长按=数字键盘（与 26 键一致）
+                // 2026-11-09：该键移到底排最左（空格左侧）
                 val symbolKey = keyMaps.first { it.pairs["click"]?.string == "Keyboard_symbols" }
                 symbolKey.pairs["label"]?.string shouldBe "符/数"
                 symbolKey.pairs["long_click"]?.string shouldBe "Keyboard_number"
+                symbolKey.pairs["width"]?.string shouldBe "25"
                 // 2026-11-05 爸爸反馈：从数字键盘切回九宫格后只能打一个中文就只剩数字。
                 // 九宫格按键只有数字，ascii_mode 一旦残留 true 就只上屏数字 —— 必须每次显示都强制回中文。
                 t9Node.pairs["reset_ascii_mode"]?.string shouldBe "true"

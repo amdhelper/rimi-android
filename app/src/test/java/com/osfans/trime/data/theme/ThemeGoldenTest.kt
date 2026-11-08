@@ -118,8 +118,10 @@ class ThemeGoldenTest :
 
                 Then("color schemes and preset keys are decoded") {
                     theme.presetColorSchemes.size shouldBe 37
-                    // 122 = 109 + 13 个九宫格主键/标点 preset（T9_0..T9_9 + T9_COMMA/PERIOD/QUESTION）
-                    theme.presetKeys.size shouldBe 122
+                    // 124 = 109 + 15 个九宫格主键/标点 preset
+                    // （T9_2..T9_9 + T9_SLASH + T9_EXCLAM/QUOTE/PAREN + T9_COMMA/PERIOD/QUESTION；
+                    //   2026-11-09 爸爸令：原 T9_1 改斜杠键，T9_0 拆成引号/括号两键）
+                    theme.presetKeys.size shouldBe 124
                     val brightnessDown = theme.presetKeys.getValue("BRIGHTNESS_DOWN")
                     brightnessDown.label shouldBe "亮度-"
                     brightnessDown.send shouldBe "BRIGHTNESS_DOWN"

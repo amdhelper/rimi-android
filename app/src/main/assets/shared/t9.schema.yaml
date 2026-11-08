@@ -87,6 +87,12 @@ translator:
 
 punctuator:
   import_preset: default
+  # 2026-11-09 爸爸令：九宫格原「1」键改作斜杠键。
+  # 默认标点表里 '/' 是候选列表 [、, '/', ／, ÷]（按一次还要再选），这里覆盖成直接上屏半角 '/'。
+  # ⚠️ 列表节点不能直接跟 map 合并（librime 报 incompatible node type: commit），
+  #    必须用 Rime 的「/=」替换操作符：'/' + '/=' 写成 '//='，表示整体替换半角 '/' 这一项。
+  half_shape:
+    '//=': { commit: '/' }
 
 key_binder:
   import_preset: default

@@ -984,7 +984,10 @@ preset_keys:
   # 日弥九宫格 T9 主键（2026-11-08 UI 改版）
   # 中文态显示字母（states[0]），数字态显示数字（states[1]）。
   # toggle: ascii_mode 只负责切标签，键值仍是 send 的数字，拼音由 t9 方案的 algebra 映射。
-  T9_1: {label: '1', send: '1'}  # 1 在 T9 里没有拼音字母映射，保留数字标签
+  # 2026-11-09 爸爸令：九个主力键里「1」没有拼音字母映射（多出来的那个），改作斜杠键。
+  #   标点表里 '/' 默认是候选列表 [、, '/', ／, ÷]（要再选一次），t9 方案已覆盖成直接上屏 '/'
+  #   （见 assets/shared/t9.schema.yaml 的 punctuator/half_shape）。
+  T9_SLASH: {label: '/', send: '/'}
   T9_2: {send: '2', states: ['ABC', '2'], toggle: ascii_mode}
   T9_3: {send: '3', states: ['DEF', '3'], toggle: ascii_mode}
   T9_4: {send: '4', states: ['GHI', '4'], toggle: ascii_mode}
@@ -993,7 +996,12 @@ preset_keys:
   T9_7: {send: '7', states: ['PQRS', '7'], toggle: ascii_mode}
   T9_8: {send: '8', states: ['TUV', '8'], toggle: ascii_mode}
   T9_9: {send: '9', states: ['WXYZ', '9'], toggle: ascii_mode}
-  T9_0: {label: '0', send: '0'}
+  # 2026-11-09 爸爸令：原 50% 宽的 0 键拆成「引号」「括号」两键（数字 0 不参与九宫格编码）。
+  #   T9_PAREN 用 text 发一对 ASCII 括号，由 RIME punctuator 上屏全角「（）」；
+  #   引号键走 RIME pair（第一次 “，第二次 ”）。
+  T9_EXCLAM: {send: '!', states: ['！', '!'], toggle: ascii_mode}
+  T9_QUOTE: {send: '"', states: ['“”', '""'], toggle: ascii_mode}
+  T9_PAREN: {label: '（）', text: '()'}
   T9_COMMA: {send: ',', states: ['，', ','], toggle: ascii_mode}
   T9_PERIOD: {send: '.', states: ['。', '.'], toggle: ascii_mode}
   T9_QUESTION: {send: '?', states: ['？', '?'], toggle: ascii_mode}
@@ -1263,9 +1271,9 @@ preset_keyboards:
     height: 52
     lock: true
     keys:
-    # 第 1 行：， 1 2(ABC) 3(DEF)
+    # 第 1 行：， / 2(ABC) 3(DEF)  —— 2026-11-09 爸爸令：原「1」键改斜杠键
     - {click: T9_COMMA, key_text_size: 24}
-    - {click: T9_1, key_text_size: 22}
+    - {click: T9_SLASH, key_text_size: 22}
     - {click: T9_2, key_text_size: 18}
     - {click: T9_3, key_text_size: 18}
     # 第 2 行：。 4(GHI) 5(JKL) 6(MNO)
@@ -1278,14 +1286,18 @@ preset_keyboards:
     - {click: T9_7, key_text_size: 18}
     - {click: T9_8, key_text_size: 18}
     - {click: T9_9, key_text_size: 18}
-    # 第 4 行：符/数（长按数字键盘）· 0（加宽）· 退格（长按清空整串）
-    - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number, width: 25}
-    - {click: T9_0, width: 50, key_text_size: 22}
+    # 第 4 行：！· “” · （） · 退格（长按清空整串）—— 2026-11-09 爸爸令：
+    #   「符/数」下移到底排最左，空出来的位置放惊叹号；原 50% 宽的 0 键拆成引号/括号两键。
+    - {click: T9_EXCLAM, key_text_size: 24}
+    - {click: T9_QUOTE, key_text_size: 20}
+    - {click: T9_PAREN, key_text_size: 20}
     - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫', width: 25}
-    # 第 5 行：空格（长按语音）+ 回车（2026-11-04 爸爸令：底排小回车）
+    # 第 5 行：符/数（25%）+ 空格 57%（长按语音）+ 回车 18%（2026-11-09 爸爸令：
+    #   空格左侧腾出一个键位给符/数，空格 82→57）。
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
-    - {click: space, long_click: VoiceInput, label: '空格', width: 82}
+    - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number, width: 25}
+    - {click: space, long_click: VoiceInput, label: '空格', width: 57}
     - {click: Return, label: '回车', key_text_color: '0xcdd6f4', width: 18}
 
   us_intl:
