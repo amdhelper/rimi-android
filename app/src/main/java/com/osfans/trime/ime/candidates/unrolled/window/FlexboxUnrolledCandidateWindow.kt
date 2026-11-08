@@ -12,6 +12,7 @@ import androidx.transition.Transition
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import com.osfans.trime.ime.candidates.CandidateViewHolder
 import com.osfans.trime.ime.candidates.unrolled.PagingCandidateViewAdapter
 import com.osfans.trime.ime.candidates.unrolled.UnrolledCandidateLayout
@@ -34,7 +35,7 @@ class FlexboxUnrolledCandidateWindow(di: DI) : BaseUnrolledCandidateWindow(di) {
             ): CandidateViewHolder = super.onCreateViewHolder(parent, viewType).apply {
                 itemView.apply {
                     minimumWidth = dp(40)
-                    val itemHeight = dp(theme.style.run { candidateViewHeight + commentHeight })
+                    val itemHeight = dp(theme.style.scaledCandidateBarHeight)
                     layoutParams =
                         FlexboxLayoutManager
                             .LayoutParams(wrapContent, itemHeight)

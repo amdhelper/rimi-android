@@ -66,6 +66,9 @@ class ToolButton(context: Context, private val scope: ThemeScope) : GestureFrame
     private var actionLabel = ""
     private var config: ToolBar.Button? = null
 
+    /** 固定文本标签（候选词倍数按钮用），非空时优先于图标/主题样式。 */
+    private var customLabel: String? = null
+
     private var fontSize = 0f
     private var colorStateList: ColorStateList? = null
 
@@ -168,9 +171,16 @@ class ToolButton(context: Context, private val scope: ThemeScope) : GestureFrame
     }
 
     fun setIcon(@DrawableRes src: Int) {
+        customLabel = null
         image.imageResource = src
         label.isVisible = false
         image.isVisible = true
+    }
+
+    /** 显示固定文本（不再显示图标），主题换色后仍保留。 */
+    fun setTextLabel(text: String) {
+        customLabel = text
+        updateContent()
     }
 
     fun updateStyle(option: String, enabled: Boolean) {
@@ -202,6 +212,13 @@ class ToolButton(context: Context, private val scope: ThemeScope) : GestureFrame
     }
 
     private fun updateContent() {
+        customLabel?.let {
+            label.text = it
+            image.isVisible = false
+            label.isVisible = true
+            return
+        }
+
         val style = if (option != null && optionStyles.size == 2) {
             optionStyles[if (optionEnabled) 1 else 0]
         } else {

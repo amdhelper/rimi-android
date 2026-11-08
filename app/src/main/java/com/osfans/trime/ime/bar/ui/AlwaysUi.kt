@@ -11,9 +11,11 @@ import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.osfans.trime.R
+import com.osfans.trime.data.prefs.CandidateScale
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.data.theme.model.ToolBar
+import com.osfans.trime.data.theme.model.scaledCandidateTextSize
 import splitties.views.dsl.constraintlayout.after
 import splitties.views.dsl.constraintlayout.before
 import splitties.views.dsl.constraintlayout.centerVertically
@@ -32,6 +34,7 @@ class AlwaysUi(
     override val ctx: Context,
     private val scope: ThemeScope,
     private val onButtonClick: ((String) -> Unit)? = null,
+    private val onCandidateScaleStep: ((Int) -> Unit)? = null,
 ) : Ui {
     private val theme: Theme get() = scope.theme
 
@@ -82,6 +85,31 @@ class AlwaysUi(
         R.drawable.ic_baseline_more_horiz_24,
     )
 
+    /**
+     * 候选词倍数调节按钮：紧跟在左上角三点按钮右侧。
+     * 单击 +0.5×、长按 -0.5×（1× ~ 4× 循环），默认 2×。
+     */
+    private val candidateScaleButton =
+        ToolButton(
+            ctx,
+            ToolBar.Button(
+                foreground = ToolBar.Button.Foreground(
+                    fontSize = theme.style.scaledCandidateTextSize * 0.75f,
+                ),
+            ),
+            scope,
+        ).apply {
+            setTextLabel(CandidateScale.label())
+            contentDescription = "候选词 ${CandidateScale.label()}"
+            setOnClickListener {
+                post { onCandidateScaleStep?.invoke(1) }
+            }
+            setOnLongClickListener {
+                post { onCandidateScaleStep?.invoke(-1) }
+                true
+            }
+        }
+
     private val animator =
         ViewAnimator(ctx).apply {
             add(buttonsUi.root, lParams(matchParent, matchParent))
@@ -92,11 +120,19 @@ class AlwaysUi(
     override val root: ConstraintLayout = constraintLayout {
         val (leftWidth, leftHeight) = buttonsUi.getButtonSize(theme.toolBar.primaryButton)
         val (rightWidth, rightHeight) = buttonsUi.getButtonSize(theme.toolBar.buttons.firstOrNull())
+        val (scaleWidth, scaleHeight) = buttonsUi.getButtonSize(null)
 
         add(
             leftMostButton,
             lParams(leftWidth, leftHeight) {
                 startOfParent()
+                centerVertically()
+            },
+        )
+        add(
+            candidateScaleButton,
+            lParams(scaleWidth, scaleHeight) {
+                after(leftMostButton)
                 centerVertically()
             },
         )
@@ -110,7 +146,7 @@ class AlwaysUi(
         add(
             animator,
             lParams(matchConstraints, matchParent) {
-                after(leftMostButton)
+                after(candidateScaleButton)
                 before(rightMostButton)
                 endOfParent()
                 centerVertically()
@@ -143,6 +179,7 @@ class AlwaysUi(
     /** Restyles the toolbar area after a scheme switch. */
     fun refreshColors() {
         leftMostButton.refreshColors()
+        candidateScaleButton.refreshColors()
         hideKeyboardButton.refreshColors()
         buttonsUi.refreshColors()
         clipboardUi.refreshColors()

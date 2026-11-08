@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InlineSuggestion
 import android.view.inputmethod.InlineSuggestionsResponse
+import android.widget.Toast
 import android.widget.ViewAnimator
 import android.widget.inline.InlineContentView
 import androidx.annotation.Keep
@@ -26,8 +27,10 @@ import com.osfans.trime.daemon.RimeSession
 import com.osfans.trime.daemon.launchOnReady
 import com.osfans.trime.data.db.ClipboardHelper
 import com.osfans.trime.data.prefs.AppPrefs
+import com.osfans.trime.data.prefs.CandidateScale
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import com.osfans.trime.ime.bar.ui.AlwaysUi
 import com.osfans.trime.ime.bar.ui.CandidateUi
 import com.osfans.trime.ime.bar.ui.TabUi
@@ -71,7 +74,7 @@ class InputBarDelegate(override val di: DI) :
     private val candidate: CompactCandidateDelegate by instance()
     private val rime: RimeSession by instance()
 
-    val themedHeight = theme.style.run { candidateViewHeight + commentHeight }
+    val themedHeight = theme.style.scaledCandidateBarHeight
 
     private val prefs = AppPrefs.defaultInstance()
 
@@ -131,16 +134,21 @@ class InputBarDelegate(override val di: DI) :
     }
 
     private val alwaysUi: AlwaysUi by lazy {
-        AlwaysUi(context, scope) { action ->
-            // A touch that started on the toolbar can finish after candidates replace it.
-            // ViewAnimator keeps that touch target even when its child becomes GONE.
-            if (barStateMachine.currentState != QuickBarStateMachine.State.Always) return@AlwaysUi
-            if (action.isNotEmpty()) {
-                commonKeyboardActionListener.listener.onAction(theme.resolveAction(action))
-            } else {
-                windowManager.attachWindow(SwitchOptionWindow(di))
-            }
-        }.apply {
+        AlwaysUi(
+            context,
+            scope,
+            onButtonClick = { action ->
+                // A touch that started on the toolbar can finish after candidates replace it.
+                // ViewAnimator keeps that touch target even when its child becomes GONE.
+                if (barStateMachine.currentState != QuickBarStateMachine.State.Always) return@AlwaysUi
+                if (action.isNotEmpty()) {
+                    commonKeyboardActionListener.listener.onAction(theme.resolveAction(action))
+                } else {
+                    windowManager.attachWindow(SwitchOptionWindow(di))
+                }
+            },
+            onCandidateScaleStep = { step -> stepCandidateScale(step) },
+        ).apply {
             hideKeyboardButton.apply {
                 setOnClickListener { service.requestHideSelf(0) }
                 onSwipe = swipeDownHideKeyboardCallback
@@ -169,6 +177,19 @@ class InputBarDelegate(override val di: DI) :
         clipboardTimeoutJob = null
         isClipboardFresh = false
         evalAlwaysUiState()
+    }
+
+    /**
+     * 候选词倍数调节：单击 +0.5×、长按 -0.5×（两端循环）。
+     *
+     * 写偏好会经 [com.osfans.trime.ime.core.TrimeInputMethodService] 的
+     * recreateInputViewPrefs 触发输入视图重建，候选栏按新倍数重新排版。
+     */
+    private fun stepCandidateScale(step: Int) {
+        val current = CandidateScale.current()
+        val target = if (step >= 0) CandidateScale.next(current) else CandidateScale.previous(current)
+        CandidateScale.set(target)
+        Toast.makeText(service, "候选词 ${CandidateScale.label(target)}", Toast.LENGTH_SHORT).show()
     }
 
     private val candidateUi by lazy {

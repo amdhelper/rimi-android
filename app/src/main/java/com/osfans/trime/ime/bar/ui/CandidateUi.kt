@@ -9,6 +9,7 @@ import android.view.View
 import com.osfans.trime.R
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import splitties.dimensions.dp
 import splitties.views.dsl.constraintlayout.before
 import splitties.views.dsl.constraintlayout.centerVertically
@@ -35,7 +36,7 @@ class CandidateUi(
         ctx.constraintLayout {
             add(
                 unrollButton,
-                lParams(dp(40)) {
+                lParams(dp(theme.style.scaledCandidateBarHeight)) {
                     centerVertically()
                     endOfParent()
                 },

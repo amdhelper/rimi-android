@@ -15,6 +15,9 @@ import com.osfans.trime.core.CandidateProto
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.data.theme.model.GeneralStyle
+import com.osfans.trime.data.theme.model.scaledCandidateTextSize
+import com.osfans.trime.data.theme.model.scaledCandidateViewHeight
+import com.osfans.trime.data.theme.model.scaledCommentTextSize
 import com.osfans.trime.ime.core.AutoScaleTextView
 import com.osfans.trime.ime.keyboard.GestureFrame
 import com.osfans.trime.util.roundedRippleDrawable
@@ -49,8 +52,8 @@ class CandidateItemUi(
     private val theme: Theme
         get() = scope.theme
 
-    private val textSize = theme.style.candidateTextSize
-    private val commentSize = theme.style.commentTextSize
+    private val textSize = theme.style.scaledCandidateTextSize
+    private val commentSize = theme.style.scaledCommentTextSize
 
     // Read at use time so a scheme switch re-binds rows with the new colors.
     private val textColor: Int get() = scope.colors.candidateTextColor
@@ -152,7 +155,7 @@ class CandidateItemUi(
     override val root = view(::GestureFrame) {
         add(
             content,
-            lParams(wrapContent, dp(theme.style.candidateViewHeight)) {
+            lParams(wrapContent, dp(theme.style.scaledCandidateViewHeight)) {
                 gravity = gravityCenter
             },
         )

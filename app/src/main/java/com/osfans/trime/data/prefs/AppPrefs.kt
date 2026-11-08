@@ -351,11 +351,21 @@ class AppPrefs(
             const val MODE = "show_candidates_window"
             const val LAYOUT = "candidates_layout"
             const val POSITION = "candidates_window_position"
+            const val SCALE = "candidate_scale"
         }
 
         val mode = enum(R.string.show_candidates_window, MODE, PopupCandidatesMode.DISABLED)
         val layout = enum(R.string.candidates_layout, LAYOUT, PopupCandidatesLayout.AUTOMATIC)
         val position = enum(R.string.candidates_window_position, POSITION, PopupPosition.BOTTOM_LEFT)
+
+        /**
+         * 候选词显示倍数（1× ~ 4×，步长 0.5×，默认 2×）。
+         *
+         * 用 float 存原始档位；必须在 provider 里注册，注册后
+         * [com.osfans.trime.ime.core.TrimeInputMethodService] 才能收到改动
+         * 并重建输入视图。见 [CandidateScale]。
+         */
+        val candidateScale = float(SCALE, CandidateScale.DEFAULT).apply { register() }
     }
 
     /**

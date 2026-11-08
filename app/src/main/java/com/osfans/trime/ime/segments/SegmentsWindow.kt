@@ -19,6 +19,7 @@ import com.osfans.trime.R
 import com.osfans.trime.data.db.CollectionHelper
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.keyboard.KeyboardWindow
 import com.osfans.trime.ime.window.BoardWindow
@@ -121,7 +122,7 @@ class SegmentsWindow(di: DI, private val source: String) : BoardWindow.BarBoardW
             flexDirection = FlexDirection.ROW_REVERSE
             alignItems = AlignItems.CENTER
             val buttons = listOf(ui.selectButton, ui.copyButton, ui.starButton, ui.searchButton, ui.shareButton)
-            val size = theme.style.run { candidateViewHeight + commentHeight }
+            val size = theme.style.scaledCandidateBarHeight
             buttons.forEachIndexed { index, button ->
                 val lParams = FlexboxLayout.LayoutParams(dp(size), dp(size))
                 if (index > 0) {

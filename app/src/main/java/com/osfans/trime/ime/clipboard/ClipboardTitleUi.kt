@@ -9,6 +9,7 @@ import android.content.Context
 import com.osfans.trime.R
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import com.osfans.trime.ime.bar.ui.ToolButton
 import com.osfans.trime.ime.core.InputTabLayout
 import splitties.dimensions.dp
@@ -28,7 +29,7 @@ class ClipboardTitleUi(override val ctx: Context, private val scope: ThemeScope)
 
     val deleteAllButton = ToolButton(ctx, R.drawable.ic_baseline_delete_sweep_24, scope)
 
-    private val size = theme.style.run { candidateViewHeight + commentHeight }
+    private val size = theme.style.scaledCandidateBarHeight
 
     override val root = constraintLayout {
         add(

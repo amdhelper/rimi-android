@@ -15,6 +15,7 @@ import com.google.android.flexbox.JustifyContent
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.data.theme.model.ToolBar
+import com.osfans.trime.data.theme.model.scaledCandidateBarHeight
 import splitties.dimensions.dp
 import splitties.views.dsl.core.Ui
 import splitties.views.dsl.core.view
@@ -34,7 +35,7 @@ class ButtonsBarUi(
 
     val firstButton: ToolButton?
 
-    private val defaultButtonSize = theme.style.run { candidateViewHeight + commentHeight }
+    private val defaultButtonSize = theme.style.scaledCandidateBarHeight
 
     private fun toolButton(
         buttonConfig: ToolBar.Button?,
