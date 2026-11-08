@@ -161,6 +161,11 @@ class MainActivity : AppCompatActivity() {
 
             Intent.ACTION_RUN -> {
                 val route = intent.parcelable<NavigationRoute>(EXTRA_SETTINGS_ROUTE) ?: return
+                // 已经在目标页面时直接返回：重复 popBackStack+navigate 会销毁当前 Fragment，
+                // 而它手动创建的 AlertDialog 不会跟着消失——变成无主对话框，
+                // 用户点按钮就会在已 detach 的 Fragment 上 requireContext() 崩溃
+                // （真机崩溃：Fragment RimiSyncFragment not attached to a context）。
+                if (navController.currentDestination?.hasRoute(route::class) == true) return
                 navController.popBackStack(NavigationRoute.Main, false)
                 navController.navigate(route)
             }

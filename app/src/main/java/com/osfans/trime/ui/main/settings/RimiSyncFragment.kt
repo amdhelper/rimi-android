@@ -48,6 +48,30 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     private lateinit var serverPreference: Preference
     private lateinit var voicePermissionPreference: Preference
 
+    /**
+     * 手动创建的对话框挂在 Activity 窗口上，不会随 Fragment 销毁。
+     * Fragment 被导航替换后，旧对话框仍留在屏幕上，点按钮会回到已 detach 的
+     * 旧实例执行 `requireContext` → IllegalStateException 崩进程
+     * （真机实测：`Fragment RimiSyncFragment ... not attached to a context`）。
+     * 所以这里统一登记，onDestroyView 时全部收掉。
+     */
+    private val trackedDialogs = mutableListOf<AlertDialog>()
+    private var loginDialog: AlertDialog? = null
+
+    private fun AlertDialog.showTracked(): AlertDialog {
+        trackedDialogs += this
+        setOnDismissListener { trackedDialogs.remove(this) }
+        show()
+        return this
+    }
+
+    override fun onDestroyView() {
+        trackedDialogs.toList().forEach { runCatching { it.dismiss() } }
+        trackedDialogs.clear()
+        loginDialog = null
+        super.onDestroyView()
+    }
+
     override fun onCreatePreferences(
         savedInstanceState: Bundle?,
         rootKey: String?,
@@ -64,7 +88,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                             setTitle(R.string.rimi_cloud_account_title)
                             setOnPreferenceClickListener {
                                 if (RimiCloud.isLoggedIn) {
-                                    requireContext().toast(R.string.rimi_cloud_already_logged_in)
+                                    context.toast(R.string.rimi_cloud_already_logged_in)
                                 } else {
                                     promptLogin()
                                 }
@@ -108,7 +132,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                             setSummary(R.string.rimi_cloud_auto_sync_summary)
                             setOnPreferenceChangeListener { _, newValue ->
                                 RimiCloud.autoSync = newValue as Boolean
-                                RimiCloudSyncWork.restart(requireContext())
+                                RimiCloudSyncWork.restart(context)
                                 true
                             }
                         },
@@ -123,7 +147,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                             setSummary(R.string.rimi_cloud_screen_off_only_summary)
                             setOnPreferenceChangeListener { _, newValue ->
                                 RimiCloud.syncOnlyWhenScreenOff = newValue as Boolean
-                                RimiCloudSyncWork.restart(requireContext())
+                                RimiCloudSyncWork.restart(context)
                                 true
                             }
                         },
@@ -141,7 +165,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                             setOnPreferenceChangeListener { _, newValue ->
                                 val minutes = newValue as? Int ?: return@setOnPreferenceChangeListener false
                                 RimiCloud.syncIntervalMinutes = minutes
-                                RimiCloudSyncWork.restart(requireContext())
+                                RimiCloudSyncWork.restart(context)
                                 true
                             }
                         },
@@ -183,10 +207,12 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                                 ) {
                                     ctx.toast(R.string.rimi_voice_permission_granted)
                                 } else {
-                                    XXPermissions
-                                        .with(requireActivity())
-                                        .permission(Permission.RECORD_AUDIO)
-                                        .request(null)
+                                    activity?.let { act ->
+                                        XXPermissions
+                                            .with(act)
+                                            .permission(Permission.RECORD_AUDIO)
+                                            .request(null)
+                                    }
                                 }
                                 true
                             }
@@ -206,6 +232,8 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     }
 
     private fun refreshUi() {
+        if (!isAdded) return
+        val ctx = context ?: return
         val loggedIn = RimiCloud.isLoggedIn
         accountPreference.summary =
             if (loggedIn) {
@@ -226,7 +254,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
         serverPreference.summary = RimiCloud.server
         voicePermissionPreference.summary =
             if (ContextCompat.checkSelfPermission(
-                    requireContext(),
+                    ctx,
                     Manifest.permission.RECORD_AUDIO,
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
@@ -255,7 +283,9 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     }
 
     private fun promptLogin() {
-        val ctx = requireContext()
+        val ctx = context ?: return
+        // 已经弹出登录框时不要再叠一层（onResume 的自动弹框与手动点击会撞车）
+        if (loginDialog?.isShowing == true) return
         val input =
             EditText(ctx).apply {
                 hint = getString(R.string.rimi_cloud_login_hint)
@@ -285,11 +315,12 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
             input.requestFocus()
             dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
-        dialog.show()
+        loginDialog = dialog
+        dialog.showTracked()
     }
 
     private fun login(secret: String) {
-        val ctx = requireContext()
+        val ctx = context ?: return
         lifecycleScope.launch {
             var error: String? = null
             withLoadingDialog(ctx) {
@@ -310,7 +341,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     }
 
     private fun confirmLogout() {
-        val ctx = requireContext()
+        val ctx = context ?: return
         AlertDialog
             .Builder(ctx)
             .setTitle(R.string.rimi_cloud_logout)
@@ -320,12 +351,13 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
                 RimiCloud.logout()
                 RimiCloudSyncWork.start(ctx)
                 refreshUi()
-            }.show()
+            }.create()
+            .showTracked()
     }
 
     private fun syncNow() {
         if (!RimiCloud.isLoggedIn) return
-        val ctx = requireContext()
+        val ctx = context ?: return
         lifecycleScope.launch {
             var report: RimiDictSync.Report? = null
             var error: String? = null
@@ -358,7 +390,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
     }
 
     private fun promptServer() {
-        val ctx = requireContext()
+        val ctx = context ?: return
         val input =
             EditText(ctx).apply {
                 setText(RimiCloud.server)
@@ -379,6 +411,7 @@ class RimiSyncFragment : PaddingPreferenceFragment() {
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 RimiCloud.server = input.text.toString()
                 refreshUi()
-            }.show()
+            }.create()
+            .showTracked()
     }
 }
