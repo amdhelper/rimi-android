@@ -118,8 +118,8 @@ class ThemeGoldenTest :
 
                 Then("color schemes and preset keys are decoded") {
                     theme.presetColorSchemes.size shouldBe 37
-                    // 109 = 106 + 语音输入键 + 九宫格/全键盘切换键（M4/M5 2026-11-04）
-                    theme.presetKeys.size shouldBe 109
+                    // 122 = 109 + 13 个九宫格主键/标点 preset（T9_0..T9_9 + T9_COMMA/PERIOD/QUESTION）
+                    theme.presetKeys.size shouldBe 122
                     val brightnessDown = theme.presetKeys.getValue("BRIGHTNESS_DOWN")
                     brightnessDown.label shouldBe "亮度-"
                     brightnessDown.send shouldBe "BRIGHTNESS_DOWN"

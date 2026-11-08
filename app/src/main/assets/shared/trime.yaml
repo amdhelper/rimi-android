@@ -981,6 +981,22 @@ preset_keys:
   # 这两个 preset_keys 留作命令备查，键盘里已无引用。
   SwitchToT9: {label: "9", send: FUNCTION, command: switch_schema, option: t9}
   SwitchToQwerty: {label: "26", send: FUNCTION, command: switch_schema, option: rimi}
+  # 日弥九宫格 T9 主键（2026-11-08 UI 改版）
+  # 中文态显示字母（states[0]），数字态显示数字（states[1]）。
+  # toggle: ascii_mode 只负责切标签，键值仍是 send 的数字，拼音由 t9 方案的 algebra 映射。
+  T9_1: {label: '1', send: '1'}  # 1 在 T9 里没有拼音字母映射，保留数字标签
+  T9_2: {send: '2', states: ['ABC', '2'], toggle: ascii_mode}
+  T9_3: {send: '3', states: ['DEF', '3'], toggle: ascii_mode}
+  T9_4: {send: '4', states: ['GHI', '4'], toggle: ascii_mode}
+  T9_5: {send: '5', states: ['JKL', '5'], toggle: ascii_mode}
+  T9_6: {send: '6', states: ['MNO', '6'], toggle: ascii_mode}
+  T9_7: {send: '7', states: ['PQRS', '7'], toggle: ascii_mode}
+  T9_8: {send: '8', states: ['TUV', '8'], toggle: ascii_mode}
+  T9_9: {send: '9', states: ['WXYZ', '9'], toggle: ascii_mode}
+  T9_0: {label: '0', send: '0'}
+  T9_COMMA: {send: ',', states: ['，', ','], toggle: ascii_mode}
+  T9_PERIOD: {send: '.', states: ['。', '.'], toggle: ascii_mode}
+  T9_QUESTION: {send: '?', states: ['？', '?'], toggle: ascii_mode}
 
 preset_keyboards:
   default:
@@ -1227,8 +1243,12 @@ preset_keyboards:
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
   # 日弥九宫格（T9）：键只发数字，拼音由 t9 方案把音节映射成数字来匹配。
-  # 2026-11-04 爸爸令：底排整行大键（原回车键）改成大空格键（拇指最顺手），回车保留长按；
-  # 原小空格键让位给 '1'（拼音没有 1 开头音节，'1' 直发），'0' 挂 '1' 键长按（小字 0 提示）。
+  # 2026-11-08 爸爸令（UI 改版）：
+  #   ① 一行 3 键 → 一行 4 键；九个主力键整体右移一列，最左列给最常用标点 ，。？
+  #   ② 打中文时九宫格只显示字母（ABC/DEF/…），数字标签只在数字态（ascii_mode）出现；
+  #      字母标签走 preset_keys 的 states+toggle: ascii_mode（见上方 T9_* 定义）。
+  #   ③ key_text_size 覆盖 key_long_text_size（默认 14sp 对 3-4 个字母偏小）。
+  # 2026-11-04 爸爸令保留：底排 82% 空格（长按语音）+ 18% 回车。
   t9:
     name: 日弥九宫格
     author: "rimi"
@@ -1238,26 +1258,33 @@ preset_keyboards:
     # 这里声明 reset_ascii_mode: true → 每次显示九宫格都强制回到中文（不吃上次的西文状态）。
     reset_ascii_mode: true
     # ⚠️ width 是「每个键占屏宽的百分比权重」，MAX_TOTAL_WEIGHT=100：
-    #    33.3 → 每键 1/3 屏宽，三键正好一行，第四个键自动换行。
-    width: 33.3
+    #    25 → 每键 1/4 屏宽，四键正好一行，第五个键自动换行。
+    width: 25
     height: 52
     lock: true
     keys:
-    - {click: ',', long_click: '。', label: '，'}
-    - {click: '2', label: '2', hint: 'abc'}
-    - {click: '3', label: '3', hint: 'def'}
-    - {click: '4', label: '4', hint: 'ghi'}
-    - {click: '5', label: '5', hint: 'jkl'}
-    - {click: '6', label: '6', hint: 'mno'}
-    - {click: '7', label: '7', hint: 'pqrs'}
-    - {click: '8', label: '8', hint: 'tuv'}
-    - {click: '9', label: '9', hint: 'wxyz'}
-    - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number}
-    - {click: '1', label: '1', hint: '0', long_click: '0'}
-    - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫'}
+    # 第 1 行：， 1 2(ABC) 3(DEF)
+    - {click: T9_COMMA, key_text_size: 24}
+    - {click: T9_1, key_text_size: 22}
+    - {click: T9_2, key_text_size: 18}
+    - {click: T9_3, key_text_size: 18}
+    # 第 2 行：。 4(GHI) 5(JKL) 6(MNO)
+    - {click: T9_PERIOD, key_text_size: 24}
+    - {click: T9_4, key_text_size: 18}
+    - {click: T9_5, key_text_size: 18}
+    - {click: T9_6, key_text_size: 18}
+    # 第 3 行：？ 7(PQRS) 8(TUV) 9(WXYZ)
+    - {click: T9_QUESTION, key_text_size: 24}
+    - {click: T9_7, key_text_size: 18}
+    - {click: T9_8, key_text_size: 18}
+    - {click: T9_9, key_text_size: 18}
+    # 第 4 行：符/数（长按数字键盘）· 0（加宽）· 退格（长按清空整串）
+    - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number, width: 25}
+    - {click: T9_0, width: 50, key_text_size: 22}
+    - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫', width: 25}
+    # 第 5 行：空格（长按语音）+ 回车（2026-11-04 爸爸令：底排小回车）
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
-    # 2026-11-04 爸爸令：空格长按 = 语音转写（与 26 键一致）；回车改成底排右侧小键。
     - {click: space, long_click: VoiceInput, label: '空格', width: 82}
     - {click: Return, label: '回车', key_text_color: '0xcdd6f4', width: 18}
 

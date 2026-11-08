@@ -7,6 +7,7 @@ package com.osfans.trime.data.theme
 import com.charleskorn.kaml.YamlList
 import com.charleskorn.kaml.YamlNode
 import com.charleskorn.kaml.yamlMap
+import com.osfans.trime.data.theme.model.KeyActionToken
 import com.osfans.trime.util.get
 import com.osfans.trime.util.mapping
 import com.osfans.trime.util.pairs
@@ -298,33 +299,53 @@ class ThemeDslExpanderTest :
                 spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
             }
 
-            Then("t9 bottom row is a big space bar plus a small Return key") {
-                // 2026-11-04 爸爸令：九宫格底排整行大键（原回车）→ 大空格键 + 右侧小回车；
-                // 空格长按 = 语音转写（与 26 键一致），回车改由小键负责。
+            Then("t9 is a four-column grid: punctuation column + 9 letter keys") {
+                // 2026-11-08 爸爸令：九宫格一行 3 键改 4 键，九个主力键整体右移一列，
+                // 最左列放最常用标点 ，。？；中文态只显示字母，数字态才显示数字。
                 val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
-                val t9Keys = keyboards.pairs["t9"]!!.mapping!!.pairs["keys"] as YamlList
-                val keyMaps = t9Keys.items.mapNotNull { it.mapping }
+                val t9Node = keyboards.pairs["t9"]!!.mapping!!
+                t9Node.pairs["width"]?.string shouldBe "25"
+                val keyMaps = (t9Node.pairs["keys"] as YamlList).items.mapNotNull { it.mapping }
+                keyMaps.mapNotNull { it.pairs["click"]?.string } shouldBe
+                    listOf(
+                        "T9_COMMA", "T9_1", "T9_2", "T9_3",
+                        "T9_PERIOD", "T9_4", "T9_5", "T9_6",
+                        "T9_QUESTION", "T9_7", "T9_8", "T9_9",
+                        "Keyboard_symbols", "T9_0", "BackSpace",
+                        "space", "Return",
+                    )
+
+                val theme = ThemeTestSupport.yaml.decodeFromYamlNode<Theme>(expanded.yamlMap)
+                // 主键标签随 ascii_mode 切换：中文=字母，数字态=数字（键值始终是 send 的数字）
+                theme.presetKeys.getValue("T9_2").let {
+                    it.send shouldBe "2"
+                    it.states shouldBe listOf("ABC", "2")
+                    it.toggle shouldBe "ascii_mode"
+                }
+                theme.presetKeys.getValue("T9_9").states shouldBe listOf("WXYZ", "9")
+                theme.presetKeys.getValue("T9_COMMA").states shouldBe listOf("，", ",")
+                theme.presetKeys.getValue("T9_1").label shouldBe "1"
+
+                val t9 = theme.presetKeyboards.getValue("t9")
+                t9.keys.size shouldBe 17
+                t9.keys.first().click shouldBe KeyActionToken.Plain("T9_COMMA")
+                // 底排仍是 82% 空格 + 18% 回车；空格长按 = 语音转写
                 val spaceKey = keyMaps.first { it.pairs["click"]?.string == "space" }
                 spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
                 spaceKey.pairs["width"]?.string shouldBe "82"
                 val returnKey = keyMaps.first { it.pairs["click"]?.string == "Return" }
                 returnKey.pairs["width"]?.string shouldBe "18"
                 returnKey.pairs["label"]?.string shouldBe "回车"
-                val bottomRowWidth =
-                    listOfNotNull(
-                        spaceKey.pairs["width"]?.string?.toFloat(),
-                        returnKey.pairs["width"]?.string?.toFloat(),
-                    ).sum()
-                bottomRowWidth shouldBe 100f
-                val oneKey = keyMaps.first { it.pairs["click"]?.string == "1" }
-                oneKey.pairs["long_click"]?.string shouldBe "0"
+                // 0 有独立键（加宽），不再挂在 1 的长按
+                keyMaps.first { it.pairs["click"]?.string == "T9_1" }.pairs["long_click"] shouldBe null
+                keyMaps.first { it.pairs["click"]?.string == "T9_0" }.pairs["width"]?.string shouldBe "50"
                 // 2026-11-05 爸爸令：九宫格「符」键改「符/数」——点=符号键盘、长按=数字键盘（与 26 键一致）
                 val symbolKey = keyMaps.first { it.pairs["click"]?.string == "Keyboard_symbols" }
                 symbolKey.pairs["label"]?.string shouldBe "符/数"
                 symbolKey.pairs["long_click"]?.string shouldBe "Keyboard_number"
                 // 2026-11-05 爸爸反馈：从数字键盘切回九宫格后只能打一个中文就只剩数字。
                 // 九宫格按键只有数字，ascii_mode 一旦残留 true 就只上屏数字 —— 必须每次显示都强制回中文。
-                keyboards.pairs["t9"]!!.mapping!!.pairs["reset_ascii_mode"]?.string shouldBe "true"
+                t9Node.pairs["reset_ascii_mode"]?.string shouldBe "true"
             }
 
             Then("every keyboard defines visible gaps and a key border") {
