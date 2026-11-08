@@ -7,10 +7,10 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- 输入法平台名称  -->
-    <string name="app_name_release">日弥输入法</string>
-    <string name="app_name_debug">日弥输入法（调试）</string>
-    <string name="qq_group_1">同文 QQ 群 1</string>
-    <string name="qq_group_2">同文 QQ 群 2</string>
+    <string name="app_name_release">非全盲视障优化输入法</string>
+    <string name="app_name_debug">非全盲视障优化输入法（调试）</string>
+    <string name="qq_group_1">用户交流 QQ 群 1</string>
+    <string name="qq_group_2">用户交流 QQ 群 2</string>
     <string name="rime_qq_group">中州韵 QQ 群</string>
     <string name="librime_version">RIME 版本</string>
     <string name="opencc_version">OpenCC 版本</string>
@@ -65,8 +65,8 @@
     <string name="custom_sound_effect_name">自定义按键音效</string>
     <string name="setup__next">下一步</string>
     <string name="done">完成</string>
-    <string name="setup__enable_ime_hint">在语言和输入设置中启用<b>日弥输入法</b></string>
-    <string name="setup__select_ime_hint">选择<b>日弥输入法</b>作为默认输入法</string>
+    <string name="setup__enable_ime_hint">在语言和输入设置中启用<b>非全盲视障优化输入法</b></string>
+    <string name="setup__select_ime_hint">选择<b>非全盲视障优化输入法</b>作为默认输入法</string>
     <string name="setup__enable_ime">启用输入法</string>
     <string name="setup__select_ime">选择输入法</string>
     <string name="setup__prev">上一步</string>
@@ -123,7 +123,7 @@
     <string name="use_app_specific_storage">使用应用专属存储空间</string>
     <string name="sync_from_external_desc">每次部署或同步用户数据前，从指定目录导入数据到内部存储，并在同步用户数据后导出到该目录。需要较多存储空间。推荐老用户使用。</string>
     <string name="use_app_specific_storage_desc">直接使用应用内部私有存储空间，用户需要使用支持的文件管理器管理数据。卸载应用时系统可能会询问是否保留数据，请随时做好备份。</string>
-    <string name="external_sync_select_folder_message">外部同步需要选择数据文件夹。请选择存放 Trime 配置文件的位置。</string>
+    <string name="external_sync_select_folder_message">外部同步需要选择数据文件夹。请选择存放本应用配置文件的位置。</string>
     <string name="external_sync_fallback_app_storage">文件夹选择失败或已取消。存储模式将还原为使用应用专属存储空间。</string>
     <string name="maintenance">维护</string>
     <string name="loading">正在加载</string>
@@ -151,7 +151,7 @@
     <string name="enable_landscape_mode">启用横屏模式</string>
     <string name="split_space_percent">自动分割键盘比例</string>
     <string name="setup__step_three">第 3 步</string>
-    <string name="setup__select_data_path_hint">选择<b>日弥输入法</b>如何存储 Rime 数据</string>
+    <string name="setup__select_data_path_hint">选择<b>非全盲视障优化输入法</b>如何存储 Rime 数据</string>
     <string name="setup__select_data_path">选择外部数据目录…</string>
     <string name="setup__data_path_imported">数据文件夹导入成功</string>
     <string name="setup__data_path_import_failed">数据文件夹导入失败</string>
@@ -251,8 +251,8 @@
     <string name="star_success">收藏成功</string>
     <string name="ignore_system_gesture_insets">忽略系统手势边衬区</string>
 
-    <string name="rimi_cloud_sync_short">日弥云同步</string>
-    <string name="rimi_cloud_account">日弥账户</string>
+    <string name="rimi_cloud_sync_short">词库云同步</string>
+    <string name="rimi_cloud_account">词库账户</string>
     <string name="rimi_cloud_account_title">账户</string>
     <string name="rimi_cloud_account_not_logged_in">未登录 · 点此用 wumi 助记词登录</string>
     <string name="rimi_cloud_account_logged_in">已登录 %1$s · 级别 %2$s</string>
@@ -283,7 +283,21 @@
     <string name="rimi_voice_permission">录音权限</string>
     <string name="rimi_voice_permission_granted">已授权，键盘上的 🎤 可以直接说话</string>
     <string name="rimi_voice_permission_denied">未授权：点击这里授予麦克风权限</string>
-    <string name="rimi_voice_summary">说话直接上屏（识别走日弥 paraformer 通道，需要登录 wumi 账户）</string>
+    <string name="rimi_voice_summary">说话直接上屏（识别走paraformer 语音通道，需要登录 wumi 账户）</string>
     <string name="rimi_cloud_server_category">服务器</string>
     <string name="rimi_cloud_server">服务器地址</string>
+
+    <!-- 应用内自更新 -->
+    <string name="check_update">检查更新</string>
+    <string name="check_update_summary">当前版本 %1$s · 从井 WUB 官网检查新版本</string>
+    <string name="check_update_checking">正在检查更新…</string>
+    <string name="check_update_latest">已是最新版本（v%1$s）</string>
+    <string name="check_update_failed">检查更新失败：%1$s</string>
+    <string name="update_available_title">发现新版本</string>
+    <string name="update_available_message">当前版本：v%1$s\n最新版本：v%2$s\n大小：%3$s\n\n%4$s</string>
+    <string name="update_now">下载并安装</string>
+    <string name="update_later">稍后</string>
+    <string name="update_download_started">已开始下载，完成后会提示安装</string>
+    <string name="update_download_failed">下载失败：%1$s</string>
+    <string name="update_install_permission">请允许本应用安装未知来源的应用，然后再试一次</string>
 </resources>

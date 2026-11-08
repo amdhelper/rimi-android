@@ -1,15 +1,15 @@
-# Rimi 日弥 · 全拼主方案
+# Zoom · 全拼主方案
 # 深色现代 · 医学/中医/易经词库 · 强联想
 # 词库底座: 雾凇拼音 rime_ice（188 万词条，已内含 rimi.medical/rimi.yijing）
 #   dictionary: rimi.mobile  → 词条来自雾凇全量词库
-#   prism: rimi           → 拼写棱镜用日弥自己的 algebra（简拼/容错），
+#   prism: rimi           → 拼写棱镜用本方案自己的 algebra（简拼/容错），
 #                           多方案共用词库时 prism 必须各自独立（雾凇双拼同款做法）
 # 轻量模式（无 vendor/rime-ice）由 rimi-setup/deploy_linux.sh 自动回退 dictionary: rimi
 schema:
   schema_id: rimi
   # 🔥 RIME 只认 name 键（schema_name 是无效键，会被忽略导致方案显示名塌缩成
   #    schema_id "rimi"，kimpanel 标签变成 "r" 而不是 "日"——2026-08-17 实证）
-  name: "日弥"
+  name: "非全盲视障优化输入法"
   version: "0.2.1"
   author:
     - rimi
@@ -128,7 +128,7 @@ translator:
   # 🔥 2026-08-17 用户反馈修复: 原 dictionary: rimi 靠 use_preset_vocabulary 取通用词，
   # 用户环境预设加载失败 → 主词库只剩 84KB 医学/易经词，常用词全丢。
   # 改用雾凇 rime_ice 词库（188 万词条，其 import_tables 已含 rimi.medical/rimi.yijing）。
-  # prism 保持 rimi：拼写棱镜用日弥自己的 algebra（简拼/容错），不与雾凇方案冲突。
+  # prism 保持 rimi：拼写棱镜用本方案自己的 algebra（简拼/容错），不与雾凇方案冲突。
   dictionary: rimi.mobile
   prism: rimi
   # 用户词库：自学习落盘（重中之重）

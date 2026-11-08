@@ -140,7 +140,7 @@ fallback_colors:
 
 preset_color_schemes:
   default:
-    name: 日弥深色／Rimi Dark #方案名稱
+    name: Zoom Dark #方案名稱
     author: rimi #作者資訊
     # Catppuccin Mocha（与桌面 rimi_dark 同色板）
     back_color: 0x1e1e2e #候選區背景
@@ -956,10 +956,10 @@ preset_keys:
   Date: {label: 日期, command: date, option: "yyyy-MM-dd"}
   ChineseDate: {label: 農曆, command: date, option: "zh_CN@calendar=chinese"} #農曆等日期(>=Android 7.0)：date 語言@calendar=曆法 格式。具體參見https://developer.android.com/reference/android/icu/util/Calendar.html
   Time: {label: 時間, command: date, option: "HH:mm:ss"} #時間： date 格式
-  TrimeApp: {label: 同文, command: run, option: "com.osfans.trime"} #運行程序: run 包名
-  TrimeCmp: {label: 同文組件, command: run, option: "com.osfans.trime/.ui.main.MainActivity"} #運行程序指定組件: run 包名/組件名
-  Homepage: {label: 同文主頁, command: run, option: "https://github.com/osfans/trime"} #查看網頁: run 網址
-  CommitHomepage: {label: 同文網址, commit: https://github.com/osfans/trime} #直接上屏
+  TrimeApp: {label: Zoom, command: run, option: "com.osfans.trime"} #運行程序: run 包名
+  TrimeCmp: {label: Zoom 设置, command: run, option: "com.osfans.trime/.ui.main.MainActivity"} #運行程序指定組件: run 包名/組件名
+  Homepage: {label: 官网, command: run, option: "https://github.com/amdhelper/rimi-android"} #查看網頁: run 網址
+  CommitHomepage: {label: 官网地址, commit: https://github.com/amdhelper/rimi-android} #直接上屏
   Wiki: {label: 維基, command: run, option: "https://zh.wikipedia.org/wiki/%s"} #搜索網頁: %s或者%1$s爲當前字符
   Google: {label: 谷歌, command: run, option: "https://www.google.com/search?q=%s"} #搜索網頁: %s或者%1$s爲當前字符
   MoeDict: {label: 萌典, command: run, option: "https://www.moedict.tw/%3$s"} #搜索網頁: %3$s爲光標前字符
@@ -973,7 +973,7 @@ preset_keys:
   Sync: {label: 同步, send: FUNCTION, command: apply, option: "SYNC_USER_DATA"} #用户资料同步
   updateConfig: {label: 更新配置, send: FUNCTION, command: apply, option: "UPDATE_CONFIG"} #更新配置文件
   RepeatCommit: { label: 重复,  command: commit, option: "%1$s" } #重复输入刚上屏的内容
-  # 日弥：语音输入（M4）——录音 → paraformer 通道 → 直接上屏
+  # Zoom：语音输入（M4）——录音 → paraformer 通道 → 直接上屏
   # 2026-11-04 爸爸令：🎤 独立键拿掉，语音改挂空格长按（省出一块底排空间，空格加宽吸收）
   VoiceInput: {label: "🎤", command: voice_input}
   # 九宫格 / 全键盘互切（切方案 → 键盘自动跟随，见 smartMatchKeyboard）
@@ -981,7 +981,7 @@ preset_keys:
   # 这两个 preset_keys 留作命令备查，键盘里已无引用。
   SwitchToT9: {label: "9", send: FUNCTION, command: switch_schema, option: t9}
   SwitchToQwerty: {label: "26", send: FUNCTION, command: switch_schema, option: rimi}
-  # 日弥九宫格 T9 主键（2026-11-08 UI 改版）
+  # 九宫格 T9 主键（2026-11-08 UI 改版）
   # 中文态显示字母（states[0]），数字态显示数字（states[1]）。
   # toggle: ascii_mode 只负责切标签，键值仍是 send 的数字，拼音由 t9 方案的 algebra 映射。
   # 2026-11-09 爸爸令：九个主力键里「1」没有拼音字母映射（多出来的那个），改作斜杠键。
@@ -1250,7 +1250,7 @@ preset_keyboards:
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
-  # 日弥九宫格（T9）：键只发数字，拼音由 t9 方案把音节映射成数字来匹配。
+  # 九宫格（T9）：键只发数字，拼音由 t9 方案把音节映射成数字来匹配。
   # 2026-11-08 爸爸令（UI 改版）：
   #   ① 一行 3 键 → 一行 4 键；九个主力键整体右移一列，最左列给最常用标点 ，。？
   #   ② 打中文时九宫格只显示字母（ABC/DEF/…），数字标签只在数字态（ascii_mode）出现；
@@ -1258,7 +1258,7 @@ preset_keyboards:
   #   ③ key_text_size 覆盖 key_long_text_size（默认 14sp 对 3-4 个字母偏小）。
   # 2026-11-04 爸爸令保留：底排 82% 空格（长按语音）+ 18% 回车。
   t9:
-    name: 日弥九宫格
+    name: 九宫格
     author: "rimi"
     ascii_mode: 0
     # 2026-11-05 爸爸反馈「从数字键盘切回九宫格后只能打一个中文就只剩数字」：

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Rimi community
+ * SPDX-FileCopyrightText: 2026 Zoom IME contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -35,7 +35,7 @@ import com.osfans.trime.worker.RimiCloudSyncWork
 import kotlinx.coroutines.launch
 
 /**
- * 日弥云同步设置页：wumi 账户登录 + 词库双向同步（M3）。
+ * 非全盲视障优化输入法云同步设置页：wumi 账户登录 + 词库双向同步（M3）。
  */
 class RimiSyncFragment : PaddingPreferenceFragment() {
     private lateinit var accountPreference: Preference

@@ -468,7 +468,7 @@ schema:
     - stroke
     - melt_eng
   description: "基于 RIME 的全拼方案：雾凇拼音 188 万词底座 + 医学/中医/易经专业词库 + 英文联想。"
-  name: "日弥"
+  name: "非全盲视障优化输入法"
   schema_id: rimi
   version: 0.2.1
 speller:

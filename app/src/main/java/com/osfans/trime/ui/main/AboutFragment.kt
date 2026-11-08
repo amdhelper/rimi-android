@@ -6,18 +6,32 @@
 package com.osfans.trime.ui.main
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.widget.Toast
+import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import com.osfans.trime.BuildConfig
 import com.osfans.trime.R
+import com.osfans.trime.data.update.AppUpdateChecker
+import com.osfans.trime.data.update.AppUpdateInfo
 import com.osfans.trime.ui.common.PaddingPreferenceFragment
 import com.osfans.trime.util.Const
 import com.osfans.trime.util.addCategory
 import com.osfans.trime.util.addPreference
 import com.osfans.trime.util.formatDateTime
+import kotlinx.coroutines.launch
+import java.io.File
+import java.util.Locale
 
 class AboutFragment : PaddingPreferenceFragment() {
 
@@ -27,6 +41,10 @@ class AboutFragment : PaddingPreferenceFragment() {
         rootKey: String?,
     ) {
         preferenceScreen = preferenceManager.createPreferenceScreen(requireContext()).apply {
+            addPreference(
+                R.string.check_update,
+                getString(R.string.check_update_summary, Const.VERSION_NAME),
+            ) { checkForUpdate() }
             addPreference(R.string.current_version, Const.VERSION_NAME) {
                 startActivity(
                     Intent(
@@ -99,41 +117,154 @@ class AboutFragment : PaddingPreferenceFragment() {
                     findNavController().navigate(NavigationRoute.License)
                 }
             }
-            addCategory("") {
-                isIconSpaceReserved = false
-                addPreference(R.string.qq_group_1, Const.QQ_GROUP_1_NUM) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(Const.QQ_GROUP_1_URL),
+        }
+    }
+
+    // ---------------- 应用内自更新 ----------------
+
+    private var pendingDownloadId: Long = -1L
+
+    private val downloadReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != DownloadManager.ACTION_DOWNLOAD_COMPLETE) return
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
+            if (id != pendingDownloadId) return
+            pendingDownloadId = -1L
+            installDownloadedApk(id)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val ctx = context ?: return
+        val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ctx.registerReceiver(downloadReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            ctx.registerReceiver(downloadReceiver, filter)
+        }
+    }
+
+    override fun onStop() {
+        try {
+            context?.unregisterReceiver(downloadReceiver)
+        } catch (_: IllegalArgumentException) {
+            // 未注册（提前退出）时忽略
+        }
+        super.onStop()
+    }
+
+    private fun checkForUpdate() {
+        val ctx = context ?: return
+        Toast.makeText(ctx, R.string.check_update_checking, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            try {
+                val info = AppUpdateChecker.check(BuildConfig.VERSION_NAME)
+                val c = context ?: return@launch
+                if (!info.hasUpdate) {
+                    Toast.makeText(
+                        c,
+                        getString(
+                            R.string.check_update_latest,
+                            info.latestVersion.ifBlank { Const.VERSION_NAME },
                         ),
-                    )
+                        Toast.LENGTH_LONG,
+                    ).show()
+                    return@launch
                 }
-                addPreference(R.string.qq_group_2, Const.QQ_GROUP_2_NUM) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(Const.QQ_GROUP_2_URL),
+                val size =
+                    if (info.size > 0) {
+                        String.format(Locale.US, "%.1f MB", info.size / 1048576.0)
+                    } else {
+                        "—"
+                    }
+                androidx.appcompat.app.AlertDialog.Builder(c)
+                    .setTitle(R.string.update_available_title)
+                    .setMessage(
+                        getString(
+                            R.string.update_available_message,
+                            Const.VERSION_NAME,
+                            info.latestVersion,
+                            size,
+                            info.notes.trim(),
                         ),
                     )
-                }
-                addPreference(R.string.rime_qq_group, Const.RIME_QQ_GROUP_NUM) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(Const.RIME_QQ_GROUP_URL),
-                        ),
-                    )
-                }
-                addPreference(R.string.telegram, Const.TELEGRAM_NAME) {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(Const.TELEGRAM_URL),
-                        ),
-                    )
+                    .setPositiveButton(R.string.update_now) { _, _ -> startDownload(info) }
+                    .setNegativeButton(R.string.update_later, null)
+                    .show()
+            } catch (e: Exception) {
+                context?.let {
+                    Toast.makeText(
+                        it,
+                        getString(R.string.check_update_failed, e.message ?: ""),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             }
+        }
+    }
+
+    private fun startDownload(info: AppUpdateInfo) {
+        val ctx = context ?: return
+        try {
+            pendingDownloadId = AppUpdateChecker.enqueueDownload(ctx, info)
+            Toast.makeText(ctx, R.string.update_download_started, Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(
+                ctx,
+                getString(R.string.update_download_failed, e.message ?: ""),
+                Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    private fun installDownloadedApk(downloadId: Long) {
+        val ctx = context ?: return
+        val dm = ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val cursor = dm.query(DownloadManager.Query().setFilterById(downloadId)) ?: return
+        try {
+            if (!cursor.moveToFirst()) return
+            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+            if (status != DownloadManager.STATUS_SUCCESSFUL) {
+                Toast.makeText(
+                    ctx,
+                    ctx.getString(R.string.update_download_failed, ""),
+                    Toast.LENGTH_LONG,
+                ).show()
+                return
+            }
+            val localUri = cursor.getString(
+                cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI),
+            ) ?: return
+            val path = Uri.parse(localUri).path ?: return
+            val file = File(path)
+            if (!file.exists()) return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                !ctx.packageManager.canRequestPackageInstalls()
+            ) {
+                Toast.makeText(ctx, R.string.update_install_permission, Toast.LENGTH_LONG).show()
+                ctx.startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:${ctx.packageName}"),
+                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                )
+                return
+            }
+            val apkUri = FileProvider.getUriForFile(
+                ctx,
+                "${ctx.packageName}.fileprovider",
+                file,
+            )
+            ctx.startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+            )
+        } finally {
+            cursor.close()
         }
     }
 

@@ -1,8 +1,8 @@
-# Rimi 日弥 · 九宫格（T9）方案
+# Zoom · 九宫格（T9）方案
 #
 # 键盘只发 2-9 数字，这里用 algebra 把词典的拼音音节映射成数字，
 # 于是 "ni hao" 的编码变成 "64 426"：用户连按 64426，librime 按音节表
-# 自动切分成 64+426 命中「你好」。词库直接复用日弥 188 万词的 rimi.mobile，
+# 自动切分成 64+426 命中「你好」。词库直接复用全量 188 万词的 rimi.mobile，
 # 不新增任何词典文件；prism 必须独立（algebra 与全拼方案不同）。
 #
 # ⚠️ 不要删音节间的空格：RIME 的 prism 靠空格分隔的音节表切分连续数字，
@@ -11,13 +11,13 @@
 # 切换：左上角三点菜单里的「26键全键盘 / 9键九宫格」项发 switch_schema 命令（见 CommonKeyboardActionListener）。
 schema:
   schema_id: t9
-  name: "日弥九宫格"
+  name: "九宫格"
   version: "0.1.0"
   author:
     - rimi
   description: |-
     九宫格拼音：2-9 数字键对应 abc/def/ghi/jkl/mno/pqrs/tuv/wxyz，
-    词库复用日弥全拼方案（医学/中医/易经 + 雾凇 188 万词）。
+    词库复用全拼方案（医学/中医/易经 + 雾凇 188 万词）。
 
 switches:
   - name: ascii_mode

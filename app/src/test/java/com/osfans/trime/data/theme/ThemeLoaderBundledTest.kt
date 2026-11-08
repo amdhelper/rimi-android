@@ -33,7 +33,7 @@ class ThemeLoaderBundledTest :
                 theme.presetColorSchemes.isNotEmpty() shouldBe true
                 theme.presetColorSchemes.containsKey("default") shouldBe true
                 // 爸爸要求键盘默认深色：内置 trime.yaml 的 default 方案是 Catppuccin Mocha 深色板。
-                theme.presetColorSchemes.getValue("default")["name"] shouldBe "日弥深色／Rimi Dark"
+                theme.presetColorSchemes.getValue("default")["name"] shouldBe "Zoom Dark"
             }
 
             Then("a missing asset is reported as a failure instead of throwing") {
