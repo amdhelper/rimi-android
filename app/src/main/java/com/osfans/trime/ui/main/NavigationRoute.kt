@@ -16,6 +16,7 @@ import com.osfans.trime.ui.main.settings.ClipboardSettingsFragment
 import com.osfans.trime.ui.main.settings.GeneralSettingsFragment
 import com.osfans.trime.ui.main.settings.KeyboardSettingsFragment
 import com.osfans.trime.ui.main.settings.ProfileSettingsFragment
+import com.osfans.trime.ui.main.settings.RimiDictMarketFragment
 import com.osfans.trime.ui.main.settings.RimiSyncFragment
 import com.osfans.trime.ui.main.settings.schema.SchemaListFragment
 import com.osfans.trime.ui.main.settings.theme.ThemeSettingsFragment
@@ -40,6 +41,9 @@ sealed class NavigationRoute : Parcelable {
 
     @Serializable
     data object RimiSync : NavigationRoute()
+
+    @Serializable
+    data object RimiDictMarket : NavigationRoute()
 
     @Serializable
     data object General : NavigationRoute()
@@ -87,6 +91,9 @@ sealed class NavigationRoute : Parcelable {
             }
             fragment<RimiSyncFragment, RimiSync> {
                 label = ctx.getString(R.string.rimi_cloud_sync_short)
+            }
+            fragment<RimiDictMarketFragment, RimiDictMarket> {
+                label = ctx.getString(R.string.rimi_dict_market)
             }
 
             fragment<GeneralSettingsFragment, General> {

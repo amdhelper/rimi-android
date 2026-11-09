@@ -251,6 +251,26 @@
     <string name="star_success">收藏成功</string>
     <string name="ignore_system_gesture_insets">忽略系统手势边衬区</string>
 
+    <string name="rimi_dict_market">词库市场</string>
+    <string name="rimi_dict_market_intro_title">按需安装，只装你要的</string>
+    <string name="rimi_dict_market_intro">内置词库只保留常用底座。网络热词、医学、计算机、成语诗词、地名姓名、生活娱乐等词库在这里按需下载；装好后自动重新部署，可随时卸载。词库仅作用于本机，不影响账户。</string>
+    <string name="rimi_dict_market_refresh">刷新词库列表</string>
+    <string name="rimi_dict_market_refresh_summary">从服务器获取最新清单（不需要登录）</string>
+    <string name="rimi_dict_market_meta">%1$s\n约 %2$s 条 · %3$s · %4$s</string>
+    <string name="rimi_dict_market_installed">已安装</string>
+    <string name="rimi_dict_market_available">可下载</string>
+    <string name="rimi_dict_market_install_title">安装「%1$s」</string>
+    <string name="rimi_dict_market_install_message">%1$s\n\n体积约 %2$s，安装后需要重新部署（约 10~60 秒）。</string>
+    <string name="rimi_dict_market_uninstall_title">卸载「%1$s」</string>
+    <string name="rimi_dict_market_uninstall_message">卸载后该词库的候选会消失；你上屏学过的个人词不受影响。</string>
+    <string name="rimi_dict_market_downloading">正在下载… %1$s / %2$s</string>
+    <string name="rimi_dict_market_deploying">正在重新部署词库，请稍候…</string>
+    <string name="rimi_dict_market_install_done">「%1$s」已安装，正在重新部署</string>
+    <string name="rimi_dict_market_uninstall_done">「%1$s」已卸载，正在重新部署</string>
+    <string name="rimi_dict_market_failed">操作失败：%1$s</string>
+    <string name="rimi_dict_market_offline">网络不可用，已显示本地缓存清单（%1$s）</string>
+    <string name="rimi_dict_market_empty">暂无词库清单，请检查网络后刷新</string>
+
     <string name="rimi_cloud_sync_short">词库云同步</string>
     <string name="rimi_cloud_account">词库账户</string>
     <string name="rimi_cloud_account_title">账户</string>

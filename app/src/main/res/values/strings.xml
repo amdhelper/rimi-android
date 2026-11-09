@@ -252,6 +252,26 @@
     <string name="star_success">Star success</string>
     <string name="ignore_system_gesture_insets">Ignore system gesture insets</string>
 
+    <string name="rimi_dict_market">Dictionary Market</string>
+    <string name="rimi_dict_market_intro_title">Install only what you need</string>
+    <string name="rimi_dict_market_intro">The built-in dictionaries keep only the common base. Download network slang, medical, computer, idioms/poetry, places/names and more here. Installed dictionaries redeploy automatically and can be removed anytime.</string>
+    <string name="rimi_dict_market_refresh">Refresh list</string>
+    <string name="rimi_dict_market_refresh_summary">Fetch the latest catalog from the server (no sign-in required)</string>
+    <string name="rimi_dict_market_meta">%1$s\nAbout %2$s entries · %3$s · %4$s</string>
+    <string name="rimi_dict_market_installed">Installed</string>
+    <string name="rimi_dict_market_available">Downloadable</string>
+    <string name="rimi_dict_market_install_title">Install “%1$s”</string>
+    <string name="rimi_dict_market_install_message">%1$s\n\nAbout %2$s. Installing triggers a redeploy (10–60 s).</string>
+    <string name="rimi_dict_market_uninstall_title">Remove “%1$s”</string>
+    <string name="rimi_dict_market_uninstall_message">Candidates from this dictionary will disappear. Words you typed and learned are kept.</string>
+    <string name="rimi_dict_market_downloading">Downloading… %1$s / %2$s</string>
+    <string name="rimi_dict_market_deploying">Redeploying dictionaries…</string>
+    <string name="rimi_dict_market_install_done">“%1$s” installed; redeploying</string>
+    <string name="rimi_dict_market_uninstall_done">“%1$s” removed; redeploying</string>
+    <string name="rimi_dict_market_failed">Failed: %1$s</string>
+    <string name="rimi_dict_market_offline">Network unavailable; showing cached catalog (%1$s)</string>
+    <string name="rimi_dict_market_empty">No dictionaries yet. Check your network and refresh.</string>
+
     <string name="rimi_cloud_sync_short">Dictionary Cloud Sync</string>
     <string name="rimi_cloud_account">Account</string>
     <string name="rimi_cloud_account_title">Account</string>

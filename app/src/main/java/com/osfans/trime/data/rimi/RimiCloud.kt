@@ -280,6 +280,9 @@ object RimiCloud {
         parse<StatusData>(request("GET", "/rimi/dict/status", null, token)).entryCount
     }
 
+    /** 公开只读接口（如词库市场清单）：不附 token，未登录也能用。 */
+    suspend fun publicGet(path: String): String = request("GET", path, null, null)
+
     // ---------------- 语音识别（M4） ----------------
 
     /**
