@@ -78,7 +78,19 @@ class RimiDictMarketFragment : PaddingPreferenceFragment() {
 
     private fun refresh() {
         val ctx = context ?: return
+        // 已有清单时静默刷新：服务端改了词库源/上新词库，用户不用重装 App 也能看到。
+        // （2026-11-10 实测踩坑：只靠缓存时，服务端把 tencent 从上游改指日弥 fork，
+        //  手机上仍按旧 URL 下载，装了词库却没有「摸摸哒」——必须在进入页面时刷新清单。）
+        val silent = catalog != null
         lifecycleScope.launch {
+            if (silent) {
+                runCatching { RimiDictMarket.fetchCatalog() }
+                    .onSuccess { cat ->
+                        catalog = cat
+                        withContext(Dispatchers.Main) { render(cat) }
+                    }
+                return@launch
+            }
             var error: String? = null
             withLoadingDialog(ctx) {
                 runCatching { RimiDictMarket.fetchCatalog() }
