@@ -71,6 +71,11 @@ class Key(
     var extraWidthLeft = 0
     var extraWidthRight = 0
 
+    /** 动态覆盖标签（例如九宫格输入时最左侧展示候选拼音） */
+    var overrideLabel: String? = null
+    var overrideTextSize: Float? = null
+    var customClickHandler: (() -> Unit)? = null
+
     private val label = keyDef?.label ?: ""
     private val labelSymbol = keyDef?.labelSymbol ?: ""
     val hint: String = keyDef?.hint ?: ""
@@ -290,6 +295,7 @@ class Key(
     fun getCode(behavior: KeyBehavior): Int = getAction(behavior)!!.code
 
     fun getLabel(): String = when {
+        overrideLabel != null -> overrideLabel!!
         label.isNotEmpty() &&
             keyAction == click &&
             !keyActions.containsKey(KeyBehavior.ASCII) &&
@@ -298,8 +304,9 @@ class Key(
         else -> keyAction!!.getLabel(parent) // 中文狀態顯示標籤
     }
 
-    fun getPreviewText(behavior: KeyBehavior): String = when (behavior) {
-        KeyBehavior.CLICK -> keyAction!!.getPreview(parent)
+    fun getPreviewText(behavior: KeyBehavior): String = when {
+        overrideLabel != null -> overrideLabel!!
+        behavior == KeyBehavior.CLICK -> keyAction!!.getPreview(parent)
         else -> getAction(behavior)!!.getPreview(parent)
     }
 

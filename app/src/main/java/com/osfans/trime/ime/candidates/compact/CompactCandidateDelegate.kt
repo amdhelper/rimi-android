@@ -10,6 +10,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.view.ContextThemeWrapper
 import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.osfans.trime.R
@@ -24,9 +25,12 @@ import com.osfans.trime.ime.bar.UnrollButtonStateMachine
 import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
 import com.osfans.trime.ime.candidates.unrolled.decoration.FlexboxVerticalDecoration
 import com.osfans.trime.ime.core.InputView
+import com.osfans.trime.ime.core.TrimeInputMethodService
+import com.osfans.trime.ime.keyboard.t9.ChinesePinyinHelper
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -42,6 +46,30 @@ class CompactCandidateDelegate(override val di: DI) :
     private val scope: ThemeScope by instance()
     private val inputView: InputView by instance()
     private val bar: InputBarDelegate by instance()
+    private val service: TrimeInputMethodService by instance()
+
+    private var lastData: Candidates.Bulk? = null
+    var activeFilterPinyin: String? = null
+        private set
+
+    init {
+        service.lifecycleScope.launch {
+            ChinesePinyinHelper.init(context)
+        }
+    }
+
+    fun filterByPinyin(pinyin: String?) {
+        activeFilterPinyin = pinyin
+        val data = lastData ?: return
+        applyCandidateList(data)
+    }
+
+    fun clearPinyinFilter() {
+        if (activeFilterPinyin != null) {
+            activeFilterPinyin = null
+            lastData?.let { applyCandidateList(it) }
+        }
+    }
 
     private val theme: Theme
         get() = scope.theme
@@ -174,7 +202,22 @@ class CompactCandidateDelegate(override val di: DI) :
     }
 
     override fun onCandidateListUpdate(data: Candidates.Bulk) {
-        val (total, highlighted, candidates) = data
+        lastData = data
+        if (data.candidates.isEmpty()) {
+            activeFilterPinyin = null
+        }
+        applyCandidateList(data)
+    }
+
+    private fun applyCandidateList(data: Candidates.Bulk) {
+        val total = data.total
+        val highlighted = data.highlighted
+        val filter = activeFilterPinyin
+        val candidates = if (!filter.isNullOrEmpty()) {
+            ChinesePinyinHelper.filterAndSortCandidates(data.candidates, filter)
+        } else {
+            data.candidates
+        }
 
         val maxSpanCount = maxSpanCountPref.getValue()
 

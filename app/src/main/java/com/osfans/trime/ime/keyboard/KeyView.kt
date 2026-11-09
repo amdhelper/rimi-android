@@ -110,9 +110,14 @@ class KeyView(
             } else {
                 when (behavior) {
                     KeyBehavior.CLICK -> {
-                        val pressedIdx = keyboard.firstPressedKeyIndex
-                        val actionBehavior = if (pressedIdx != -1 && pressedIdx != id) KeyBehavior.COMBO else behavior
-                        key.getAction(actionBehavior)?.let { processKeyAction(it, actionBehavior) }
+                        val customHandler = key.customClickHandler
+                        if (customHandler != null) {
+                            customHandler.invoke()
+                        } else {
+                            val pressedIdx = keyboard.firstPressedKeyIndex
+                            val actionBehavior = if (pressedIdx != -1 && pressedIdx != id) KeyBehavior.COMBO else behavior
+                            key.getAction(actionBehavior)?.let { processKeyAction(it, actionBehavior) }
+                        }
                     }
 
                     KeyBehavior.DOUBLE_CLICK, KeyBehavior.LAZY_DOUBLE_CLICK,
@@ -315,7 +320,12 @@ class KeyView(
 
     private fun drawLabel(canvas: Canvas, label: String) {
         val textColor = key.getTextColor()
-        val textSize = sp(key.keyTextSize.takeIf { it > 0 } ?: if (label.length > 1 && !label.isIconFont) keyboardView.keyLongTextSize else keyboardView.keyTextSize)
+        val customTextSize = key.overrideTextSize
+        val textSize = if (customTextSize != null && customTextSize > 0) {
+            sp(customTextSize)
+        } else {
+            sp(key.keyTextSize.takeIf { it > 0 } ?: if (label.length > 1 && !label.isIconFont) keyboardView.keyLongTextSize else keyboardView.keyTextSize)
+        }
 
         if (label.isIconFont) {
             drawIcon(canvas, label, textSize.toInt(), textColor, key.keyTextOffsetX, key.keyTextOffsetY)

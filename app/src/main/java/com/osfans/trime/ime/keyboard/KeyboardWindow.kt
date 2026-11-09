@@ -13,6 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.osfans.trime.R
+import com.osfans.trime.core.CompositionProto
 import com.osfans.trime.core.RimeMessage
 import com.osfans.trime.core.SchemaItem
 import com.osfans.trime.daemon.RimeSession
@@ -20,8 +21,10 @@ import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.model.TextKeyboard
 import com.osfans.trime.ime.broadcast.EnterKeyDisplayDelegate
 import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
+import com.osfans.trime.ime.candidates.compact.CompactCandidateDelegate
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.keyboard.KeyboardPrefs.isLandscapeMode
+import com.osfans.trime.ime.keyboard.t9.T9PinyinMatcher
 import com.osfans.trime.ime.popup.PopupDelegate
 import com.osfans.trime.ime.window.BoardWindow
 import com.osfans.trime.ime.window.ResidentWindow
@@ -50,6 +53,9 @@ class KeyboardWindow(di: DI) :
     private val commonKeyboardActionListener: CommonKeyboardActionListener by instance()
     private val popup: PopupDelegate by instance()
     private val enterKeyDisplay: EnterKeyDisplayDelegate by instance()
+    private val compactCandidate: CompactCandidateDelegate by instance()
+
+    private var lastT9Digits: String = ""
 
     private val cursorCapsMode: Int
         get() =
@@ -362,7 +368,78 @@ class KeyboardWindow(di: DI) :
         }
     }
 
+    private fun isT9KeyboardActive(): Boolean =
+        currentKeyboardId == "t9" || rime.run { statusCached }.schemaId == "t9"
+
+    override fun onCompositionUpdate(data: CompositionProto) {
+        if (!isT9KeyboardActive() || rime.run { statusCached }.isAsciiMode) {
+            resetT9LeftKeys()
+            return
+        }
+        val preedit = data.preedit ?: ""
+        val digits = preedit.filter { it in '2'..'9' }
+        if (digits.isNotEmpty() && data.length > 0) {
+            updateT9PinyinCandidates(digits)
+        } else {
+            resetT9LeftKeys()
+        }
+    }
+
+    private fun updateT9PinyinCandidates(digits: String) {
+        lastT9Digits = digits
+        val keyboard = activeKeyboard ?: return
+        val keyboardView = currentKeyboardView ?: return
+        val leftKeys = keyboard.keys.filter { it.column == 0 && it.row in 0..3 }
+        if (leftKeys.isEmpty()) return
+
+        val pinyinCandidates = T9PinyinMatcher.matchCandidates(digits, leftKeys.size)
+        leftKeys.forEachIndexed { index, key ->
+            val pinyin = pinyinCandidates.getOrNull(index)
+            if (pinyin != null) {
+                key.overrideLabel = pinyin
+                key.overrideTextSize = when {
+                    pinyin.length <= 2 -> 19f
+                    pinyin.length <= 4 -> 16f
+                    else -> 13f
+                }
+                key.customClickHandler = {
+                    onT9PinyinCandidateSelected(pinyin)
+                }
+            } else {
+                key.overrideLabel = null
+                key.overrideTextSize = null
+                key.customClickHandler = null
+            }
+            keyboardView.invalidateKeyByIndex(key.index)
+        }
+    }
+
+    private fun resetT9LeftKeys() {
+        if (lastT9Digits.isEmpty()) return
+        lastT9Digits = ""
+        val keyboard = activeKeyboard ?: return
+        val keyboardView = currentKeyboardView ?: return
+        val leftKeys = keyboard.keys.filter { it.column == 0 && it.row in 0..3 }
+        leftKeys.forEach { key ->
+            if (key.overrideLabel != null || key.customClickHandler != null) {
+                key.overrideLabel = null
+                key.overrideTextSize = null
+                key.customClickHandler = null
+                keyboardView.invalidateKeyByIndex(key.index)
+            }
+        }
+        compactCandidate.clearPinyinFilter()
+    }
+
+    private fun onT9PinyinCandidateSelected(pinyin: String) {
+        Timber.d("onT9PinyinCandidateSelected: $pinyin")
+        compactCandidate.filterByPinyin(pinyin)
+    }
+
     override fun onKeyAppearanceUpdate(composing: Boolean, menu: Boolean, paging: Boolean) {
+        if (!composing) {
+            resetT9LeftKeys()
+        }
         if (!rime.run { statusCached }.isAsciiMode) {
             activeKeyboard?.appearanceStateKeys?.forEach { key ->
                 currentKeyboardView?.invalidateKeyByIndex(key.index)
@@ -414,6 +491,7 @@ class KeyboardWindow(di: DI) :
     }
 
     override fun onDetached() {
+        resetT9LeftKeys()
         currentKeyboardView?.onDetach()
     }
 }
