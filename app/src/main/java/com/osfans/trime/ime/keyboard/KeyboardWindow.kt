@@ -19,11 +19,13 @@ import com.osfans.trime.core.SchemaItem
 import com.osfans.trime.daemon.RimeSession
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.model.TextKeyboard
+import com.osfans.trime.data.theme.model.candidateScaleFactor
 import com.osfans.trime.ime.broadcast.EnterKeyDisplayDelegate
 import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
 import com.osfans.trime.ime.candidates.compact.CompactCandidateDelegate
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.keyboard.KeyboardPrefs.isLandscapeMode
+import com.osfans.trime.ime.keyboard.t9.T9PinyinLabelSize
 import com.osfans.trime.ime.keyboard.t9.T9PinyinMatcher
 import com.osfans.trime.ime.popup.PopupDelegate
 import com.osfans.trime.ime.window.BoardWindow
@@ -393,15 +395,13 @@ class KeyboardWindow(di: DI) :
         if (leftKeys.isEmpty()) return
 
         val pinyinCandidates = T9PinyinMatcher.matchCandidates(digits, leftKeys.size)
+        // 2026-11-09 爸爸令：最左侧候选拼音组合要与候选词用同一个倍数放大。
+        val scale = theme.style.candidateScaleFactor
         leftKeys.forEachIndexed { index, key ->
             val pinyin = pinyinCandidates.getOrNull(index)
             if (pinyin != null) {
                 key.overrideLabel = pinyin
-                key.overrideTextSize = when {
-                    pinyin.length <= 2 -> 19f
-                    pinyin.length <= 4 -> 16f
-                    else -> 13f
-                }
+                key.overrideTextSize = T9PinyinLabelSize.sizeFor(pinyin, scale)
                 key.customClickHandler = {
                     onT9PinyinCandidateSelected(pinyin)
                 }

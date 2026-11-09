@@ -322,7 +322,8 @@ class KeyView(
         val textColor = key.getTextColor()
         val customTextSize = key.overrideTextSize
         val textSize = if (customTextSize != null && customTextSize > 0) {
-            sp(customTextSize)
+            // 动态标签（九宫格左侧拼音）会随候选词倍数放大，超出按键时按可用宽高收缩防裁切。
+            fitInsideKey(sp(customTextSize), label)
         } else {
             sp(key.keyTextSize.takeIf { it > 0 } ?: if (label.length > 1 && !label.isIconFont) keyboardView.keyLongTextSize else keyboardView.keyTextSize)
         }
@@ -344,6 +345,32 @@ class KeyView(
 
             canvas.drawText(label, centerX + sp(key.keyTextOffsetX), centerY + adjustmentY + sp(key.keyTextOffsetY), textPaint)
         }
+    }
+
+    /**
+     * 把动态标签的字号收缩到按键可用区域内（宽、高都要放得下）。
+     * 只用于 [Key.overrideTextSize] 的标签：候选词倍数调到 3×/4× 时字号可能比键还大，
+     * 直接画会被 View 边界裁掉，这里等比缩到能放下为止。
+     */
+    private fun fitInsideKey(desiredSize: Float, label: String): Float {
+        if (label.isEmpty()) return desiredSize
+        val availWidth = (width - paddingLeft - paddingRight).toFloat()
+        val availHeight = (height - paddingTop - paddingBottom).toFloat()
+        if (availWidth <= 0f || availHeight <= 0f) return desiredSize
+
+        textPaint.textSize = desiredSize
+        var fitted = desiredSize
+        val textWidth = textPaint.measureText(label)
+        if (textWidth > availWidth) {
+            fitted *= availWidth / textWidth
+            textPaint.textSize = fitted
+        }
+        val metrics = textPaint.fontMetrics
+        val textHeight = metrics.descent - metrics.ascent
+        if (textHeight > availHeight) {
+            fitted *= availHeight / textHeight
+        }
+        return fitted
     }
 
     private fun drawIcon(
