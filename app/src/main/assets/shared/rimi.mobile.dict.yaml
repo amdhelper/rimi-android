@@ -1,4 +1,4 @@
-# Rimi 移动端词库（由 scripts/build_mobile_assets.py 生成，勿手改）
+# Zoom 移动端词库（由 scripts/build_mobile_assets.py 生成，勿手改）
 # 底座 = 8105 字表 + 基础词库；专业词库 = rimi.medical / yijing / zwds_bazi / shushu
 ---
 name: rimi.mobile
