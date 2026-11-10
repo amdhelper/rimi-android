@@ -42,6 +42,7 @@ import kotlin.math.max
  * 交互：按住键盘底排空格键 → 输入法窗口内浮出录音面板（按住开始录音）→松开自动结束并发送识别到输入框。
  * 识别走 wumi 的 paraformer 通道 `POST /asr/transcribe`（body = 原始音频，JWT 鉴权），
  * 与桌面 rimi_voice / wumi App 同一条链路。结果直接 commitText 到当前输入框。
+ * 免费额度：医者/站长不限次，其他登录用户每天 100 次（服务端按用户扣减）。
  *
  * ⚠️ 面板必须挂在输入法窗口内部（[TrimeInputMethodService.showOverlay]），不能用 Dialog：
  * 真机实测（PLR-AL30 / EMUI）APPLICATION_ATTACHED_DIALOG 能显示、能收 BACK，
@@ -92,8 +93,8 @@ object VoiceInputController {
      * 改成输入法窗口内 overlay 弹窗——问用户要不要登录、写清免费级别、给登录入口。
      * ⚠️ 必须走 showOverlay（同 showPanel 的教训：Dialog 触摸会被系统手势窗吞掉），
      * 且面板贴窗口底部（IME touchable region 只覆盖键盘区）。
-     * 免费规则与桌面 rimi_voice 同口径：站长（founder）/医者（elder）免费云端，
-     * 其余级别暂不提供免费云端转写。
+     * 免费规则与桌面 rimi_voice 同口径（2026-11-11 爸爸令）：
+     * 站长（founder）/医者（elder）不限次，其他级别每天免费 100 次。
      */
     private fun showLoginPrompt(service: TrimeInputMethodService) {
         val ctx = service
@@ -122,8 +123,8 @@ object VoiceInputController {
         val body =
             TextView(ctx).apply {
                 text = "语音转写需要登录 wumi 账户，要登录吗？\n\n" +
-                    "免费范围：站长、医者——免费使用云端语音转写。\n" +
-                    "其他级别（地纪行者、天纪卦师、人纪学员、麻瓜）：暂不提供免费云端转写。\n\n" +
+                    "免费额度：所有登录用户每天 100 次；站长、医者不限次。\n" +
+                    "登录后都可以直接使用云端语音转写。\n\n" +
                     "点「去登录」会直接打开登录界面：贴入 12 个助记词（wumi 备份里那串）或 64 位 seed 即可。"
                 setTextColor(0xFFCDD6F4.toInt())
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)

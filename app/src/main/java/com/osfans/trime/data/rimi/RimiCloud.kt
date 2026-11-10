@@ -307,6 +307,11 @@ object RimiCloud {
             conn.readTimeout = 90_000
             conn.setRequestProperty("Accept", "application/json")
             conn.setRequestProperty("Content-Type", "audio/wav")
+            // 🔥 2026-11-11：服务端据此区分 rimi 输入法 / wumi App 的转写消耗，
+            // 并给非医者扣减每天 100 次免费额度；音频时长用于站务统计。
+            conn.setRequestProperty("X-Wumi-Client", "rimi-ime")
+            val audioMs = ((wav.size - 44).coerceAtLeast(0) / 32).toString()
+            conn.setRequestProperty("X-Wumi-Audio-Ms", audioMs)
             conn.setRequestProperty("Authorization", "Bearer $token")
             conn.setFixedLengthStreamingMode(wav.size)
             conn.outputStream.use { it.write(wav) }
@@ -315,6 +320,12 @@ object RimiCloud {
             val text = stream?.bufferedReader()?.use { it.readText() } ?: ""
             if (code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw RimiUnauthorizedException(text.take(300))
+            }
+            if (code == HttpURLConnection.HTTP_FORBIDDEN &&
+                (text.contains("320104") || text.contains("asr_quota_exceeded") ||
+                    text.contains("免费语音转写"))
+            ) {
+                throw RimiCloudException("今日免费语音转写 100 次已用完（非医者每天 100 次）")
             }
             if (code !in 200..299) {
                 throw RimiCloudException("语音识别失败（HTTP $code）${text.take(120)}")
