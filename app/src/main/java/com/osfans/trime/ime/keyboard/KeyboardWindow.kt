@@ -388,9 +388,15 @@ class KeyboardWindow(di: DI) :
     }
 
     private fun updateT9PinyinCandidates(digits: String) {
+        // 数字串变了说明用户又按了键：旧的拼音组合过滤已经过期，先清掉再按新候选重排。
+        val digitsChanged = digits != lastT9Digits
         lastT9Digits = digits
         val keyboard = activeKeyboard ?: return
         val keyboardView = currentKeyboardView ?: return
+        if (digitsChanged) {
+            compactCandidate.clearPinyinFilter()
+        }
+
         val leftKeys = keyboard.keys.filter { it.column == 0 && it.row in 0..3 }
         if (leftKeys.isEmpty()) return
 

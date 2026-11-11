@@ -112,20 +112,71 @@ object ChinesePinyinHelper {
     fun filterAndSortCandidates(
         candidates: Array<CandidateProto>,
         targetPinyin: String,
-    ): Array<CandidateProto> {
-        if (targetPinyin.isEmpty() || candidates.isEmpty()) return candidates
+    ): Array<CandidateProto> = filterAndSortCandidatesWithIndices(candidates, targetPinyin).candidates
+
+    /**
+     * 同 [filterAndSortCandidates]，但同时返回「显示位置 → 原始候选下标」的映射。
+     *
+     * 九宫格最左侧拼音组合触发的只是**展示层重排**，Rime 引擎里的候选顺序没有变。
+     * 点击候选词时必须用原始下标去 select/delete，否则会选中原始顺序里同一位置的词
+     * （shequ 选「社区」却上屏「切入」、xuzhou 选「徐州」却上屏「宇宙」就是这个问题）。
+     */
+    fun filterAndSortCandidatesWithIndices(
+        candidates: Array<CandidateProto>,
+        targetPinyin: String,
+    ): FilteredCandidates {
+        if (targetPinyin.isEmpty() || candidates.isEmpty()) {
+            return FilteredCandidates(candidates, IntArray(candidates.size) { it })
+        }
 
         val matched = mutableListOf<CandidateProto>()
+        val matchedIndices = mutableListOf<Int>()
         val others = mutableListOf<CandidateProto>()
+        val otherIndices = mutableListOf<Int>()
 
-        for (cand in candidates) {
+        candidates.forEachIndexed { index, cand ->
             if (isMatch(cand.text, targetPinyin)) {
                 matched.add(cand)
+                matchedIndices.add(index)
             } else {
                 others.add(cand)
+                otherIndices.add(index)
             }
         }
 
-        return (matched + others).toTypedArray()
+        return FilteredCandidates(
+            (matched + others).toTypedArray(),
+            (matchedIndices + otherIndices).toIntArray(),
+        )
+    }
+
+    /** 过滤重排后的候选列表及其到原始候选下标的映射。 */
+    data class FilteredCandidates(
+        val candidates: Array<CandidateProto>,
+        val originalIndices: IntArray,
+    ) {
+        /** 显示位置 → 原始候选下标；越界时原样返回（等同于未过滤）。 */
+        fun originalIndex(displayPosition: Int): Int = originalIndices.getOrNull(displayPosition) ?: displayPosition
+
+        /** 原始高亮下标 → 显示位置；不在当前列表里返回 -1（不显示高亮）。 */
+        fun displayIndex(originalIndex: Int): Int = originalIndices.indexOf(originalIndex)
+    }
+
+    /**
+     * 仅供单元测试：临时替换拼音表，执行完自动还原，避免污染其它用例。
+     */
+    internal fun <T> withPinyinTableForTest(
+        table: Map<Char, String>,
+        block: () -> T,
+    ): T {
+        val backup = HashMap(hanziPinyinMap)
+        hanziPinyinMap.clear()
+        hanziPinyinMap.putAll(table)
+        try {
+            return block()
+        } finally {
+            hanziPinyinMap.clear()
+            hanziPinyinMap.putAll(backup)
+        }
     }
 }

@@ -52,6 +52,14 @@ class CompactCandidateDelegate(override val di: DI) :
     var activeFilterPinyin: String? = null
         private set
 
+    /**
+     * 当前显示顺序 → Rime 原始候选下标。
+     *
+     * 九宫格拼音组合过滤会重排候选数组，但 Rime 引擎内部顺序不变；
+     * 点击/长按必须按这个映射换算回原始下标，否则会选中同位置的另一个词。
+     */
+    private var displayToOriginalIndices: IntArray = IntArray(0)
+
     init {
         service.lifecycleScope.launch {
             ChinesePinyinHelper.init(context)
@@ -124,10 +132,14 @@ class CompactCandidateDelegate(override val di: DI) :
     val adapter by lazy {
         CompactCandidateViewAdapter(scope).apply {
             setOnItemClickListener { _, _, position ->
-                rime.launchOnReady { it.selectCandidate(position, global = true) }
+                // 拼音组合过滤只是展示层重排，必须用原始下标去选词，
+                // 否则会选中 Rime 原始顺序里同位置的词（选「社区」上屏「切入」）。
+                val candidateIndex = displayToOriginalIndices.getOrNull(position) ?: position
+                rime.launchOnReady { it.selectCandidate(candidateIndex, global = true) }
             }
             setOnItemLongClickListener { _, view, position ->
-                inputView.showCandidateActionMenu(position, items[position].text, view, global = true)
+                val candidateIndex = displayToOriginalIndices.getOrNull(position) ?: position
+                inputView.showCandidateActionMenu(candidateIndex, items[position].text, view, global = true)
                 true
             }
         }
@@ -211,13 +223,13 @@ class CompactCandidateDelegate(override val di: DI) :
 
     private fun applyCandidateList(data: Candidates.Bulk) {
         val total = data.total
-        val highlighted = data.highlighted
         val filter = activeFilterPinyin
-        val candidates = if (!filter.isNullOrEmpty()) {
-            ChinesePinyinHelper.filterAndSortCandidates(data.candidates, filter)
-        } else {
-            data.candidates
-        }
+        val filtered =
+            ChinesePinyinHelper.filterAndSortCandidatesWithIndices(data.candidates, filter.orEmpty())
+        val candidates = filtered.candidates
+        displayToOriginalIndices = filtered.originalIndices
+        // 高亮下标也是 Rime 原始下标，重排后要换算成显示位置，否则高亮会落在错词上。
+        val highlighted = filtered.displayIndex(data.highlighted)
 
         val maxSpanCount = maxSpanCountPref.getValue()
 
