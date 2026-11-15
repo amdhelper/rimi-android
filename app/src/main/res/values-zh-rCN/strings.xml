@@ -320,4 +320,14 @@
     <string name="update_download_started">已开始下载，完成后会提示安装</string>
     <string name="update_download_failed">下载失败：%1$s</string>
     <string name="update_install_permission">请允许本应用安装未知来源的应用，然后再试一次</string>
+
+    <!-- 手写输入（2026-11-15） -->
+    <string name="handwriting_input">手写输入</string>
+    <string name="handwriting_undo">撤销笔画</string>
+    <string name="handwriting_clear">清空</string>
+    <string name="handwriting_space">空格</string>
+    <string name="handwriting_backspace">退格</string>
+    <string name="handwriting_hint_write">请在下方书写汉字</string>
+    <string name="handwriting_loading">正在加载手写模型…</string>
+    <string name="handwriting_load_failed">手写模型加载失败</string>
 </resources>

@@ -58,4 +58,7 @@ include_directories("${X11Keysym}")
 
 include(Rime)
 
+# 手写识别引擎（zinnia，BSD-3-Clause）：静态库，链进 rime_jni。
+add_subdirectory(zinnia)
+
 add_subdirectory(librime_jni)

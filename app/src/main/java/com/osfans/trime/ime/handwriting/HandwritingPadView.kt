@@ -1,0 +1,125 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Rimi community
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+package com.osfans.trime.ime.handwriting
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.view.MotionEvent
+import android.view.View
+import com.osfans.trime.data.handwriting.InkPoint
+import com.osfans.trime.data.theme.ThemeScope
+import splitties.dimensions.dp
+
+/**
+ * 手写画板：捕获笔画并绘制墨迹。
+ *
+ * 坐标保持视图像素原样交给 zinnia（引擎按 width/height 归一化），
+ * 不做缩放，避免引入二次误差。只跟踪第一根手指，忽略多指。
+ */
+@SuppressLint("ViewConstructor")
+class HandwritingPadView(
+    context: Context,
+    private val scope: ThemeScope,
+) : View(context) {
+    private val strokes = mutableListOf<MutableList<InkPoint>>()
+    private var activePointerId = -1
+    private val path = Path()
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
+
+    /** 笔画变化（写完一笔 / 撤销 / 清空）时回调，用于触发识别。 */
+    var onStrokeChanged: (() -> Unit)? = null
+
+    init {
+        refreshColors()
+    }
+
+    fun refreshColors() {
+        // 深色键盘上用候选字色画墨迹，对比度与候选词一致。
+        paint.color = scope.colors.candidateTextColor
+        paint.strokeWidth = context.dp(6).toFloat()
+        setBackgroundColor(scope.colors.keyboardBackColor)
+        invalidate()
+    }
+
+    /** 当前全部笔画（只读快照）。 */
+    fun snapshot(): List<List<InkPoint>> = strokes.map { it.toList() }
+
+    fun undo(): Boolean {
+        if (strokes.isEmpty()) return false
+        strokes.removeAt(strokes.lastIndex)
+        invalidate()
+        onStrokeChanged?.invoke()
+        return true
+    }
+
+    fun clear() {
+        if (strokes.isEmpty()) return
+        strokes.clear()
+        invalidate()
+        onStrokeChanged?.invoke()
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        for (stroke in strokes) {
+            if (stroke.isEmpty()) continue
+            path.reset()
+            path.moveTo(stroke[0].x, stroke[0].y)
+            for (i in 1 until stroke.size) {
+                path.lineTo(stroke[i].x, stroke[i].y)
+            }
+            canvas.drawPath(path, paint)
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                activePointerId = event.getPointerId(0)
+                strokes.add(mutableListOf(InkPoint(event.x, event.y)))
+                invalidate()
+                return true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (activePointerId < 0 || strokes.isEmpty()) return false
+                val index = event.findPointerIndex(activePointerId)
+                if (index < 0) return false
+                val stroke = strokes.last()
+                val x = event.getX(index)
+                val y = event.getY(index)
+                val last = stroke.last()
+                // 最小间距过滤：去掉抖动重复点，保留笔迹形状。
+                val dx = x - last.x
+                val dy = y - last.y
+                if (dx * dx + dy * dy >= 4f) {
+                    stroke.add(InkPoint(x, y))
+                    invalidate()
+                }
+                return true
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (activePointerId < 0) return false
+                val index = event.findPointerIndex(activePointerId)
+                if (index >= 0 && strokes.isNotEmpty()) {
+                    val stroke = strokes.last()
+                    stroke.add(InkPoint(event.getX(index), event.getY(index)))
+                }
+                activePointerId = -1
+                invalidate()
+                onStrokeChanged?.invoke()
+                return true
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+}

@@ -24,6 +24,7 @@ import com.osfans.trime.ime.bar.ui.ToolButton
 import com.osfans.trime.ime.broadcast.InputBroadcastReceiver
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.dialog.EnabledSchemaPickerDialog
+import com.osfans.trime.ime.handwriting.HandwritingWindow
 import com.osfans.trime.ime.keyboard.KeyboardWindow
 import com.osfans.trime.ime.window.BoardWindow
 import com.osfans.trime.ime.window.BoardWindowManager
@@ -61,6 +62,12 @@ class SwitchOptionWindow(di: DI) :
                 "9键九宫格",
                 R.drawable.ic_baseline_phone_24,
                 SwitchOptionEntry.Static.Type.KeyboardT9,
+            ),
+            // 手写输入开关：26键/9键 右侧（2026-11-15 爸爸令）。
+            SwitchOptionEntry.Static(
+                context.getString(R.string.handwriting_input),
+                R.drawable.ic_baseline_edit_24,
+                SwitchOptionEntry.Static.Type.Handwriting,
             ),
             SwitchOptionEntry.Static(
                 context.getString(R.string.theme),
@@ -142,6 +149,9 @@ class SwitchOptionWindow(di: DI) :
 
                         SwitchOptionEntry.Static.Type.KeyboardT9 ->
                             switchToSchema("t9")
+
+                        SwitchOptionEntry.Static.Type.Handwriting ->
+                            windowManager.attachWindow(HandwritingWindow(di))
 
                         SwitchOptionEntry.Static.Type.SchemaList -> showDialog { r ->
                             EnabledSchemaPickerDialog.build(r, service.lifecycleScope, context) {

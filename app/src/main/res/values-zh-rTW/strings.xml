@@ -265,4 +265,14 @@
     <string name="update_download_started">已開始下載，完成後會提示安裝</string>
     <string name="update_download_failed">下載失敗：%1$s</string>
     <string name="update_install_permission">請允許本應用程式安裝未知來源的應用程式，然後再試一次</string>
+
+    <!-- 手写输入（2026-11-15） -->
+    <string name="handwriting_input">手寫輸入</string>
+    <string name="handwriting_undo">復原筆畫</string>
+    <string name="handwriting_clear">清空</string>
+    <string name="handwriting_space">空格</string>
+    <string name="handwriting_backspace">退格</string>
+    <string name="handwriting_hint_write">請在下方書寫漢字</string>
+    <string name="handwriting_loading">正在載入手寫模型…</string>
+    <string name="handwriting_load_failed">手寫模型載入失敗</string>
 </resources>
