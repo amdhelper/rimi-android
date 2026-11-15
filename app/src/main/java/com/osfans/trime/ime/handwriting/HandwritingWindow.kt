@@ -24,13 +24,16 @@ import com.osfans.trime.core.RimeApi
 import com.osfans.trime.daemon.RimeSession
 import com.osfans.trime.daemon.launchOnReady
 import com.osfans.trime.data.handwriting.HandwritingRecognizer
+import com.osfans.trime.data.prefs.AppPrefs
 import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.data.theme.model.scaledCandidateTextSize
 import com.osfans.trime.data.theme.model.scaledCandidateViewHeight
 import com.osfans.trime.ime.core.InputView
+import com.osfans.trime.ime.core.TouchEventReceiverWindow
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.window.BoardWindow
+import com.osfans.trime.ime.window.BoardWindowManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -62,6 +65,7 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private val rime: RimeSession by instance()
     private val scope: ThemeScope by instance()
     private val inputView: InputView by instance()
+    private val windowManager: BoardWindowManager by instance()
     private val theme: Theme get() = scope.theme
 
     override val title: String get() = context.getString(R.string.handwriting_input)
@@ -70,6 +74,7 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     override val scaleTitle: Boolean = false
 
     private var recognizeJob: Job? = null
+    private var autoCommitJob: Job? = null
     private var viewCreated = false
     private var lastCandidates: List<String> = emptyList()
     private var hintRes: Int = R.string.handwriting_hint_write
@@ -91,8 +96,26 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private val pad by lazy {
         HandwritingPadView(context, scope).apply {
             onStrokeChanged = { scheduleRecognize() }
+            // 落笔即取消待发的自动上屏：防止写下一个字写到一半时上一个字被提交。
+            onNewStrokeStart = { autoCommitJob?.cancel() }
         }
     }
+
+    /**
+     * 悬浮候选行触摸双保险：onComputeInsets 已把宿主并入 IME 可触摸区，
+     * 另挂 TouchEventReceiverWindow（preedit/CandidatesView 同款成熟模式）
+     * 转发触摸，防个别 OEM 对 IME 触摸区扩展支持不一致导致候选点不到。
+     */
+    private val touchReceiver by lazy { TouchEventReceiverWindow(candidateScroll) }
+
+    private val candidateLayoutListener =
+        View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            if (candidateScroll.isAttachedToWindow && candidateScroll.width > 0 && candidateScroll.height > 0) {
+                touchReceiver.show()
+            } else {
+                touchReceiver.dismiss()
+            }
+        }
 
     private val controlButtons = mutableListOf<TextView>()
 
@@ -148,6 +171,7 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private fun showHint(textRes: Int) {
         hintRes = textRes
         lastCandidates = emptyList()
+        autoCommitJob?.cancel()
         // 提示语不随候选倍数放大：它是引导文字，放大只会挤占画板（2026-11-15 爸爸反馈）。
         candidateScroll.updateLayoutParams { height = context.dp(theme.style.candidateViewHeight) }
         candidateRow.removeAllViews()
@@ -179,6 +203,9 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
                 setPadding(context.dp(14), 0, context.dp(14), 0)
                 setOnClickListener {
                     // 上屏后清空画板，连续写下一个字（标准手写输入法交互）。
+                    // 自动上屏刚清过板时（lastCandidates 已空）忽略迟到的点击，防重复上屏。
+                    if (lastCandidates.isEmpty()) return@setOnClickListener
+                    autoCommitJob?.cancel()
                     service.commitText(word)
                     pad.clear()
                 }
@@ -186,11 +213,36 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
             candidateRow.addView(item, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
         candidateScroll.scrollTo(0, 0)
+        scheduleAutoCommit()
+    }
+
+    /**
+     * 自动上屏（2026-11-15 爸爸反馈：写完一个字墨迹赖在画板，没法直接写下一个）。
+     * 停笔超过设定时长 → 首选候选自动上屏 + 清板，与搜狗/百度手写同款交互。
+     * 新笔画落笔会取消计时（onNewStrokeStart），识别更新后重新计时，
+     * 因此多笔画字（十/二…）连续书写不会被拆成单笔画上屏。
+     */
+    private fun scheduleAutoCommit() {
+        autoCommitJob?.cancel()
+        val delayMs = AppPrefs.defaultInstance().keyboard.handwritingAutoCommit.getValue().delayMs
+        if (delayMs <= 0 || lastCandidates.isEmpty()) return
+        autoCommitJob = service.lifecycleScope.launch {
+            delay(delayMs)
+            // 窗口可能已销毁/切走（InputView 重建不一定走 onDetached）：只在仍是当前窗时上屏。
+            if (!windowManager.isAttached(this@HandwritingWindow)) return@launch
+            val word = lastCandidates.firstOrNull() ?: return@launch
+            service.commitText(word)
+            // 同步清空候选，挡住与点击上屏的竞态（pad.clear 的回调是异步的）。
+            lastCandidates = emptyList()
+            pad.clear()
+        }
     }
 
     /** 写完一笔后防抖 150ms 再识别；识别在 Default 线程，不阻塞 UI。 */
     private fun scheduleRecognize() {
         recognizeJob?.cancel()
+        // 笔画变了，旧候选的自动上屏计时作废（识别完成后按新候选重新计时）。
+        autoCommitJob?.cancel()
         recognizeJob = service.lifecycleScope.launch {
             delay(150)
             val strokes = pad.snapshot()
@@ -235,6 +287,8 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
             )
             visibility = View.VISIBLE
         }
+        // 每次布局（含提示态↔候选态高度变化）后同步触摸转发窗位置。
+        candidateScroll.addOnLayoutChangeListener(candidateLayoutListener)
         controlButtons.forEach { styleControlButton(it) }
         showHint(R.string.handwriting_loading)
         // 进入手写前把键盘上未上屏的组合先落定，避免残留预编辑混进手写文本。
@@ -256,7 +310,11 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     override fun onDetached() {
         recognizeJob?.cancel()
         recognizeJob = null
+        autoCommitJob?.cancel()
+        autoCommitJob = null
         // 收起悬浮候选行，恢复普通键盘的可触摸区（onComputeInsets 随布局自动回退）。
+        candidateScroll.removeOnLayoutChangeListener(candidateLayoutListener)
+        touchReceiver.dismiss()
         inputView.floatingCandidateHost.apply {
             removeView(candidateScroll)
             visibility = View.GONE

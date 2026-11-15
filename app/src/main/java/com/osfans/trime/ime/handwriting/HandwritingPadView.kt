@@ -39,6 +39,12 @@ class HandwritingPadView(
     /** 笔画变化（写完一笔 / 撤销 / 清空）时回调，用于触发识别。 */
     var onStrokeChanged: (() -> Unit)? = null
 
+    /**
+     * 新笔画落笔（ACTION_DOWN）时回调，先于笔画入列。
+     * 手写窗用它取消待发的自动上屏——避免写到一半把上一个字 committed 掉。
+     */
+    var onNewStrokeStart: (() -> Unit)? = null
+
     init {
         refreshColors()
     }
@@ -87,6 +93,7 @@ class HandwritingPadView(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                onNewStrokeStart?.invoke()
                 activePointerId = event.getPointerId(0)
                 strokes.add(mutableListOf(InkPoint(event.x, event.y)))
                 invalidate()

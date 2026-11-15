@@ -163,6 +163,8 @@ class AppPrefs(
             const val MAX_SPAN_COUNT = "max_span_count"
             const val MAX_SPAN_COUNT_LANDSCAPE = "max_span_count_landscape"
             const val HORIZONTAL_CANDIDATE_MODE = "horizontal_candidate_mode"
+
+            const val HANDWRITING_AUTO_COMMIT = "handwriting_auto_commit"
         }
 
         enum class LandscapeMode(override val stringRes: Int) : PreferenceDelegateEnum {
@@ -171,6 +173,24 @@ class AppPrefs(
             WIDE(R.string.wide_or_landscape),
             ALWAYS(R.string.always),
         }
+
+        /**
+         * 手写自动上屏（2026-11-15 爸爸反馈：写完一个字墨迹留在画板，没法直接写下一个）。
+         * 停笔超过 delayMs 自动上屏首选候选并清板，与主流手写输入法一致；
+         * 写新笔画会重置计时，多笔画字（十/二…）不会被拆成单笔画上屏。
+         */
+        enum class HandwritingAutoCommit(
+            override val stringRes: Int,
+            val delayMs: Long,
+        ) : PreferenceDelegateEnum {
+            OFF(R.string.handwriting_auto_commit_off, 0L),
+            FAST(R.string.handwriting_auto_commit_1s, 1000L),
+            NORMAL(R.string.handwriting_auto_commit_1_5s, 1500L),
+            SLOW(R.string.handwriting_auto_commit_2_5s, 2500L),
+        }
+
+        val handwritingAutoCommit =
+            enum(R.string.handwriting_auto_commit, HANDWRITING_AUTO_COMMIT, HandwritingAutoCommit.NORMAL)
 
         val landscapeMode = enum(R.string.enable_landscape_mode, LANDSCAPE_MODE, LandscapeMode.NEVER)
         val splitSpacePercent = int(

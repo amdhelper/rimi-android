@@ -330,4 +330,9 @@
     <string name="handwriting_hint_write">请在下方书写汉字</string>
     <string name="handwriting_loading">正在加载手写模型…</string>
     <string name="handwriting_load_failed">手写模型加载失败</string>
+    <string name="handwriting_auto_commit">手写自动上屏</string>
+    <string name="handwriting_auto_commit_off">关闭</string>
+    <string name="handwriting_auto_commit_1s">停笔 1 秒后</string>
+    <string name="handwriting_auto_commit_1_5s">停笔 1.5 秒后</string>
+    <string name="handwriting_auto_commit_2_5s">停笔 2.5 秒后</string>
 </resources>

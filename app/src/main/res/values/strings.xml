@@ -331,4 +331,9 @@
     <string name="handwriting_hint_write">Write a character below</string>
     <string name="handwriting_loading">Loading handwriting model…</string>
     <string name="handwriting_load_failed">Failed to load handwriting model</string>
+    <string name="handwriting_auto_commit">Handwriting auto commit</string>
+    <string name="handwriting_auto_commit_off">Off</string>
+    <string name="handwriting_auto_commit_1s">After 1 second</string>
+    <string name="handwriting_auto_commit_1_5s">After 1.5 seconds</string>
+    <string name="handwriting_auto_commit_2_5s">After 2.5 seconds</string>
 </resources>

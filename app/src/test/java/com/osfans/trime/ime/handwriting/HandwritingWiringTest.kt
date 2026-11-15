@@ -118,4 +118,32 @@ class HandwritingWiringTest :
                 serviceSrc shouldContain "outInsets.touchableRegion.set(0, floatingHostLocation[1], decorView.width, decorView.height)"
             }
         }
+
+        Given("手写自动上屏（2026-11-15 爸爸反馈：写完一个字没法直接写下一个）") {
+            val windowSrc = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingWindow.kt").readText()
+            val padSrc = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingPadView.kt").readText()
+            val prefsSrc = source("src/main/java/com/osfans/trime/data/prefs/AppPrefs.kt").readText()
+
+            Then("偏好存在且默认 1.5 秒（可关）") {
+                prefsSrc shouldContain "HANDWRITING_AUTO_COMMIT"
+                prefsSrc shouldContain "HandwritingAutoCommit.NORMAL"
+                prefsSrc shouldContain "OFF(R.string.handwriting_auto_commit_off, 0L)"
+            }
+            Then("停笔超时自动上屏首选并清板，窗口已切走时不上屏") {
+                windowSrc shouldContain "private fun scheduleAutoCommit()"
+                windowSrc shouldContain "handwritingAutoCommit.getValue().delayMs"
+                windowSrc shouldContain "if (!windowManager.isAttached(this@HandwritingWindow)) return@launch"
+            }
+            Then("新笔画落笔取消待发自动上屏（防多笔画字被拆开上屏）") {
+                padSrc shouldContain "var onNewStrokeStart: (() -> Unit)? = null"
+                val downBlock = padSrc.substringAfter("MotionEvent.ACTION_DOWN -> {").substringBefore("MotionEvent.ACTION_MOVE")
+                downBlock shouldContain "onNewStrokeStart?.invoke()"
+                windowSrc shouldContain "onNewStrokeStart = { autoCommitJob?.cancel() }"
+            }
+            Then("悬浮候选触摸双保险：insets 扩区 + TouchEventReceiverWindow 转发") {
+                windowSrc shouldContain "TouchEventReceiverWindow(candidateScroll)"
+                windowSrc shouldContain "addOnLayoutChangeListener(candidateLayoutListener)"
+                windowSrc shouldContain "touchReceiver.dismiss()"
+            }
+        }
     })
