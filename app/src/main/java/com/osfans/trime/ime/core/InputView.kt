@@ -59,6 +59,7 @@ import splitties.views.dsl.constraintlayout.startOfParent
 import splitties.views.dsl.constraintlayout.startToEndOf
 import splitties.views.dsl.constraintlayout.topOfParent
 import splitties.views.dsl.core.add
+import splitties.views.dsl.core.frameLayout
 import splitties.views.dsl.core.imageView
 import splitties.views.dsl.core.matchParent
 import splitties.views.dsl.core.view
@@ -78,6 +79,16 @@ class InputView(
     private val keyboardBackground =
         imageView {
             scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+
+    /**
+     * 悬浮候选宿主：挂在键盘面板（含三点菜单的 inputBar）正上方。
+     * 手写窗把放大候选行放进来——候选不挤占画板，触摸由
+     * TrimeInputMethodService.onComputeInsets 把本区域并入可触摸区。
+     */
+    val floatingCandidateHost =
+        frameLayout {
+            visibility = View.GONE
         }
     private val placeholderListener = OnClickListener { }
 
@@ -255,6 +266,16 @@ class InputView(
             },
         )
 
+        // 悬浮候选行（手写窗用）：与 preedit 同锚位，画在键盘面板上方。
+        // 后于 preedit 添加，两者同时可见时覆盖其上（手写进窗已落定组合，正常不共存）。
+        add(
+            floatingCandidateHost,
+            lParams(matchParent, wrapContent) {
+                above(keyboardView)
+                startOfParent()
+            },
+        )
+
         add(
             keyboardView,
             lParams(matchParent, wrapContent) {
@@ -382,6 +403,7 @@ class InputView(
         // implies that InputView should not be attached again after detached.
         updateWindowViewHeightJob.cancel()
         popup.root.removeAllViews()
+        floatingCandidateHost.removeAllViews()
         broadcaster.clear()
         super.onDetachedFromWindow()
     }

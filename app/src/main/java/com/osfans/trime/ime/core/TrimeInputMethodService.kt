@@ -491,14 +491,25 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     }
 
     private val inputViewLocation = intArrayOf(0, 0)
+    private val floatingHostLocation = intArrayOf(0, 0)
 
     override fun onComputeInsets(outInsets: Insets) {
         if (inputDeviceManager.useVirtualKeyboard) {
-            inputView?.keyboardView?.getLocationInWindow(inputViewLocation)
+            val iv = inputView
+            iv?.keyboardView?.getLocationInWindow(inputViewLocation)
             outInsets.apply {
                 contentTopInsets = inputViewLocation[1]
                 visibleTopInsets = inputViewLocation[1]
                 touchableInsets = Insets.TOUCHABLE_INSETS_VISIBLE
+            }
+            // 手写窗的放大候选行悬浮在键盘面板上方（三点菜单之上），落在
+            // visibleTopInsets 之上默认不可触摸——把宿主区域并入可触摸区。
+            // contentTopInsets 保持键盘顶：候选行覆盖应用内容，不推高编辑器。
+            val host = iv?.floatingCandidateHost
+            if (host != null && host.visibility == View.VISIBLE && host.childCount > 0 && host.height > 0) {
+                host.getLocationInWindow(floatingHostLocation)
+                outInsets.touchableInsets = Insets.TOUCHABLE_INSETS_REGION
+                outInsets.touchableRegion.set(0, floatingHostLocation[1], decorView.width, decorView.height)
             }
         } else {
             val n = decorView.findViewById<View>(android.R.id.navigationBarBackground)?.height ?: 0

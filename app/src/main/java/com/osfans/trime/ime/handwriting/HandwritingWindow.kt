@@ -13,6 +13,7 @@ import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -27,6 +28,7 @@ import com.osfans.trime.data.theme.Theme
 import com.osfans.trime.data.theme.ThemeScope
 import com.osfans.trime.data.theme.model.scaledCandidateTextSize
 import com.osfans.trime.data.theme.model.scaledCandidateViewHeight
+import com.osfans.trime.ime.core.InputView
 import com.osfans.trime.ime.core.TrimeInputMethodService
 import com.osfans.trime.ime.window.BoardWindow
 import kotlinx.coroutines.Dispatchers
@@ -48,13 +50,18 @@ import splitties.views.dsl.core.wrapContent
  * 手写输入窗口（三点菜单 → 手写输入）。
  *
  * 完全离线：zinnia + Tegaki 简体模型，写完一笔自动识别，候选字点一下上屏，
- * 上屏后自动清空画板继续写下一个字。布局 = 候选行 + 画板 + 控制行，
+ * 上屏后自动清空画板继续写下一个字。布局 = 画板 + 控制行，
  * 高度跟随当前键盘高度（InputView 用 currentKeyboardHeight 设定窗口高度）。
+ *
+ * 候选行悬浮在键盘面板上方（三点菜单之上，InputView.floatingCandidateHost）：
+ * 放大候选不再挤占画板（2026-11-15 爸爸令）。触摸由 service.onComputeInsets
+ * 把宿主区域并入可触摸区保证。
  */
 class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private val service: TrimeInputMethodService by instance()
     private val rime: RimeSession by instance()
     private val scope: ThemeScope by instance()
+    private val inputView: InputView by instance()
     private val theme: Theme get() = scope.theme
 
     override val title: String get() = context.getString(R.string.handwriting_input)
@@ -114,15 +121,19 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
 
     private val root by lazy {
         context.verticalLayout {
-            add(
-                candidateScroll,
-                lParams(matchParent, context.dp(theme.style.scaledCandidateViewHeight)),
-            )
+            // 候选行不在此布局内——悬浮到键盘面板上方（见 onAttached），画板拿满高度。
             add(pad, lParams(matchParent, 0, weight = 1f))
             add(controlRow, lParams(matchParent, wrapContent).apply {
                 topMargin = context.dp(4)
                 bottomMargin = context.dp(4)
             })
+        }
+    }
+
+    /** 悬浮候选行底色：与键盘面板一致，盖在应用内容上仍清晰可读。 */
+    private fun styleCandidateRow() {
+        candidateScroll.background = GradientDrawable().apply {
+            setColor(scope.colors.keyboardBackColor)
         }
     }
 
@@ -211,6 +222,19 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     }
 
     override fun onAttached() {
+        // 候选行悬浮到键盘面板上方（三点菜单之上）：放大候选不挤占画板。
+        // 宿主是 FrameLayout，必须换用 FrameLayout.LayoutParams。
+        styleCandidateRow()
+        inputView.floatingCandidateHost.apply {
+            addView(
+                candidateScroll,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    context.dp(theme.style.candidateViewHeight),
+                ),
+            )
+            visibility = View.VISIBLE
+        }
         controlButtons.forEach { styleControlButton(it) }
         showHint(R.string.handwriting_loading)
         // 进入手写前把键盘上未上屏的组合先落定，避免残留预编辑混进手写文本。
@@ -232,11 +256,17 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     override fun onDetached() {
         recognizeJob?.cancel()
         recognizeJob = null
+        // 收起悬浮候选行，恢复普通键盘的可触摸区（onComputeInsets 随布局自动回退）。
+        inputView.floatingCandidateHost.apply {
+            removeView(candidateScroll)
+            visibility = View.GONE
+        }
     }
 
     override fun refreshColors() {
         if (!viewCreated) return
         pad.refreshColors()
+        styleCandidateRow()
         controlButtons.forEach { styleControlButton(it) }
         if (lastCandidates.isEmpty()) showHint(hintRes) else showCandidates(lastCandidates)
     }

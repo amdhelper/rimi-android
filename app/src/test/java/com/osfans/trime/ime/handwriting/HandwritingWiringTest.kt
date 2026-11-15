@@ -93,4 +93,29 @@ class HandwritingWiringTest :
                 padSrc shouldContain "setBackgroundColor(scope.colors.keyBackColor)"
             }
         }
+
+        Given("悬浮候选行（2026-11-15 爸爸令：候选在三点菜单上方，不挤占画板）") {
+            val windowSrc = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingWindow.kt").readText()
+            val inputViewSrc = source("src/main/java/com/osfans/trime/ime/core/InputView.kt").readText()
+            val serviceSrc = source("src/main/java/com/osfans/trime/ime/core/TrimeInputMethodService.kt").readText()
+
+            Then("InputView 有悬浮宿主且锚在键盘面板上方") {
+                inputViewSrc shouldContain "val floatingCandidateHost"
+                // 宿主与 preedit 同锚位：above(keyboardView)
+                val hostAdd = inputViewSrc.indexOf("floatingCandidateHost,")
+                val anchor = inputViewSrc.indexOf("above(keyboardView)", hostAdd)
+                (hostAdd >= 0 && anchor > hostAdd && anchor - hostAdd < 300) shouldBe true
+            }
+            Then("候选行不进画板布局，attach 时挂到宿主、detach 时收起") {
+                val rootBlock = windowSrc.substringAfter("private val root by lazy").substringBefore("private fun styleCandidateRow")
+                (rootBlock.contains("candidateScroll")) shouldBe false
+                windowSrc shouldContain "inputView.floatingCandidateHost.apply {"
+                windowSrc shouldContain "removeView(candidateScroll)"
+            }
+            Then("宿主可见时 onComputeInsets 把该区域并入可触摸区") {
+                serviceSrc shouldContain "floatingCandidateHost"
+                serviceSrc shouldContain "Insets.TOUCHABLE_INSETS_REGION"
+                serviceSrc shouldContain "outInsets.touchableRegion.set(0, floatingHostLocation[1], decorView.width, decorView.height)"
+            }
+        }
     })
