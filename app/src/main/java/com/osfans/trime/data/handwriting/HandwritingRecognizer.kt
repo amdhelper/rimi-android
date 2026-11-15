@@ -100,6 +100,7 @@ object HandwritingRecognizer {
                 ink.side,
                 result.take(NBEST_LOG),
             )
+            dumpTrace(context, strokes, ink.side, result)
             result
         } catch (e: Exception) {
             Timber.e(e, "Handwriting recognize failed")
@@ -108,4 +109,37 @@ object HandwritingRecognizer {
     }
 
     private const val NBEST_LOG = 6
+
+    private const val TRACE_MAX_BYTES = 400_000L
+
+    /**
+     * 落盘最近的手写轨迹（外部私有目录 hw_trace.jsonl，adb 可直接读），用于离线复现
+     * 「真实手写识别错」：把用户实际笔迹喂进 zinnia 试不同归一化/清洗策略。
+     * 超过 400KB 自动清空重来，不参与同步、不上传。
+     */
+    private fun dumpTrace(
+        context: Context,
+        strokes: List<List<InkPoint>>,
+        side: Int,
+        candidates: List<String>,
+    ) {
+        try {
+            val dir = context.getExternalFilesDir(null) ?: return
+            val f = File(dir, "hw_trace.jsonl")
+            if (f.length() > TRACE_MAX_BYTES) f.delete()
+            val sb = StringBuilder(1024)
+            sb.append("{\"t\":").append(System.currentTimeMillis())
+            sb.append(",\"side\":").append(side)
+            sb.append(",\"cand\":\"").append(candidates.joinToString(",")).append("\"")
+            sb.append(",\"strokes\":[")
+            strokes.forEachIndexed { i, s ->
+                if (i > 0) sb.append(',')
+                s.joinTo(sb, ",", "[", "]") { "[${it.x.toInt()},${it.y.toInt()}]" }
+            }
+            sb.append("]}\n")
+            f.appendText(sb.toString())
+        } catch (e: Exception) {
+            Timber.w(e, "hw trace dump failed")
+        }
+    }
 }
