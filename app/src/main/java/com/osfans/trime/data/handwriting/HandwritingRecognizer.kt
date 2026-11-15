@@ -64,8 +64,11 @@ object HandwritingRecognizer {
     }
 
     /**
-     * 识别笔画，返回候选字（可能为空）。width/height 传画板实际尺寸。
-     * 模型未就绪时先尝试加载；仍失败返回空列表（UI 显示加载失败提示）。
+     * 识别笔画，返回候选字（可能为空）。
+     *
+     * 归一化在 [HandwritingInk.encodeNormalized] 里完成：按墨迹 bbox 等比缩放居中，
+     * width/height 一律传方框边长（zinnia 各轴独立归一化，传非方形尺寸会把字压扁）。
+     * 画板尺寸只用于日志（排查写多大字更容易看）。
      */
     @Synchronized
     fun recognize(
@@ -75,15 +78,34 @@ object HandwritingRecognizer {
         height: Int,
         nbest: Int = NBEST_DEFAULT,
     ): List<String> {
-        val ink = HandwritingInk.encode(strokes) ?: return emptyList()
-        if (width <= 0 || height <= 0) return emptyList()
+        val ink = HandwritingInk.encodeNormalized(strokes) ?: return emptyList()
         if (!ensureModel(context)) return emptyList()
         return try {
-            HandwritingNative.nativeRecognize(handle, width, height, ink.points, ink.strokeLengths, nbest)
-                ?.toList() ?: emptyList()
+            val result =
+                HandwritingNative.nativeRecognize(
+                    handle,
+                    ink.side,
+                    ink.side,
+                    ink.points,
+                    ink.strokeLengths,
+                    nbest,
+                )?.toList() ?: emptyList()
+            // release 包的 Timber 会丢掉 < INFO 的日志，取证一律用 i 级（只在你手写时打）。
+            Timber.i(
+                "hw: strokes=%d pts=%d pad=%dx%d side=%d cand=%s",
+                strokes.count { it.isNotEmpty() },
+                ink.points.size / 2,
+                width,
+                height,
+                ink.side,
+                result.take(NBEST_LOG),
+            )
+            result
         } catch (e: Exception) {
             Timber.e(e, "Handwriting recognize failed")
             emptyList()
         }
     }
+
+    private const val NBEST_LOG = 6
 }

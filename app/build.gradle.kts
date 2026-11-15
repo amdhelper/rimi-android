@@ -25,8 +25,8 @@ android {
         applicationId = "com.rimi.ime"
         minSdk = 21
         targetSdk = 37
-        versionCode = 2026111504
-        versionName = "0.1.15"
+        versionCode = 2026111505
+        versionName = "0.1.16"
 
         multiDexEnabled = true
         buildConfigField("String", "BUILDER", "\"${project.builder}\"")
