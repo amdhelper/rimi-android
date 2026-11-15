@@ -7,6 +7,7 @@ package com.osfans.trime.ime.bar.ui
 
 import android.content.Context
 import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.View
 import androidx.core.view.isVisible
 import com.osfans.trime.R
@@ -86,8 +87,12 @@ class TabUi(
         }
     }
 
-    fun setTitle(title: String) {
+    fun setTitle(title: String, scaled: Boolean = true) {
         titleText.text = title
+        titleText.setTextSize(
+            TypedValue.COMPLEX_UNIT_SP,
+            if (scaled) theme.style.scaledCandidateTextSize else theme.style.candidateTextSize,
+        )
     }
 
     fun addExternal(

@@ -312,7 +312,7 @@ class InputBarDelegate(override val di: DI) :
 
     override fun onWindowAttached(window: BoardWindow) {
         if (window is BoardWindow.BarBoardWindow) {
-            tabUi.setTitle(window.title)
+            tabUi.setTitle(window.title, window.scaleTitle)
             window.onCreateBarView()?.let { tabUi.addExternal(it, window.showTitle) }
             tabUi.setBackButtonOnClickListener {
                 windowManager.attachWindow(KeyboardWindow)

@@ -76,4 +76,21 @@ class HandwritingWiringTest :
                 (model.length() > 1_000_000) shouldBe true
             }
         }
+
+        Given("画板区域视觉约定（2026-11-15 爸爸反馈）") {
+            val windowSrc = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingWindow.kt").readText()
+            val padSrc = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingPadView.kt").readText()
+
+            Then("标题不随候选倍数放大") {
+                windowSrc shouldContain "override val scaleTitle: Boolean = false"
+            }
+            Then("提示语用原始字号，只有真候选才缩放") {
+                windowSrc shouldContain "setTextSize(TypedValue.COMPLEX_UNIT_SP, theme.style.candidateTextSize)"
+                windowSrc shouldContain "height = context.dp(theme.style.candidateViewHeight)"
+                windowSrc shouldContain "height = context.dp(theme.style.scaledCandidateViewHeight)"
+            }
+            Then("画板底色区别于键盘背景（用键面色）") {
+                padSrc shouldContain "setBackgroundColor(scope.colors.keyBackColor)"
+            }
+        }
     })

@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.osfans.trime.R
 import com.osfans.trime.core.RimeApi
@@ -57,6 +58,9 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private val theme: Theme get() = scope.theme
 
     override val title: String get() = context.getString(R.string.handwriting_input)
+
+    // 标题不随候选倍数放大（UI chrome，放大挤占画板；2026-11-15 爸爸反馈）。
+    override val scaleTitle: Boolean = false
 
     private var recognizeJob: Job? = null
     private var viewCreated = false
@@ -133,10 +137,12 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private fun showHint(textRes: Int) {
         hintRes = textRes
         lastCandidates = emptyList()
+        // 提示语不随候选倍数放大：它是引导文字，放大只会挤占画板（2026-11-15 爸爸反馈）。
+        candidateScroll.updateLayoutParams { height = context.dp(theme.style.candidateViewHeight) }
         candidateRow.removeAllViews()
         val hint = TextView(context).apply {
             setText(textRes)
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, theme.style.scaledCandidateTextSize)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, theme.style.candidateTextSize)
             setTextColor(scope.colors.commentTextColor)
             gravity = Gravity.CENTER_VERTICAL
             setPadding(context.dp(12), 0, context.dp(12), 0)
@@ -151,6 +157,8 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
             showHint(R.string.handwriting_hint_write)
             return
         }
+        // 只有真候选字才随倍数放大（候选行高同步），提示态保持原始高度。
+        candidateScroll.updateLayoutParams { height = context.dp(theme.style.scaledCandidateViewHeight) }
         candidates.forEach { word ->
             val item = TextView(context).apply {
                 text = word

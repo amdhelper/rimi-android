@@ -47,7 +47,9 @@ class HandwritingPadView(
         // 深色键盘上用候选字色画墨迹，对比度与候选词一致。
         paint.color = scope.colors.candidateTextColor
         paint.strokeWidth = context.dp(6).toFloat()
-        setBackgroundColor(scope.colors.keyboardBackColor)
+        // 画板底色用键面色（比键盘背景稍亮一档），让用户一眼看出可手写的范围
+        // （2026-11-15 爸爸反馈：底板颜色要区别于 UI 其他地方）。
+        setBackgroundColor(scope.colors.keyBackColor)
         invalidate()
     }
 

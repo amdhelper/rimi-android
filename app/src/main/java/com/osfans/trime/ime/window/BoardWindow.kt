@@ -60,6 +60,12 @@ sealed class BoardWindow(override val di: DI) : DIAware {
 
         open val title: String = ""
 
+        /**
+         * 标题是否跟随候选词倍数缩放。默认 true（与候选栏一致）；
+         * 手写窗口设 false——标题是 UI chrome，放大只会挤占画板（2026-11-15 爸爸反馈）。
+         */
+        open val scaleTitle: Boolean = true
+
         open fun onCreateBarView(): View? = null
 
         override fun toString(): String = javaClass.name
