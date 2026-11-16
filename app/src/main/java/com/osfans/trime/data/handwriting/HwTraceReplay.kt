@@ -60,6 +60,8 @@ object HwTraceReplay {
         }
         val out = File(dir, "hw_replay.jsonl")
         out.writeText("")
+        // 清掉上一轮回放渲染图，防新旧混淆。
+        dir.listFiles { f -> f.name.startsWith("hw_render_r") && f.name.endsWith(".png") }?.forEach { it.delete() }
         var count = 0
         src.useLines { lines ->
             lines.forEachIndexed { index, line ->
@@ -77,7 +79,7 @@ object HwTraceReplay {
                         }
                         strokes.add(pts)
                     }
-                    val cand = HandwritingRecognizer.recognize(context, strokes, 0, 0, trace = false)
+                    val cand = HandwritingRecognizer.recognize(context, strokes, 0, 0, trace = false, tag = "r$index")
                     val rec = JSONObject()
                     rec.put("i", index)
                     rec.put("strokes", strokes.size)

@@ -75,6 +75,15 @@ internal class Predictor(
     private var decoder: CtcDecoder? = null
     private var expectedClasses = 0
 
+    /**
+     * 汉字约束解码（2026-11-16 爸爸反馈「灿卡住不识别」）：
+     * 行草字形（火旁像 K、山写成 U）无约束时 PP-OCRv5 读成拉丁 ku/K，
+     * 纯汉字过滤后=空候选。手写输入只收汉字 → CTC 每步只在汉字类里选 top-k，
+     * 逼模型给出最接近的汉字（语言先验）。由 rimi 适配层开启；雨燕整行手写不开。
+     */
+    var chineseOnly: Boolean = false
+    private var hanMask: BooleanArray? = null
+
 
     fun isReady(): Boolean = runtime != null && decoder != null
 
@@ -96,6 +105,7 @@ internal class Predictor(
             runtime = HandWriting.create(context, modelFile.absolutePath, cpuThreads, powerMode)
             decoder = CtcDecoder(dictionary)
             expectedClasses = dictionary.size + 2
+            hanMask = CtcDecoder.hanAllowedMask(dictionary, expectedClasses)
             true
         } catch (e: Exception) {
             runtime = null
@@ -123,7 +133,12 @@ internal class Predictor(
             } else {
                 output.data.size / classes
             }
-            decoder.decodeBeam(output.data, timesteps, classes)
+            decoder.decodeBeam(
+                output.data, timesteps, classes,
+                beamWidth = if (chineseOnly) 16 else CtcDecoder.DEFAULT_BEAM_WIDTH,
+                maxCandidates = if (chineseOnly) 16 else CtcDecoder.DEFAULT_MAX_CANDIDATES,
+                allowed = if (chineseOnly) hanMask else null,
+            )
                 .filter { it.text.isNotBlank() }
                 .map { Candidate(it.text, it.confidence) }
         } catch (e: Exception) {

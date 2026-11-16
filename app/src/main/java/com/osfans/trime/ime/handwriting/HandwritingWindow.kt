@@ -244,6 +244,9 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
         autoCommitJob?.cancel()
         val delayMs = AppPrefs.defaultInstance().keyboard.handwritingAutoCommit.getValue().delayMs
         if (delayMs <= 0 || lastCandidates.isEmpty()) return
+        // 部件组合歧义（行草 灿 → 仙/汕/灿 并存）：等用户选字，不自动上屏
+        // （2026-11-16 爸爸反馈；你/好 等高置信整字不触发，自动上屏照常）。
+        if (HandwritingRecognizer.lastCompositionAmbiguous) return
         autoCommitJob = service.lifecycleScope.launch {
             delay(delayMs)
             // 窗口可能已销毁/切走（InputView 重建不一定走 onDetached）：只在仍是当前窗时上屏。

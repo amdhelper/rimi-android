@@ -8,7 +8,7 @@ internal class CtcDecoder(private val dictionary: List<String>) {
 
     companion object {
         private const val BLANK_INDEX = 0
-        private const val DEFAULT_BEAM_WIDTH = 10
+        internal const val DEFAULT_BEAM_WIDTH = 10
         private const val DEFAULT_TOP_K = 3
         const val DEFAULT_MAX_CANDIDATES = 8
         private const val SPACE_CHARS = " \u3000\t"
@@ -16,6 +16,18 @@ internal class CtcDecoder(private val dictionary: List<String>) {
 
         private fun stripSpaces(text: String): String =
             if (text.none { it in SPACE_CHARS }) text else text.filter { it !in SPACE_CHARS }
+
+        /** 单字符是否汉字（CJK 基本区 + 扩展 A + 兼容区 + 〇），与 HandwritingInk.isHanChar 同判据。 */
+        internal fun isHanChar(c: Char): Boolean =
+            c in '一'..'鿿' || c in '㐀'..'䶿' ||
+                c in '豈'..'﫿' || c == '〇'
+
+        /** 构造汉字约束掩码：blank(0) + 字典里的汉字类允许，拉丁/数字/标点屏蔽。 */
+        internal fun hanAllowedMask(dictionary: List<String>, numClasses: Int): BooleanArray =
+            BooleanArray(numClasses) { idx ->
+                idx == BLANK_INDEX ||
+                    (idx - 1 < dictionary.size && dictionary[idx - 1].length == 1 && isHanChar(dictionary[idx - 1][0]))
+            }
     }
 
     data class Decoded(val text: String, val confidence: Float)
@@ -26,7 +38,7 @@ internal class CtcDecoder(private val dictionary: List<String>) {
         else -> " "
     }
 
-    fun decodeBeam(output: FloatArray, timesteps: Int, numClasses: Int, beamWidth: Int = DEFAULT_BEAM_WIDTH, topK: Int = DEFAULT_TOP_K, maxCandidates: Int = DEFAULT_MAX_CANDIDATES): List<Decoded> {
+    fun decodeBeam(output: FloatArray, timesteps: Int, numClasses: Int, beamWidth: Int = DEFAULT_BEAM_WIDTH, topK: Int = DEFAULT_TOP_K, maxCandidates: Int = DEFAULT_MAX_CANDIDATES, allowed: BooleanArray? = null): List<Decoded> {
         if (timesteps <= 0 || numClasses <= 1) return emptyList()
         if (output.size < timesteps * numClasses) return emptyList()
 
@@ -35,7 +47,7 @@ internal class CtcDecoder(private val dictionary: List<String>) {
 
         for (t in 0 until timesteps) {
             val offset = t * numClasses
-            val topIndices = topKIndices(output, offset, numClasses, topK)
+            val topIndices = topKIndices(output, offset, numClasses, topK, allowed)
             val next = HashMap<CharsKey, DoubleArray>(beam.size * (topIndices.size + 1))
 
             for ((key, probs) in beam) {
@@ -116,12 +128,16 @@ internal class CtcDecoder(private val dictionary: List<String>) {
 
     private fun logProb(p: Float): Double = ln(p.toDouble().coerceAtLeast(1e-12))
 
-    private fun topKIndices(output: FloatArray, offset: Int, numClasses: Int, k: Int): IntArray {
+    private fun topKIndices(output: FloatArray, offset: Int, numClasses: Int, k: Int, allowed: BooleanArray? = null): IntArray {
         val size = k.coerceIn(1, numClasses)
         val indices = IntArray(size) { -1 }
         val probs = FloatArray(size) { -1f }
 
         for (c in 0 until numClasses) {
+            // 汉字约束（2026-11-16）：allowed 非空时只在允许的类里选 top-k。
+            // 手写输入只收汉字，行草字形（灿→K+U）无约束会被读成拉丁，
+            // 约束后逼模型在汉字里找最接近的字形（语言先验）。blank(0) 恒允许。
+            if (allowed != null && c != BLANK_INDEX && (c >= allowed.size || !allowed[c])) continue
             val p = output[offset + c]
             if (p <= probs[size - 1]) continue
             var i = size - 1

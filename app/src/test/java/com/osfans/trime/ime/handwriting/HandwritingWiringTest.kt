@@ -113,6 +113,23 @@ class HandwritingWiringTest :
             Then("候选提取汉字不整条丢弃（防噪声滤光后无候选）") {
                 recognizerSrc shouldContain "HandwritingInk.hanOnly(it.text.trim())"
             }
+            Then("CTC 解码约束汉字类（防行草字形被读成拉丁 ku/K，2026-11-16 真机取证）") {
+                recognizerSrc shouldContain "it.chineseOnly = true"
+                val predictorSrc = source("src/main/java/com/yuyan/imemodule/handwriting/internal/Predictor.kt").readText()
+                predictorSrc shouldContain "allowed = if (chineseOnly) hanMask else null"
+            }
+            Then("部件组合识别接线（灿→左火右山→⿰组合，2026-11-16 爸爸反馈）") {
+                recognizerSrc shouldContain "HandwritingCompose.splitClusters(strokes)"
+                recognizerSrc shouldContain "HandwritingCompose.compose(lc, rc)"
+                val composeSrc = source("src/main/java/com/osfans/trime/data/handwriting/HandwritingCompose.kt").readText()
+                composeSrc shouldContain "hw/ids_lr.txt"
+                val idsAsset = source("src/main/assets/hw/ids_lr.txt")
+                (idsAsset.length() > 50_000) shouldBe true
+                idsAsset.readText() shouldContain "灿\t火\t山"
+                // 歧义时暂停自动上屏（等用户选 灿/仙/汕）
+                val windowSrc2 = source("src/main/java/com/osfans/trime/ime/handwriting/HandwritingWindow.kt").readText()
+                windowSrc2 shouldContain "if (HandwritingRecognizer.lastCompositionAmbiguous) return"
+            }
         }
 
         Given("回放验证器安全门（取证工具）") {

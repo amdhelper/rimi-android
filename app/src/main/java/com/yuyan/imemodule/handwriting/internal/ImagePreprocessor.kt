@@ -35,8 +35,9 @@ class ImagePreprocessor {
             maxWidth: Int,
             expectedChars: Int,
             strokeCount: Int,
+            marginRatio: Float = MARGIN_RATIO,
         ): RenderScales {
-            val contentHeight = targetHeight * (1f - 2 * MARGIN_RATIO)
+            val contentHeight = targetHeight * (1f - 2 * marginRatio)
             val aspect = boxWidth / boxHeight
             val flat = aspect > MAX_CONTENT_ASPECT && strokeCount <= FLAT_MAX_STROKES
             val widthLimit = if (flat) {
@@ -63,7 +64,15 @@ class ImagePreprocessor {
         }
     }
 
-    fun renderStrokesForRec(strokes: List<Stroke>, targetHeight: Int = REC_INPUT_HEIGHT, maxWidth: Int = REC_MAX_WIDTH, expectedChars: Int = 1): RecInput {
+    fun renderStrokesForRec(
+        strokes: List<Stroke>,
+        targetHeight: Int = REC_INPUT_HEIGHT,
+        maxWidth: Int = REC_MAX_WIDTH,
+        expectedChars: Int = 1,
+        strokeBase: Float = 3f,
+        smooth: Boolean = true,
+        marginRatio: Float = MARGIN_RATIO,
+    ): RecInput {
         var minX = Float.MAX_VALUE
         var minY = Float.MAX_VALUE
         var maxX = -Float.MAX_VALUE
@@ -80,14 +89,14 @@ class ImagePreprocessor {
         if (minX > maxX || minY > maxY) return blankRecInput(targetHeight, maxWidth)
         val boxWidth = maxOf(1f, maxX - minX)
         val boxHeight = maxOf(1f, maxY - minY)
-        val scales = computeRenderScales(boxWidth, boxHeight, targetHeight, maxWidth, expectedChars, strokes.size)
+        val scales = computeRenderScales(boxWidth, boxHeight, targetHeight, maxWidth, expectedChars, strokes.size, marginRatio)
         val scaleX = scales.scaleX
         val scaleY = scales.scaleY
         val widthLimit = scales.widthLimit
 
         val drawWidth = boxWidth * scaleX
         val drawHeight = boxHeight * scaleY
-        val imageWidth = (drawWidth + targetHeight * MARGIN_RATIO * 2)
+        val imageWidth = (drawWidth + targetHeight * marginRatio * 2)
             .toInt()
             .coerceIn(8, widthLimit)
 
@@ -100,7 +109,7 @@ class ImagePreprocessor {
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
-            strokeWidth = maxOf(1.5f, targetHeight / 16f) / ((scaleX + scaleY) / 2f)
+            strokeWidth = maxOf(1.5f, strokeBase) / ((scaleX + scaleY) / 2f)
         }
 
         val translateX = (imageWidth - drawWidth) / 2f - minX * scaleX
@@ -110,7 +119,7 @@ class ImagePreprocessor {
         canvas.translate(translateX, translateY)
         canvas.scale(scaleX, scaleY)
         for (stroke in strokes) {
-            val path = buildSmoothPath(stroke) ?: continue
+            val path = (if (smooth) buildSmoothPath(stroke) else buildPolylinePath(stroke)) ?: continue
             canvas.drawPath(path, paint)
         }
         canvas.restore()
@@ -158,6 +167,17 @@ class ImagePreprocessor {
     private fun blankRecInput(targetHeight: Int, maxWidth: Int): RecInput {
         val width = minOf(targetHeight * 2, maxWidth)
         return RecInput(FloatArray(3 * width * targetHeight) { -1f }, width, targetHeight)
+    }
+
+    /** 不平滑折线（取证 A/B 用：保留连笔尖角原貌，2026-11-16）。 */
+    private fun buildPolylinePath(stroke: Stroke): Path? {
+        if (stroke.points.size < 2) return null
+        val path = Path()
+        path.moveTo(stroke.points[0].x, stroke.points[0].y)
+        for (i in 1 until stroke.points.size) {
+            path.lineTo(stroke.points[i].x, stroke.points[i].y)
+        }
+        return path
     }
 
     private fun buildSmoothPath(stroke: Stroke): Path? {
