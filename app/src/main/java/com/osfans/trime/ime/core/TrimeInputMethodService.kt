@@ -596,6 +596,8 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     ) {
         Timber.d("onStartInputView: restarting=$restarting")
         isInputViewShowing = true
+        // 取证回放：adb push hw_replay.flag 后键盘弹出即触发（华为拦自定义广播，不依赖 receiver）。
+        com.osfans.trime.data.handwriting.HwTraceReplay.maybeReplay(this)
         InputFeedbackManager.startInput()
         postRimeJob {
             updateRimeOption(this)

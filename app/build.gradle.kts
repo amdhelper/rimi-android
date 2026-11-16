@@ -25,8 +25,8 @@ android {
         applicationId = "com.rimi.ime"
         minSdk = 21
         targetSdk = 37
-        versionCode = 2026111506
-        versionName = "0.1.17"
+        versionCode = 2026111601
+        versionName = "0.1.18"
 
         multiDexEnabled = true
         buildConfigField("String", "BUILDER", "\"${project.builder}\"")
@@ -93,6 +93,12 @@ android {
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
+    }
+
+    androidResources {
+        // 雨燕手写模型 rec.nb 不压缩：assets.openFd() 可直接读长度
+        // （Predictor.materializeModel 优先 openFd，压缩 asset 会走 open() 兜底）。
+        noCompress += listOf("nb")
     }
 
     packaging {

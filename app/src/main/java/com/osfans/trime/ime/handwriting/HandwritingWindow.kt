@@ -52,7 +52,7 @@ import splitties.views.dsl.core.wrapContent
 /**
  * 手写输入窗口（三点菜单 → 手写输入）。
  *
- * 完全离线：zinnia + Tegaki 简体模型，写完一笔自动识别，候选字点一下上屏，
+ * 完全离线：雨燕引擎（Paddle-Lite v2.14 + PP-OCRv5 简体模型，覆盖 18382 字），写完一笔自动识别，候选字点一下上屏，
  * 上屏后自动清空画板继续写下一个字。布局 = 画板 + 控制行，
  * 高度跟随当前键盘高度（InputView 用 currentKeyboardHeight 设定窗口高度）。
  *
@@ -78,6 +78,12 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private var viewCreated = false
     private var lastCandidates: List<String> = emptyList()
     private var hintRes: Int = R.string.handwriting_hint_write
+
+    // 手写窗加高（2026-11-16 爸爸反馈「手写区域太低，笔画写到底部就丢」）：
+    // 画板高度 = 窗高 - 标题栏 - 控制行，默认跟随键盘高度偏矮，向下笔画（撇/竖钩收尾）
+    // 容易冲出画板底部落到控制行/手势区被吞。进窗把窗高抬 30%，画板更大更好写；
+    // 退窗恢复原高，不影响普通键盘。
+    private var savedWindowHeight = 0
 
     private val candidateRow by lazy {
         LinearLayout(context).apply {
@@ -274,6 +280,13 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     }
 
     override fun onAttached() {
+        // 进窗加高画板（爸爸反馈手写区太矮丢笔画）：抬 30%，退窗恢复。
+        val lp = windowManager.view.layoutParams
+        if (lp.height > 0 && savedWindowHeight == 0) {
+            savedWindowHeight = lp.height
+            lp.height = (savedWindowHeight * 1.3f).toInt()
+            windowManager.view.layoutParams = lp
+        }
         // 候选行悬浮到键盘面板上方（三点菜单之上）：放大候选不挤占画板。
         // 宿主是 FrameLayout，必须换用 FrameLayout.LayoutParams。
         styleCandidateRow()
@@ -308,6 +321,11 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     }
 
     override fun onDetached() {
+        // 恢复普通键盘窗高（进窗时抬了 30%）。
+        if (savedWindowHeight > 0) {
+            windowManager.view.updateLayoutParams { height = savedWindowHeight }
+            savedWindowHeight = 0
+        }
         recognizeJob?.cancel()
         recognizeJob = null
         autoCommitJob?.cancel()

@@ -6,58 +6,76 @@
 package com.osfans.trime.data.handwriting
 
 import android.content.Context
+import com.yuyan.imemodule.handwriting.internal.ImagePreprocessor
+import com.yuyan.imemodule.handwriting.internal.Predictor
 import timber.log.Timber
 import java.io.File
 
 /**
- * 离线手写识别器（zinnia + Tegaki 简体中文轻量模型，覆盖 6763 字）。
+ * 离线手写识别器（雨燕输入法核心：Paddle-Lite v2.14 + PP-OCRv5 模型，覆盖 18382 字）。
  *
- * 模型打进 assets/handwriting/，首次使用拷到 filesDir 后按路径打开
- * （zinnia 内部 mmap，不占 Java 堆）。全部方法 synchronized：
- * zinnia::Recognizer::classify 对同一实例不可重入。
+ * 2026-11-16 换引擎：zinnia+Tegaki（2008 年老引擎）对爸爸真实笔迹 TOP1 ≈ 30%，
+ * 你/好/我/天 连前 20 都进不去，判定不可用；换雨燕开源核心（BSD-3-Clause，
+ * vendored 在 com/yuyan/ 下，出处与许可见 assets/hw/README.md）。
+ *
+ * rimi 专用编排（区别于雨燕整行手写）：rimi 是「一次写一个字、停笔自动上屏」交互，
+ * 故 ① 整字渲染（expectedChars=1，不做多字切分）——雨燕的 StrokeSegmenter 会把
+ * 左右结构单字（好/明）误切成两个字并横向拉扁渲染，整字识别全毁（明→PA）；
+ * ② 候选只保留汉字——PP-OCRv5 是场景文字 OCR 模型，会吐拉丁/标点噪声（你./T你/PA），
+ * 手写输入只要汉字。引擎吃原始视图像素坐标，内部 bbox 等比渲染（48px 高）→ CTC 束搜索，
+ * 完全离线不联网。全部方法 synchronized：推理对同一实例不可重入。
  */
 object HandwritingRecognizer {
-    private const val ASSET_PATH = "handwriting/handwriting-zh_CN.model"
     private const val NBEST_DEFAULT = 12
 
-    // 模型版本号：换模型文件时 +1，触发重新拷贝。
-    // 不能用 assets.openFd() 判大小——APK 里 asset 默认被压缩，openFd 会抛
-    // FileNotFoundException（真机/模拟器实测），必须走 assets.open() 流式拷贝。
-    private const val MODEL_VERSION = 1
-
-    private var handle = 0L
+    private var predictor: Predictor? = null
     private var loadFailed = false
 
-    val isReady: Boolean @Synchronized get() = handle != 0L
+    private val cpuThreads: Int by lazy {
+        val cores = Runtime.getRuntime().availableProcessors()
+        when {
+            cores >= 6 -> 4
+            cores >= 4 -> 3
+            else -> 2
+        }
+    }
 
-    /** 拷贝模型（如需）并打开。失败只记一次，不反复重试拷贝。 */
+    val isReady: Boolean get() = predictor?.isReady() == true
+
+    /** 拷贝模型（如需）并加载引擎。失败只记一次，不反复重试拷贝。 */
     @Synchronized
     fun ensureModel(context: Context): Boolean {
-        if (handle != 0L) return true
+        if (isReady) return true
         if (loadFailed) return false
+        val ctx = context.applicationContext
+        HwDebugLog.log(ctx, "ensureModel begin")
+        // 分步诊断（文件取证：华为设备 logcat 屏蔽应用日志）。
+        val avail = com.yuyan.inputmethod.core.HandWriting.isAvailable()
+        HwDebugLog.log(ctx, "step1 so available=$avail")
+        if (!avail) {
+            loadFailed = true
+            return false
+        }
+        val model = Predictor.materializeModel(ctx)
+        HwDebugLog.log(ctx, "step2 model=${model?.absolutePath} len=${model?.length()}")
+        if (model == null || model.length() < 100 * 1024) {
+            loadFailed = true
+            return false
+        }
         return try {
-            val dir = File(context.filesDir, "handwriting")
-            dir.mkdirs()
-            val modelFile = File(dir, "handwriting-zh_CN.model")
-            val stampFile = File(dir, "model.version")
-            val stampOk = runCatching { stampFile.readText().trim() == MODEL_VERSION.toString() }.getOrDefault(false)
-            if (!modelFile.exists() || modelFile.length() == 0L || !stampOk) {
-                context.assets.open(ASSET_PATH).use { input ->
-                    modelFile.outputStream().use { output -> input.copyTo(output) }
-                }
-                stampFile.writeText(MODEL_VERSION.toString())
-            }
-            handle = HandwritingNative.nativeOpenModel(modelFile.absolutePath)
-            if (handle == 0L) {
-                Timber.e("Handwriting model open failed: %s", modelFile.absolutePath)
-                loadFailed = true
-                false
+            val p = predictor ?: Predictor(ctx, cpuThreads, com.yuyan.inputmethod.core.HandWriting.POWER_MODE_HIGH).also { predictor = it }
+            val ok = p.load()
+            HwDebugLog.log(ctx, "step3 predictor.load=$ok")
+            if (ok) {
+                Timber.i("Handwriting engine ready (Paddle-Lite + PP-OCRv5)")
             } else {
-                Timber.i("Handwriting model ready: %s", modelFile.absolutePath)
-                true
+                Timber.e("Handwriting engine init failed (model corrupt or native error)")
+                loadFailed = true
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Handwriting model load failed")
+            ok
+        } catch (t: Throwable) {
+            HwDebugLog.log(ctx, "step3 predictor.load threw: ${t.message}\n${t.stackTraceToString().take(1500)}")
+            Timber.e(t, "Handwriting engine load failed")
             loadFailed = true
             false
         }
@@ -66,9 +84,9 @@ object HandwritingRecognizer {
     /**
      * 识别笔画，返回候选字（可能为空）。
      *
-     * 归一化在 [HandwritingInk.encodeNormalized] 里完成：按墨迹 bbox 等比缩放居中，
-     * width/height 一律传方框边长（zinnia 各轴独立归一化，传非方形尺寸会把字压扁）。
-     * 画板尺寸只用于日志（排查写多大字更容易看）。
+     * 传原始视图像素坐标：整字渲染（expectedChars=1，不切分），引擎内部 bbox 等比缩放。
+     * 候选过滤为纯汉字（去拉丁/标点噪声）。画板尺寸只用于日志。
+     * trace=false 供回放取证用（不回写 hw_trace.jsonl，防回放污染真实笔迹样本）。
      */
     @Synchronized
     fun recognize(
@@ -77,32 +95,35 @@ object HandwritingRecognizer {
         width: Int,
         height: Int,
         nbest: Int = NBEST_DEFAULT,
+        trace: Boolean = true,
     ): List<String> {
-        val ink = HandwritingInk.encodeNormalized(strokes) ?: return emptyList()
+        val ink = HandwritingInk.toYuyanStrokes(strokes)
+        if (ink.isEmpty()) return emptyList()
         if (!ensureModel(context)) return emptyList()
+        val p = predictor ?: return emptyList()
         return try {
+            // 整字渲染：expectedChars=1 → 不做多字切分、不横向拉伸单字。
+            val input = ImagePreprocessor().renderStrokesForRec(ink, expectedChars = 1)
             val result =
-                HandwritingNative.nativeRecognize(
-                    handle,
-                    ink.side,
-                    ink.side,
-                    ink.points,
-                    ink.strokeLengths,
-                    nbest,
-                )?.toList() ?: emptyList()
+                p.predict(input)
+                    .map { it.text.trim() }
+                    .filter { HandwritingInk.isHanText(it) }
+                    .distinct()
+                    .take(nbest)
             // release 包的 Timber 会丢掉 < INFO 的日志，取证一律用 i 级（只在你手写时打）。
             Timber.i(
-                "hw: strokes=%d pts=%d pad=%dx%d side=%d cand=%s",
-                strokes.count { it.isNotEmpty() },
-                ink.points.size / 2,
+                "hw: strokes=%d pts=%d pad=%dx%d cand=%s",
+                ink.size,
+                ink.sumOf { it.points.size },
                 width,
                 height,
-                ink.side,
                 result.take(NBEST_LOG),
             )
-            dumpTrace(context, strokes, ink.side, result)
+            if (trace) dumpTrace(context, strokes, result)
+            HwDebugLog.log(context, "recognize: strokes=${ink.size} cand=${result.take(6)}")
             result
         } catch (e: Exception) {
+            HwDebugLog.log(context, "recognize FAILED: ${e.message}")
             Timber.e(e, "Handwriting recognize failed")
             emptyList()
         }
@@ -114,19 +135,32 @@ object HandwritingRecognizer {
 
     /**
      * 落盘最近的手写轨迹（外部私有目录 hw_trace.jsonl，adb 可直接读），用于离线复现
-     * 「真实手写识别错」：把用户实际笔迹喂进 zinnia 试不同归一化/清洗策略。
+     * 「真实手写识别错」：把用户实际笔迹喂进引擎试不同策略。
      * 超过 400KB 自动清空重来，不参与同步、不上传。
+     * side = 原始墨迹 bbox 长边（仅参考；引擎内部自行归一化）。
      */
     private fun dumpTrace(
         context: Context,
         strokes: List<List<InkPoint>>,
-        side: Int,
         candidates: List<String>,
     ) {
         try {
             val dir = context.getExternalFilesDir(null) ?: return
             val f = File(dir, "hw_trace.jsonl")
             if (f.length() > TRACE_MAX_BYTES) f.delete()
+            var minX = Float.MAX_VALUE
+            var minY = Float.MAX_VALUE
+            var maxX = -Float.MAX_VALUE
+            var maxY = -Float.MAX_VALUE
+            for (s in strokes) {
+                for (p in s) {
+                    if (p.x < minX) minX = p.x
+                    if (p.x > maxX) maxX = p.x
+                    if (p.y < minY) minY = p.y
+                    if (p.y > maxY) maxY = p.y
+                }
+            }
+            val side = if (minX > maxX) 0 else kotlin.math.round(maxOf(maxX - minX, maxY - minY)).toInt()
             val sb = StringBuilder(1024)
             sb.append("{\"t\":").append(System.currentTimeMillis())
             sb.append(",\"side\":").append(side)

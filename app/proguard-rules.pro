@@ -11,6 +11,11 @@
 # Keep JNI interface
 -keep class com.osfans.trime.core.* { *; }
 
+# 雨燕手写引擎（BSD-3，vendored）：libyuyanwriting.so 按包名查 JNI 符号，
+# 类名不可变不可 shrink。-dontobfuscate 已防改名，这里双保险防 R8 收缩。
+-keep class com.yuyan.inputmethod.core.HandWriting { *; }
+-keep class com.yuyan.inputmethod.core.HandWriting$* { *; }
+
 # remove kotlin null checks
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkNotNull(...);

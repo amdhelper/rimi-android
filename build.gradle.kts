@@ -16,7 +16,8 @@ plugins {
 spotless {
     kotlin {
         target("**/*.kt", "**/*.kts")
-        targetExclude("build-logic/convention/build/**")
+        // vendored 雨燕手写核心保持字节级原样（上游同步友好），不参与本仓风格检查。
+        targetExclude("build-logic/convention/build/**", "app/src/main/java/com/yuyan/**")
         ktlint("1.8.0")
     }
 }

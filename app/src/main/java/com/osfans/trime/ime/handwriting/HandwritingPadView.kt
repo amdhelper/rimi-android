@@ -10,8 +10,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
+import android.os.Build
 import android.view.MotionEvent
 import android.view.View
+import com.osfans.trime.data.handwriting.HwDebugLog
 import com.osfans.trime.data.handwriting.InkPoint
 import com.osfans.trime.data.theme.ThemeScope
 import splitties.dimensions.dp
@@ -19,7 +22,7 @@ import splitties.dimensions.dp
 /**
  * 手写画板：捕获笔画并绘制墨迹。
  *
- * 坐标保持视图像素原样交给 zinnia（引擎按 width/height 归一化），
+ * 坐标保持视图像素原样交给雨燕引擎（Paddle-Lite + PP-OCRv5，内部自行 bbox 归一化渲染），
  * 不做缩放，避免引入二次误差。只跟踪第一根手指，忽略多指。
  */
 @SuppressLint("ViewConstructor")
@@ -90,12 +93,28 @@ class HandwritingPadView(
         }
     }
 
+    /**
+     * 排除系统手势拦截（2026-11-16 爸爸反馈「有些笔画写上去没反应」的根因）。
+     * 全面屏手势导航在屏幕左右各保留约 82px 的返回手势区，覆盖画板边缘；
+     * 手指从边缘起笔会被系统当成「返回」手势抢走，画板收不到 → 笔画丢失。
+     * adb input 注入不经过系统手势判定，故注入测试全宽可写、真机边缘丢笔。
+     * 把整个画板设为手势排除区，边缘笔画也能正常落笔。画板高约 166dp < 系统
+     * 单边 200dp 上限，整块排除有效。API 29+ 才有此接口。
+     */
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            systemGestureExclusionRects = listOf(Rect(0, 0, w, h))
+        }
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 onNewStrokeStart?.invoke()
                 activePointerId = event.getPointerId(0)
                 strokes.add(mutableListOf(InkPoint(event.x, event.y)))
+                HwDebugLog.log(context, "pad DOWN x=${event.x.toInt()} y=${event.y.toInt()} ptr=$activePointerId")
                 invalidate()
                 return true
             }
@@ -125,6 +144,7 @@ class HandwritingPadView(
                 }
                 activePointerId = -1
                 invalidate()
+                HwDebugLog.log(context, "pad UP strokes=${strokes.size} lastPts=${strokes.lastOrNull()?.size ?: 0}")
                 onStrokeChanged?.invoke()
                 return true
             }

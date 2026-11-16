@@ -7,122 +7,92 @@ package com.osfans.trime.data.handwriting
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 
-/** 笔画→JNI 载荷编码的纯 JVM 测试（与 rimi_handwriting.cc fillCharacter 对齐）。 */
+/**
+ * 笔画→雨燕引擎输入转换的纯 JVM 测试（2026-11-16 换引擎）。
+ * 雨燕引擎吃原始视图像素坐标（内部自行 bbox 归一化渲染），
+ * 转换层只做：过滤空笔画 + 单点笔画补微偏移重复点。
+ */
 class HandwritingInkTest :
     BehaviorSpec({
         Given("空输入") {
-            Then("无笔画返回 null") {
-                HandwritingInk.encode(emptyList()).shouldBeNull()
+            Then("无笔画返回空列表") {
+                HandwritingInk.toYuyanStrokes(emptyList()) shouldBe emptyList()
             }
-            Then("全空笔画返回 null") {
-                HandwritingInk.encode(listOf(emptyList(), emptyList())).shouldBeNull()
+            Then("全空笔画返回空列表") {
+                HandwritingInk.toYuyanStrokes(listOf(emptyList(), emptyList())) shouldBe emptyList()
             }
         }
 
         Given("一条两点的笔画") {
-            val ink = HandwritingInk.encode(listOf(listOf(InkPoint(10f, 20f), InkPoint(30f, 40f))))
-            Then("扁平坐标 x,y 交替") {
-                ink.shouldNotBeNull()
-                ink.points.toList() shouldBe listOf(10f, 20f, 30f, 40f)
-                ink.strokeLengths.toList() shouldBe listOf(2)
+            val strokes = HandwritingInk.toYuyanStrokes(listOf(listOf(InkPoint(10f, 20f), InkPoint(30f, 40f))))
+            Then("原始坐标原样保留（引擎内部归一化，外部不缩放）") {
+                strokes.size shouldBe 1
+                strokes[0].points.map { it.x to it.y } shouldBe listOf(10f to 20f, 30f to 40f)
             }
         }
 
         Given("多条笔画") {
-            val ink =
-                HandwritingInk.encode(
+            val strokes =
+                HandwritingInk.toYuyanStrokes(
                     listOf(
                         listOf(InkPoint(0f, 0f), InkPoint(1f, 1f), InkPoint(2f, 2f)),
                         listOf(InkPoint(5f, 5f), InkPoint(6f, 6f)),
                     ),
                 )
-            Then("点数与顺序正确") {
-                ink.shouldNotBeNull()
-                ink.strokeLengths.toList() shouldBe listOf(3, 2)
-                ink.points.size shouldBe 10
-                ink.points[6] shouldBe 5f
-                ink.points[7] shouldBe 5f
+            Then("笔画数与点数、顺序正确") {
+                strokes.size shouldBe 2
+                strokes[0].points.size shouldBe 3
+                strokes[1].points.size shouldBe 2
+                strokes[1].points[0].x shouldBe 5f
+                strokes[1].points[0].y shouldBe 5f
             }
         }
 
         Given("单点笔画（点「丶」）") {
-            val ink = HandwritingInk.encode(listOf(listOf(InkPoint(50f, 60f))))
-            Then("补微偏移重复点，保证 zinnia 方向特征可算") {
-                ink.shouldNotBeNull()
-                ink.strokeLengths.toList() shouldBe listOf(2)
-                ink.points.toList() shouldBe listOf(50f, 60f, 50.5f, 60f)
+            val strokes = HandwritingInk.toYuyanStrokes(listOf(listOf(InkPoint(50f, 60f))))
+            Then("补微偏移重复点：ImagePreprocessor 跳过 <2 点路径，不补点则点画不出来") {
+                strokes.size shouldBe 1
+                strokes[0].points.map { it.x to it.y } shouldBe listOf(50f to 60f, 50.5f to 60f)
             }
         }
 
         Given("混有空笔画") {
-            val ink =
-                HandwritingInk.encode(
+            val strokes =
+                HandwritingInk.toYuyanStrokes(
                     listOf(emptyList(), listOf(InkPoint(1f, 2f), InkPoint(3f, 4f)), emptyList()),
                 )
             Then("空笔画被过滤") {
-                ink.shouldNotBeNull()
-                ink.strokeLengths.toList() shouldBe listOf(2)
-                ink.points.toList() shouldBe listOf(1f, 2f, 3f, 4f)
+                strokes.size shouldBe 1
+                strokes[0].points.map { it.x to it.y } shouldBe listOf(1f to 2f, 3f to 4f)
             }
         }
 
-        // ---- 归一化（2026-11-15 手写候选全错的根治）----
-        // zinnia 各轴独立归一化：传画板像素尺寸会把方形字压扁，且对位置/大小敏感。
-        Given("方形墨迹 200×200 的归一化") {
-            val ink =
-                HandwritingInk
-                    .encodeNormalized(listOf(listOf(InkPoint(500f, 200f), InkPoint(700f, 400f))), margin = 0.15f)
-                    .shouldNotBeNull()
-            Then("方框边长 = 长边 × (1 + 2×margin)") {
-                ink.side shouldBe 260
-            }
-            Then("居中并留 15% 边距（两点落在 30 与 230）") {
-                ink.points.toList() shouldBe listOf(30f, 30f, 230f, 230f)
+        Given("大坐标（真实画板 1152×582 量级）") {
+            val strokes =
+                HandwritingInk.toYuyanStrokes(
+                    listOf(listOf(InkPoint(900f, 500f), InkPoint(1100f, 560f))),
+                )
+            Then("不做任何缩放/平移（与 zinnia 时代 encodeNormalized 的本质区别）") {
+                strokes[0].points.map { it.x to it.y } shouldBe listOf(900f to 500f, 1100f to 560f)
             }
         }
 
-        Given("宽扁墨迹 700×20（写「一」）") {
-            val ink =
-                HandwritingInk
-                    .encodeNormalized(listOf(listOf(InkPoint(100f, 300f), InkPoint(800f, 320f))), margin = 0.15f)
-                    .shouldNotBeNull()
-            Then("等比缩放：横跨度与纵跨度都保持原值，不被拉伸成方形") {
-                (ink.points[2] - ink.points[0]) shouldBe 700f
-                (ink.points[3] - ink.points[1]) shouldBe 20f
+        Given("汉字候选过滤（去 PP-OCRv5 拉丁/标点噪声）") {
+            Then("纯汉字（单字/词语/兼容区/〇）保留") {
+                HandwritingInk.isHanText("你") shouldBe true
+                HandwritingInk.isHanText("你好") shouldBe true
+                HandwritingInk.isHanText("〇") shouldBe true
+                HandwritingInk.isHanText("龦") shouldBe true // 扩展 A
             }
-            Then("方框边长仍由长边决定") {
-                ink.side shouldBe 910
-            }
-        }
-
-        Given("同一字形写在画板不同位置 / 不同大小") {
-            val shape = listOf(listOf(InkPoint(0f, 0f), InkPoint(100f, 0f)), listOf(InkPoint(50f, -80f), InkPoint(50f, 80f)))
-            fun shift(dx: Float, dy: Float, scale: Float) =
-                shape.map { s -> s.map { InkPoint(it.x * scale + dx, it.y * scale + dy) } }
-            // 归一化坐标 = 点 / side（zinnia 内部就是这样除的），据此判"位置/大小无关"。
-            fun unit(ink: HandwritingInk.Normalized) = ink.points.map { it / ink.side }
-            fun expectNear(a: List<Float>, b: List<Float>) {
-                a.size shouldBe b.size
-                a.indices.forEach { i -> (kotlin.math.abs(a[i] - b[i]) < 0.01f) shouldBe true }
-            }
-            val a = HandwritingInk.encodeNormalized(shift(100f, 400f, 1f)).shouldNotBeNull()
-            val b = HandwritingInk.encodeNormalized(shift(900f, 120f, 1f)).shouldNotBeNull()
-            val c = HandwritingInk.encodeNormalized(shift(10f, 10f, 3f)).shouldNotBeNull()
-            Then("归一化结果完全一致（位置无关）") {
-                expectNear(unit(a), unit(b))
-            }
-            Then("放大 3 倍后仍一致（大小无关，且边长为 3 倍）") {
-                expectNear(unit(a), unit(c))
-                c.side shouldBe a.side * 3
-            }
-        }
-
-        Given("归一化空输入") {
-            Then("归一化：无笔画返回 null") {
-                HandwritingInk.encodeNormalized(emptyList()).shouldBeNull()
+            Then("拉丁/标点/符号/混合噪声剔除") {
+                HandwritingInk.isHanText("") shouldBe false
+                HandwritingInk.isHanText("PA") shouldBe false
+                HandwritingInk.isHanText("你.") shouldBe false
+                HandwritingInk.isHanText("T你") shouldBe false
+                HandwritingInk.isHanText("————") shouldBe false
+                HandwritingInk.isHanText("我`") shouldBe false
+                HandwritingInk.isHanText("日月 ") shouldBe false
             }
         }
     })

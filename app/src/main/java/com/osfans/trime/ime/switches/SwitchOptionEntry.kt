@@ -24,7 +24,7 @@ sealed class SwitchOptionEntry(
             // 一键切方案只放在左上角三点菜单里。
             KeyboardQwerty,
             KeyboardT9,
-            // 手写输入：离线 zinnia 识别，入口在 26键/9键 右侧（2026-11-15 爸爸令）。
+            // 手写输入：离线雨燕引擎（Paddle-Lite + PP-OCRv5），入口在 26键/9键 右侧（2026-11-15 爸爸令）。
             Handwriting,
         }
     }

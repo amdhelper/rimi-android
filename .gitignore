@@ -98,9 +98,12 @@ gen-external-apklibs
 *.mod*
 *.cmd
 .tmp_versions/
-# rimi: 手写识别模型必须进仓库（上面 *.mod* 会误吞 .model；例外必须放其后才生效）
-!app/src/main/assets/handwriting/
-!app/src/main/assets/handwriting/**
+# rimi: 手写引擎资产必须进仓库（上面 *.mod* 等规则会误吞；例外必须放其后才生效）
+!app/src/main/assets/hw/
+!app/src/main/assets/hw/**
+# rimi: 雨燕手写引擎预编译 libyuyanwriting.so 必须进仓库（上面 *.so 误吞；例外必须放其后）
+!app/src/main/jniLibs/
+!app/src/main/jniLibs/**
 modules.order
 Module.symvers
 Mkfile.old

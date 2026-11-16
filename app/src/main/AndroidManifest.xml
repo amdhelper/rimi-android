@@ -51,6 +51,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 android:resource="@xml/method" />
         </service>
 
+        <!-- 手写笔迹回放验证器（取证工具，2026-11-16 换引擎验收）：DUMP 权限门，
+             只有 adb shell/系统能投递（第三方应用拿不到 DUMP）；只读写本应用外部私有目录，不联网。
+             注意：不能用 Binder.getCallingUid() 判发送者（广播经 system_server 转发，恒为 1000）。 -->
+        <receiver
+            android:name=".ime.handwriting.HwReplayReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="com.rimi.ime.action.HW_REPLAY" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name=".provider.RimeDataProvider"
             android:authorities="${applicationId}.provider"
