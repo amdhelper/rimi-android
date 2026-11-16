@@ -178,6 +178,13 @@ class HandwritingWiringTest :
                 controlBlock shouldContain "R.string.handwriting_space"
                 controlBlock shouldContain "R.string.handwriting_backspace"
             }
+            Then("手写窗空格长按呼出 ASR（2026-11-16 爸爸令：所有模式空格长按转写）") {
+                val controlBlock = windowSrc.substringAfter("private val controlRow by lazy")
+                    .substringBefore("private val root by lazy")
+                controlBlock shouldContain "VoiceInputController.start(service)"
+                controlBlock shouldContain "VoiceInputController.stopAndSend()"
+                controlBlock shouldContain "setOnLongClickListener"
+            }
             Then("控制按钮有醒目边界描边（2026-11-16 爸爸二次反馈）") {
                 val styleBlock = windowSrc.substringAfter("private fun styleControlButton")
                     .substringBefore("private fun showHint")

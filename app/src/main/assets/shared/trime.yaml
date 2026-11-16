@@ -1057,7 +1057,7 @@ preset_keyboards:
       - {click: Shift_L}
       - {click: Keyboard_symbols, long_click: Keyboard_number}
       - {click: Mode_switch, long_click: Menu}
-      - {click: space, width: 30}
+      - {click: space, long_click: VoiceInput, width: 30}
       - {click: "'", long_click: '"'}
       - {click: BackSpace, long_click: Escape, width: 15}
       - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
@@ -1147,7 +1147,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
-    - {click: space, width: 30}
+    - {click: space, long_click: VoiceInput, width: 30}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
@@ -1192,7 +1192,7 @@ preset_keyboards:
     - {click: Shift_L}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: Mode_switch, long_click: Menu}
-    - {click: space, width: 40}
+    - {click: space, long_click: VoiceInput, width: 40}
     - {click: BackSpace, long_click: Escape, width: 15}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
   qwerty:
@@ -1245,7 +1245,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu, width: 15}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: ',', long_click: '<'}
-    - {click: space, width: 24}
+    - {click: space, long_click: VoiceInput, width: 24}
     - {click: '.', long_click: '>'}
     - {click: '/', long_click: '?'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
@@ -1292,12 +1292,12 @@ preset_keyboards:
     - {click: T9_PAREN, key_text_size: 20}
     - {click: BackSpace, long_click: Escape, repeatable: true, label: '⌫', width: 25}
     # 第 5 行：符/数（25%）+ 空格 57% + 回车 18%（2026-11-09 爸爸令：
-    # 2026-11-16 爸爸令：空格长按不再呼出 ASR 转写（误触），long_click 移除。
+    # 2026-11-16 爸爸令：所有模式空格长按呼出 ASR 转写（16 个键盘布局统一 VoiceInput）。
     #   空格左侧腾出一个键位给符/数，空格 82→57）。
     # 不放「中/英」键：九宫格按键只有数字，切到西文后按数字会直接上屏数字（2026-11-04 爸爸踩坑）
     # 不放 26 键：底排键易误触，26/9 一键切换只在左上角三点菜单（SwitchOptionWindow）里。
     - {click: Keyboard_symbols, label: '符/数', long_click: Keyboard_number, width: 25}
-    - {click: space, label: '空格', width: 57}
+    - {click: space, long_click: VoiceInput, label: '空格', width: 57}
     - {click: Return, label: '回车', key_text_color: '0xcdd6f4', width: 18}
 
   us_intl:
@@ -1351,7 +1351,7 @@ preset_keyboards:
     - {click: Shift_L}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: Mode_switch, long_click: Menu}
-    - {click: space, long_click: VOICE_ASSIST, width: 30}
+    - {click: space, long_click: VoiceInput, width: 30}
     - {click: "'", long_click: '"'}
     - {click: BackSpace, long_click: Escape, swipe_right: Delete, swipe_left: Escape, width: 15}
     - {click: Return, long_click: CommitComment, width: 15}
@@ -1383,7 +1383,7 @@ preset_keyboards:
     - {click: ','}
     - {click: '='}
     - {click: Keyboard_default, long_click: Keyboard_symbols}
-    - {click: space}
+    - {click: space, long_click: VoiceInput}
     - {click: BackSpace, long_click: Escape}
     - {click: Return}
   symbols:
@@ -1436,7 +1436,7 @@ preset_keyboards:
     - {click: Keyboard_default, long_click: Menu, width: 15}
     - {click: Keyboard_number, long_click: Color_switch}
     - {click: Keyboard_mini, long_click: Theme_settings}
-    - {click: space, width: 30}
+    - {click: space, long_click: VoiceInput, width: 30}
     - {click: '。', ascii: '.'}
     - {click: liquid_keyboard_switch, long_click: Delete}
     - {click: Return, long_click: select_all, width: 15}
@@ -1491,7 +1491,7 @@ preset_keyboards:
     - {click: Shift_L, label: 換檔, send_bindings: false}
     - {click: Mode_switch, long_click: Menu}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
-    - {click: space, width: 30}
+    - {click: space, long_click: VoiceInput, width: 30}
     - {label: 'ㄦ', long_click: '"', click: "-"}
     - {long_click: '。', click: '，'}
     - {click: BackSpace, long_click: Escape, width: 10}
@@ -1536,7 +1536,7 @@ preset_keyboards:
     - {click: Hide}
     - {click: Shift_L, send_bindings: false}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
-    - {click: space, width: 40}
+    - {click: space, long_click: VoiceInput, width: 40}
     - {click: Mode_switch, long_click: Menu}
     - {long_click: '>', click: '.'}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 10}
@@ -1595,7 +1595,7 @@ preset_keyboards:
     - {click: Menu, long_click: Color_switch, width: 14}
     - {click: Keyboard_symbols, long_click: Keyboard_number, width: 11.5}
     - {click: ",", long_click: .}
-    - {click: space, width: 25}
+    - {click: space, long_click: VoiceInput, width: 25}
     - {click: "'", long_click: "?"}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 25.5}
   scj6:
@@ -1620,7 +1620,7 @@ preset_keyboards:
     - {click: Hide, width: 10}
     - {click: '/', long_click: '^', width: 10}
     - {click: Keyboard_symbols, long_click: Keyboard_number, width: 10}
-    - {click: space, width: 40}
+    - {click: space, long_click: VoiceInput, width: 40}
     - {click: Keyboard_letter, long_click: Menu, width: 10}
     - {click: Return, composing: Return1, long_click: CommitComment, width: 20}
   telegraph:
@@ -1650,7 +1650,7 @@ preset_keyboards:
     - {click: '.', label: '。'}
     - {click: BackSpace, long_click: Escape}
     - {click: Keyboard_letter, long_click: Menu}
-    - {click: space, width: 60}
+    - {click: space, long_click: VoiceInput, width: 60}
     - {click: Return, composing: Return1}
   terra_pinyin:
     name: 地球拼音鍵盤
@@ -1692,7 +1692,7 @@ preset_keyboards:
     - {click: Mode_switch, long_click: Menu}
     - {click: Shift_L}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
-    - {click: space, width: 40}
+    - {click: space, long_click: VoiceInput, width: 40}
     - {click: ".", long_click: '"'}
     - {click: '\', long_click: '.', composing: 'ˋ', send_bindings: false}  #四聲
     - {click: Return, composing: Return1, long_click: CommitComment}
@@ -1747,7 +1747,7 @@ preset_keyboards:
     - {click: Shift_L}
     - {click: Keyboard_symbols, long_click: Keyboard_number}
     - {click: Mode_switch, long_click: Menu}
-    - {click: space, long_click: VOICE_ASSIST, width: 30}
+    - {click: space, long_click: VoiceInput, width: 30}
     - {click: "'", long_click: '"'}
     - {click: BackSpace, long_click: Escape, swipe_right: Delete, swipe_left: Escape, width: 15}
     - {click: Return, long_click: CommitComment, width: 15}
@@ -1805,6 +1805,6 @@ preset_keyboards:
     - {click: Menu, long_click: Color_switch, width: 14}
     - {click: Keyboard_symbols, long_click: Keyboard_number, width: 11.5}
     - {click: ",", long_click: .}
-    - {click: space, width: 25}
+    - {click: space, long_click: VoiceInput, width: 25}
     - {click: "'", long_click: "?"}
     - {click: Return, long_click: CommitComment, width: 25.5}

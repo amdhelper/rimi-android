@@ -278,11 +278,11 @@ class ThemeDslExpanderTest :
                 (checked > 0) shouldBe true
             }
 
-            Then("no voice on space long press, no standalone mic key") {
+            Then("voice input on space long press in ALL keyboards, no standalone mic key") {
                 // 2026-11-04 爸爸令：🎤 独立键拿掉（省底排空间）。
-                // 2026-11-16 爸爸令：空格长按不再呼出 ASR 转写（误触烦恼），long_click 移除。
+                // 2026-11-16 爸爸令：所有模式空格长按呼出 ASR 转写（16 个键盘布局统一）。
                 // 锁两点：① 任何键盘不得有 click==VoiceInput 的独立麦克风键；
-                // ② 26 键主键盘（qwerty）的空格键不得挂 long_click。
+                // ② 每个键盘的空格键 long_click 必须是 VoiceInput。
                 val keyboards = expanded.pairs!!["preset_keyboards"]!!.mapping!!
                 for ((name, kbNode) in keyboards.pairs) {
                     val keys = kbNode.mapping?.pairs?.get("keys") as? YamlList ?: continue
@@ -291,13 +291,18 @@ class ThemeDslExpanderTest :
                         withClue("keyboard=$name must not have a standalone VoiceInput key") {
                             (keyMap.pairs["click"]?.string == "VoiceInput") shouldBe false
                         }
+                        if (keyMap.pairs["click"]?.string == "space") {
+                            withClue("keyboard=$name space long press must be VoiceInput") {
+                                keyMap.pairs["long_click"]?.string shouldBe "VoiceInput"
+                            }
+                        }
                     }
                 }
                 val qwertyKeys = keyboards.pairs["qwerty"]!!.mapping!!.pairs["keys"] as YamlList
                 val spaceKey = qwertyKeys.items.mapNotNull { it.mapping }.first {
                     it.pairs["click"]?.string == "space"
                 }
-                spaceKey.pairs["long_click"] shouldBe null
+                spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
             }
 
             Then("t9 is a four-column grid: punctuation column + 9 letter keys") {
@@ -335,9 +340,9 @@ class ThemeDslExpanderTest :
                 t9.keys.size shouldBe 19
                 t9.keys.first().click shouldBe KeyActionToken.Plain("T9_COMMA")
                 // 2026-11-09 爸爸令：底排「符/数 25% + 空格 57% + 回车 18%」，
-                // 空格左侧腾出一个键位放「符/数」；2026-11-16 爸爸令：空格长按不再呼出 ASR
+                // 空格左侧腾出一个键位放「符/数」；2026-11-16 爸爸令：所有模式空格长按呼出 ASR
                 val spaceKey = keyMaps.first { it.pairs["click"]?.string == "space" }
-                spaceKey.pairs["long_click"] shouldBe null
+                spaceKey.pairs["long_click"]?.string shouldBe "VoiceInput"
                 spaceKey.pairs["width"]?.string shouldBe "57"
                 val returnKey = keyMaps.first { it.pairs["click"]?.string == "Return" }
                 returnKey.pairs["width"]?.string shouldBe "18"

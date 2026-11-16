@@ -11,6 +11,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -32,6 +33,7 @@ import com.osfans.trime.data.theme.model.scaledCandidateViewHeight
 import com.osfans.trime.ime.core.InputView
 import com.osfans.trime.ime.core.TouchEventReceiverWindow
 import com.osfans.trime.ime.core.TrimeInputMethodService
+import com.osfans.trime.ime.voice.VoiceInputController
 import com.osfans.trime.ime.window.BoardWindow
 import com.osfans.trime.ime.window.BoardWindowManager
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +148,23 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
             }
             add(makeControlButton(R.string.handwriting_clear) { pad.clear() }, sideParams())
             add(
-                makeControlButton(R.string.handwriting_space) { service.commitText(" ") },
+                makeControlButton(R.string.handwriting_space) { service.commitText(" ") }.apply {
+                    // 2026-11-16 爸爸令：所有模式空格长按呼出 ASR——手写窗空格同等待遇。
+                    // 按住录音、松开自动发送（与键盘 KeyView 的 voice_input 释放语义一致；
+                    // stopAndSend 有 recorder?:return 空闲守卫，短按空格上屏不受影响）。
+                    setOnLongClickListener {
+                        VoiceInputController.start(service)
+                        true
+                    }
+                    setOnTouchListener { _, event ->
+                        if (event.actionMasked == MotionEvent.ACTION_UP ||
+                            event.actionMasked == MotionEvent.ACTION_CANCEL
+                        ) {
+                            VoiceInputController.stopAndSend()
+                        }
+                        false
+                    }
+                },
                 lParams(0, context.dp(48), weight = 1f).apply {
                     marginStart = gap
                     marginEnd = gap
