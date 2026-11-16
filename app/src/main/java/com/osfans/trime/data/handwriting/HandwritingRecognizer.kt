@@ -19,10 +19,12 @@ import java.io.File
  * vendored 在 com/yuyan/ 下，出处与许可见 assets/hw/README.md）。
  *
  * rimi 专用编排（区别于雨燕整行手写）：rimi 是「一次写一个字、停笔自动上屏」交互，
- * 故 ① 整字渲染（expectedChars=1，不做多字切分）——雨燕的 StrokeSegmenter 会把
- * 左右结构单字（好/明）误切成两个字并横向拉扁渲染，整字识别全毁（明→PA）；
- * ② 候选只保留汉字——PP-OCRv5 是场景文字 OCR 模型，会吐拉丁/标点噪声（你./T你/PA），
- * 手写输入只要汉字。引擎吃原始视图像素坐标，内部 bbox 等比渲染（48px 高）→ CTC 束搜索，
+ * 故 ① 整字渲染（expectedChars=1，不做多字切分，宽墨迹压回方形）——雨燕的 StrokeSegmenter
+ * 会把左右结构单字（好/明）误切成两个字并横向拉扁渲染，整字识别全毁（明→PA）；
+ * 写宽的左右结构字（灿）不压方形也会被读成两个字（灿→火山，2026-11-16 爸爸反馈）；
+ * ② 候选提取汉字——PP-OCRv5 是场景文字 OCR 模型，会吐拉丁/标点噪声（你./T你/PA），
+ * 提取汉字保留（你.→你），不整条丢弃（否则写宽了噪声全被滤光=无候选「一动不动」）。
+ * 引擎吃原始视图像素坐标，内部 bbox 渲染（48px 高）→ CTC 束搜索，
  * 完全离线不联网。全部方法 synchronized：推理对同一实例不可重入。
  */
 object HandwritingRecognizer {
@@ -84,8 +86,8 @@ object HandwritingRecognizer {
     /**
      * 识别笔画，返回候选字（可能为空）。
      *
-     * 传原始视图像素坐标：整字渲染（expectedChars=1，不切分），引擎内部 bbox 等比缩放。
-     * 候选过滤为纯汉字（去拉丁/标点噪声）。画板尺寸只用于日志。
+     * 传原始视图像素坐标：整字渲染（expectedChars=1，不切分、宽墨迹压回方形）。
+     * 候选提取汉字（去拉丁/标点噪声，不整条丢弃）。画板尺寸只用于日志。
      * trace=false 供回放取证用（不回写 hw_trace.jsonl，防回放污染真实笔迹样本）。
      */
     @Synchronized
@@ -102,12 +104,12 @@ object HandwritingRecognizer {
         if (!ensureModel(context)) return emptyList()
         val p = predictor ?: return emptyList()
         return try {
-            // 整字渲染：expectedChars=1 → 不做多字切分、不横向拉伸单字。
+            // 整字渲染：expectedChars=1 → 不做多字切分、宽墨迹压回方形（防 灿→火山）。
             val input = ImagePreprocessor().renderStrokesForRec(ink, expectedChars = 1)
             val result =
                 p.predict(input)
-                    .map { it.text.trim() }
-                    .filter { HandwritingInk.isHanText(it) }
+                    .map { HandwritingInk.hanOnly(it.text.trim()) }
+                    .filter { it.isNotEmpty() }
                     .distinct()
                     .take(nbest)
             // release 包的 Timber 会丢掉 < INFO 的日志，取证一律用 i 级（只在你手写时打）。

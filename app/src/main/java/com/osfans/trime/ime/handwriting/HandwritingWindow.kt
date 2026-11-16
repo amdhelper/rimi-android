@@ -81,8 +81,9 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
 
     // 手写窗加高（2026-11-16 爸爸反馈「手写区域太低，笔画写到底部就丢」）：
     // 画板高度 = 窗高 - 标题栏 - 控制行，默认跟随键盘高度偏矮，向下笔画（撇/竖钩收尾）
-    // 容易冲出画板底部落到控制行/手势区被吞。进窗把窗高抬 30%，画板更大更好写；
+    // 容易冲出画板底部落到控制行/手势区被吞。进窗把窗高抬 40%，画板更大更好写；
     // 退窗恢复原高，不影响普通键盘。
+    // 同日二次反馈「高度还可以再增加一点，减少失误区域」：30% → 40%。
     private var savedWindowHeight = 0
 
     private val candidateRow by lazy {
@@ -137,14 +138,21 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     private val controlRow by lazy {
         context.horizontalLayout {
             val gap = context.dp(4)
-            fun rowParams() = lParams(0, context.dp(48), weight = 1f).apply {
+            // 2026-11-16 爸爸反馈：最左侧撤销键多余（停笔自动上屏+清空已覆盖），移除；
+            // 空格面积最大化（独占 weight=1f），清空/退格只占小份固定权重。
+            fun sideParams() = lParams(0, context.dp(48), weight = 0.35f).apply {
                 marginStart = gap
                 marginEnd = gap
             }
-            add(makeControlButton(R.string.handwriting_undo) { pad.undo() }, rowParams())
-            add(makeControlButton(R.string.handwriting_clear) { pad.clear() }, rowParams())
-            add(makeControlButton(R.string.handwriting_space) { service.commitText(" ") }, rowParams())
-            add(makeControlButton(R.string.handwriting_backspace) { sendBackspace() }, rowParams())
+            add(makeControlButton(R.string.handwriting_clear) { pad.clear() }, sideParams())
+            add(
+                makeControlButton(R.string.handwriting_space) { service.commitText(" ") },
+                lParams(0, context.dp(48), weight = 1f).apply {
+                    marginStart = gap
+                    marginEnd = gap
+                },
+            )
+            add(makeControlButton(R.string.handwriting_backspace) { sendBackspace() }, sideParams())
         }
     }
 
@@ -171,6 +179,10 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
         button.background = GradientDrawable().apply {
             setColor(scope.colors.keyBackColor)
             cornerRadius = context.dp(8).toFloat()
+            // 2026-11-16 爸爸反馈「底部三个按钮边界形态更明显」：2dp 描边。
+            // 用 labelColor（深色主题=浅灰 0x94a3b8，任何主题都回落到可读文字色），
+            // 键面与画板同色时靠描边一眼分出按钮区，减少笔画误落。
+            setStroke(context.dp(2), scope.colors.labelColor)
         }
     }
 
@@ -280,11 +292,11 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     }
 
     override fun onAttached() {
-        // 进窗加高画板（爸爸反馈手写区太矮丢笔画）：抬 30%，退窗恢复。
+        // 进窗加高画板（爸爸反馈手写区太矮丢笔画）：抬 40%，退窗恢复。
         val lp = windowManager.view.layoutParams
         if (lp.height > 0 && savedWindowHeight == 0) {
             savedWindowHeight = lp.height
-            lp.height = (savedWindowHeight * 1.3f).toInt()
+            lp.height = (savedWindowHeight * 1.4f).toInt()
             windowManager.view.layoutParams = lp
         }
         // 候选行悬浮到键盘面板上方（三点菜单之上）：放大候选不挤占画板。
@@ -321,7 +333,7 @@ class HandwritingWindow(di: DI) : BoardWindow.BarBoardWindow(di) {
     }
 
     override fun onDetached() {
-        // 恢复普通键盘窗高（进窗时抬了 30%）。
+        // 恢复普通键盘窗高（进窗时抬了 40%）。
         if (savedWindowHeight > 0) {
             windowManager.view.updateLayoutParams { height = savedWindowHeight }
             savedWindowHeight = 0

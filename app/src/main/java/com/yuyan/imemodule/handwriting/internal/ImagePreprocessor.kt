@@ -18,6 +18,49 @@ class ImagePreprocessor {
         private const val MAX_CONTENT_ASPECT = 8f
         private const val FLAT_MAX_STROKES = 3
         private const val FLAT_MAX_WIDTH_RATIO = 2f
+
+        /**
+         * 渲染缩放决策（纯算术，不碰 Android API，JVM 可直接单测）。
+         *
+         * 单字模式（expectedChars=1，rimi 一次写一字）：汉字是方块字，宽墨迹
+         * （左右结构写宽了，如「灿」）必须横向压回方形——否则 PP-OCRv5 把宽图
+         * 读成两个字（灿→火山），更宽时吐拉丁/标点噪声被过滤光 → 无候选
+         * （2026-11-16 爸爸反馈「灿经常打成火山 / 写宽了一动不动」）。
+         * 扁笔画（「一」，aspect>8 且笔画≤3）除外，保持原有宽渲染。
+         */
+        internal fun computeRenderScales(
+            boxWidth: Float,
+            boxHeight: Float,
+            targetHeight: Int,
+            maxWidth: Int,
+            expectedChars: Int,
+            strokeCount: Int,
+        ): RenderScales {
+            val contentHeight = targetHeight * (1f - 2 * MARGIN_RATIO)
+            val aspect = boxWidth / boxHeight
+            val flat = aspect > MAX_CONTENT_ASPECT && strokeCount <= FLAT_MAX_STROKES
+            val widthLimit = if (flat) {
+                minOf(maxWidth, (targetHeight * FLAT_MAX_WIDTH_RATIO).toInt())
+            } else {
+                maxWidth
+            }
+            val contentMaxWidth = (widthLimit - 4).toFloat()
+            var scale = contentHeight / boxHeight
+            if (boxWidth * scale > contentMaxWidth) {
+                scale = contentMaxWidth / boxWidth
+            }
+            val minContentWidth = if (expectedChars > 1) {
+                minOf(contentHeight * expectedChars.coerceAtMost(MAX_EXPECTED_CHARS), contentMaxWidth)
+            } else {
+                targetHeight * MIN_CONTENT_WIDTH_RATIO
+            }
+            val scaleX = when {
+                expectedChars == 1 && !flat && boxWidth * scale > contentHeight -> contentHeight / boxWidth
+                boxWidth * scale < minContentWidth -> minContentWidth / boxWidth
+                else -> scale
+            }
+            return RenderScales(scaleX, scale, widthLimit)
+        }
     }
 
     fun renderStrokesForRec(strokes: List<Stroke>, targetHeight: Int = REC_INPUT_HEIGHT, maxWidth: Int = REC_MAX_WIDTH, expectedChars: Int = 1): RecInput {
@@ -37,29 +80,10 @@ class ImagePreprocessor {
         if (minX > maxX || minY > maxY) return blankRecInput(targetHeight, maxWidth)
         val boxWidth = maxOf(1f, maxX - minX)
         val boxHeight = maxOf(1f, maxY - minY)
-        val contentHeight = targetHeight * (1f - 2 * MARGIN_RATIO)
-        val aspect = boxWidth / boxHeight
-        val widthLimit = if (aspect > MAX_CONTENT_ASPECT && strokes.size <= FLAT_MAX_STROKES) {
-            minOf(maxWidth, (targetHeight * FLAT_MAX_WIDTH_RATIO).toInt())
-        } else {
-            maxWidth
-        }
-        val contentMaxWidth = (widthLimit - 4).toFloat()
-        var scale = contentHeight / boxHeight
-        if (boxWidth * scale > contentMaxWidth) {
-            scale = contentMaxWidth / boxWidth
-        }
-        val scaleY = scale
-        val minContentWidth = if (expectedChars > 1) {
-            minOf(contentHeight * expectedChars.coerceAtMost(MAX_EXPECTED_CHARS), contentMaxWidth)
-        } else {
-            targetHeight * MIN_CONTENT_WIDTH_RATIO
-        }
-        val scaleX = if (boxWidth * scale < minContentWidth) {
-            minContentWidth / boxWidth
-        } else {
-            scale
-        }
+        val scales = computeRenderScales(boxWidth, boxHeight, targetHeight, maxWidth, expectedChars, strokes.size)
+        val scaleX = scales.scaleX
+        val scaleY = scales.scaleY
+        val widthLimit = scales.widthLimit
 
         val drawWidth = boxWidth * scaleX
         val drawHeight = boxHeight * scaleY
@@ -156,6 +180,9 @@ class ImagePreprocessor {
         return path
     }
 }
+
+/** 渲染缩放决策结果（纯数据，JVM 可测）。scaleY 恒为高度适配缩放。 */
+internal data class RenderScales(val scaleX: Float, val scaleY: Float, val widthLimit: Int)
 
 class RecInput(val data: FloatArray, val width: Int, val height: Int) {
     fun shape(): LongArray = longArrayOf(1, 3, height.toLong(), width.toLong())

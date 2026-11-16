@@ -19,17 +19,27 @@ data class InkPoint(val x: Float, val y: Float)
  */
 object HandwritingInk {
     /**
+     * 单个字符是否为汉字：CJK 基本区 + 扩展 A + 兼容区 + 〇。
+     * 用 Char 区间比较，minSdk 21 安全（Character.UnicodeScript 需 API 24，不用）。
+     * 极罕见的扩展 B+（代理对）不在内，手写场景可接受。纯函数，JVM 可测。
+     */
+    fun isHanChar(c: Char): Boolean =
+        c in '一'..'鿿' || c in '㐀'..'䶿' ||
+            c in '豈'..'﫿' || c == '〇'
+
+    /**
      * 候选是否为纯汉字（2026-11-16）。PP-OCRv5 是场景文字 OCR 模型，候选会混入
-     * 拉丁字母/标点/符号噪声（你./T你/PA/————）；rimi 手写只要汉字，据此过滤。
-     * 覆盖 CJK 基本区 + 扩展 A + 兼容区 + 〇；用 Char 区间比较，minSdk 21 安全
-     * （Character.UnicodeScript 需 API 24，不用）。极罕见的扩展 B+（代理对）会被
-     * 过滤，手写场景可接受。纯函数，JVM 可测。
+     * 拉丁字母/标点/符号噪声（你./T你/PA/————）；rimi 手写只要汉字。
      */
     fun isHanText(text: String): Boolean =
-        text.isNotEmpty() && text.all { c ->
-            c in '\u4E00'..'\u9FFF' || c in '\u3400'..'\u4DBF' ||
-                c in '\uF900'..'\uFAFF' || c == '\u3007'
-        }
+        text.isNotEmpty() && text.all { isHanChar(it) }
+
+    /**
+     * 提取候选中的汉字部分（2026-11-16 爸爸反馈「写宽了一动不动、无候选」）。
+     * PP-OCRv5 候选常混噪声（你./T你/PA）：旧的纯汉字过滤整条丢弃 → 明明写出了字
+     * 却一个候选都不给。改为提取汉字保留（你.→你、T你→你、PA→空）。纯函数，JVM 可测。
+     */
+    fun hanOnly(text: String): String = text.filter { isHanChar(it) }
 
     /** 空输入/全空笔画返回空列表（识别器据此直接返回空候选，不走推理）。 */
     fun toYuyanStrokes(strokes: List<List<InkPoint>>): List<Stroke> =

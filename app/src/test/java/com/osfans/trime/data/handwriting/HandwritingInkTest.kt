@@ -95,4 +95,20 @@ class HandwritingInkTest :
                 HandwritingInk.isHanText("日月 ") shouldBe false
             }
         }
+
+        Given("候选提取汉字 hanOnly（2026-11-16 爸爸反馈：写宽了一动不动、无候选）") {
+            Then("混噪声候选提取汉字保留，不再整条丢弃") {
+                HandwritingInk.hanOnly("你.") shouldBe "你"
+                HandwritingInk.hanOnly("T你") shouldBe "你"
+                HandwritingInk.hanOnly("我`") shouldBe "我"
+                HandwritingInk.hanOnly("日月 ") shouldBe "日月"
+                HandwritingInk.hanOnly("灿") shouldBe "灿"
+            }
+            Then("纯噪声提取为空（识别器据此丢弃）") {
+                HandwritingInk.hanOnly("PA") shouldBe ""
+                HandwritingInk.hanOnly("————") shouldBe ""
+                HandwritingInk.hanOnly("") shouldBe ""
+                HandwritingInk.hanOnly("123") shouldBe ""
+            }
+        }
     })

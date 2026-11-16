@@ -8,6 +8,7 @@ package com.osfans.trime.ime.handwriting
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import java.io.File
 
 /**
@@ -103,6 +104,17 @@ class HandwritingWiringTest :
             }
         }
 
+        Given("宽字识别根治（2026-11-16 爸爸反馈：灿→火山 / 写宽了一动不动）") {
+            val recognizerSrc = source("src/main/java/com/osfans/trime/data/handwriting/HandwritingRecognizer.kt").readText()
+            val preSrc = source("src/main/java/com/yuyan/imemodule/handwriting/internal/ImagePreprocessor.kt").readText()
+            Then("单字模式宽墨迹压回方形（防左右结构宽字被读成两个字）") {
+                preSrc shouldContain "expectedChars == 1 && !flat && boxWidth * scale > contentHeight"
+            }
+            Then("候选提取汉字不整条丢弃（防噪声滤光后无候选）") {
+                recognizerSrc shouldContain "HandwritingInk.hanOnly(it.text.trim())"
+            }
+        }
+
         Given("回放验证器安全门（取证工具）") {
             val manifest = source("src/main/AndroidManifest.xml").readText()
             val replay = source("src/main/java/com/osfans/trime/data/handwriting/HwTraceReplay.kt").readText()
@@ -136,7 +148,23 @@ class HandwritingWiringTest :
             }
             Then("手写窗进窗加高、退窗恢复（防画板太矮丢底部笔画，2026-11-16）") {
                 windowSrc shouldContain "savedWindowHeight"
-                windowSrc shouldContain "1.3f"
+                windowSrc shouldContain "1.4f"
+            }
+            Then("控制行无撤销键，空格独占最大宽度（2026-11-16 爸爸二次反馈）") {
+                windowSrc shouldNotContain "R.string.handwriting_undo"
+                val controlBlock = windowSrc.substringAfter("private val controlRow by lazy")
+                    .substringBefore("private val root by lazy")
+                // 空格 weight=1f 独占大份，清空/退格各 0.35f 小份
+                controlBlock shouldContain "weight = 1f"
+                controlBlock shouldContain "weight = 0.35f"
+                controlBlock shouldContain "R.string.handwriting_clear"
+                controlBlock shouldContain "R.string.handwriting_space"
+                controlBlock shouldContain "R.string.handwriting_backspace"
+            }
+            Then("控制按钮有醒目边界描边（2026-11-16 爸爸二次反馈）") {
+                val styleBlock = windowSrc.substringAfter("private fun styleControlButton")
+                    .substringBefore("private fun showHint")
+                styleBlock shouldContain "setStroke(context.dp(2), scope.colors.labelColor)"
             }
         }
 
