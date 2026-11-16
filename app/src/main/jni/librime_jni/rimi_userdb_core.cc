@@ -1,0 +1,197 @@
+// SPDX-FileCopyrightText: 2026 Rimi community
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// 日弥词库云同步 · userdb 读写核心实现。
+// 原为 rimi_sync.cc 内的匿名命名段，2026-11-17 剥离为共享核心：
+// 安卓 JNI 与鸿蒙 NAPI 两个桥接层都委托这里，数据口径永不漂移。
+
+#include "rimi_userdb_core.h"
+
+#include <rime/dict/db.h>
+#include <rime/dict/db_utils.h>
+#include <rime/dict/level_db.h>
+#include <rime/dict/user_db.h>
+#include <rime/service.h>
+
+#include <cmath>
+#include <cstdio>
+#include <string>
+#include <vector>
+
+using namespace rime;
+
+namespace rimi {
+
+namespace {
+
+std::string trim_right(std::string s) {
+  while (!s.empty() &&
+         (s.back() == ' ' || s.back() == '\t' || s.back() == '\r'))
+    s.pop_back();
+  return s;
+}
+
+std::vector<std::string> split_tab(const std::string& s) {
+  std::vector<std::string> out;
+  size_t start = 0;
+  while (true) {
+    size_t pos = s.find('\t', start);
+    if (pos == std::string::npos) {
+      out.push_back(s.substr(start));
+      break;
+    }
+    out.push_back(s.substr(start, pos - start));
+    start = pos + 1;
+  }
+  return out;
+}
+
+/// 把 userdb 的每条记录收集成 TSV：term \t code \t commits \t dee
+class CollectSink : public DbSink {
+ public:
+  CollectSink(Db* db, std::string* out) : DbSink(db), out_(out) {}
+
+  bool MetaPut(const std::string& /*key*/, const std::string& /*value*/) override {
+    return true;  // 只读，不回写 metadata
+  }
+
+  bool Put(const std::string& key, const std::string& value) override {
+    size_t tab = key.find('\t');
+    if (tab == std::string::npos)
+      return true;
+    std::string code = trim_right(key.substr(0, tab));
+    std::string term = key.substr(tab + 1);
+    if (code.empty() || term.empty())
+      return true;
+    UserDbValue v(value);
+    if (v.commits < 0)
+      return true;  // 墓碑不导出
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%.3f", v.dee);
+    out_->append(term);
+    out_->push_back('\t');
+    out_->append(code);
+    out_->push_back('\t');
+    out_->append(std::to_string(v.commits));
+    out_->push_back('\t');
+    out_->append(buf);
+    out_->push_back('\n');
+    return true;
+  }
+
+ private:
+  std::string* out_;
+};
+
+Db* create_user_db(const std::string& name) {
+  auto* component = UserDb::Require("userdb");
+  if (!component)
+    return nullptr;
+  return component->Create(name);
+}
+
+/// TSV 行格式：term \t code \t weight \t deleted(0/1)。
+/// 返回实际写入/删除条数；db 必须已经 Open。
+int apply_entries(Db* db, const std::string& data) {
+  int applied = 0;
+  size_t start = 0;
+  while (start < data.size()) {
+    size_t end = data.find('\n', start);
+    if (end == std::string::npos)
+      end = data.size();
+    std::string line = data.substr(start, end - start);
+    start = end + 1;
+    if (line.empty())
+      continue;
+    auto cols = split_tab(line);
+    if (cols.size() < 4)
+      continue;
+    std::string term = cols[0];
+    std::string code = trim_right(cols[1]);
+    if (term.empty() || code.empty())
+      continue;
+    bool deleted = cols[3] == "1";
+    std::string key = code + " \t" + term;
+    if (deleted) {
+      if (db->Erase(key))
+        ++applied;
+      continue;
+    }
+    double weight = 1.0;
+    try {
+      weight = std::stod(cols[2]);
+    } catch (...) {
+      weight = 1.0;
+    }
+    if (!std::isfinite(weight) || weight < 1.0)
+      weight = 1.0;
+    char buf[64];
+    snprintf(buf, sizeof(buf), "c=1 d=%.3f t=0", weight);
+    if (db->Update(key, buf))
+      ++applied;
+  }
+  return applied;
+}
+
+bool dump_db(Db* db, std::string* out) {
+  DbSource source(db);
+  CollectSink sink(db, out);
+  return source.Dump(&sink);
+}
+
+}  // namespace
+
+bool UserDbRead(const std::string& dict_name, std::string* out_tsv) {
+  if (!out_tsv)
+    return false;
+  out_tsv->clear();
+  the<Db> db(create_user_db(dict_name));
+  if (!db)
+    return false;
+  if (!db->OpenReadOnly())
+    return false;
+  bool ok = dump_db(db.get(), out_tsv);
+  db->Close();
+  return ok;
+}
+
+bool UserDbReadAtPath(const std::string& db_dir, std::string* out_tsv) {
+  if (!out_tsv)
+    return false;
+  out_tsv->clear();
+  the<Db> db(new LevelDb(path(db_dir), "snapshot"));
+  if (!db->OpenReadOnly())
+    return false;
+  bool ok = dump_db(db.get(), out_tsv);
+  db->Close();
+  return ok;
+}
+
+int UserDbApply(const std::string& dict_name, const std::string& tsv) {
+  the<Db> db(create_user_db(dict_name));
+  if (!db)
+    return -1;
+  if (!db->Open())
+    return -1;
+  // 全新库（还没打过字）没有 metadata，librime 之后会认不出这是 userdb
+  if (!UserDbHelper(db.get()).IsUserDb()) {
+    db->CreateMetadata();
+  }
+  int applied = apply_entries(db.get(), tsv);
+  db->Close();
+  return applied;
+}
+
+int UserDbApplyAtPath(const std::string& db_dir, const std::string& tsv) {
+  the<Db> db(new LevelDb(path(db_dir), "user", "userdb"));
+  if (!db->Open())  // create_if_missing，首次同步时本地还没 userdb
+    return -1;
+  if (!UserDbHelper(db.get()).IsUserDb()) {
+    db->CreateMetadata();  // 只写 /db_name、/rime_version、/db_type，不依赖 Service
+  }
+  int applied = apply_entries(db.get(), tsv);
+  db->Close();
+  return applied;
+}
+
+}  // namespace rimi
